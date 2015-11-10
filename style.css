@@ -1,0 +1,66 @@
+/* CSS declarations go here */
+body {
+	background-color: #EEE;
+}
+.problemTitle {
+	width: 95%;
+	padding: 0px 2.5% 0px 2.5%;
+	background-color: white;
+	overflow: hidden;
+}
+.problemTitleSmall {
+	text-align: right;
+}
+.problemDescription {
+	width: 95%;
+	margin: 20px 0px 10px 2.5%;
+	background-color: white;
+	border: none;
+}
+.logoSection {
+	text-align: center;
+	background-color: #425563;
+	padding: 20px 0px;
+}
+.logo {
+	width: 50%;
+}
+.dashboard {
+	text-align: center;
+	background-image: url("/background.jpg");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	height: 100vh;
+	overflow: hidden;
+}
+.dashboardMain {
+	overflow: scroll;
+	width: 100%;
+	height: 96vh;
+	margin-top: 2vh;
+}
+.login {
+	background-color: white;
+	padding: 40px 0px;
+	width: 60%;
+	margin-left: 20%;
+	margin-top: 200px;
+}
+.AccountsUIWrapper {
+	text-align: left;
+	margin: 5px;
+}
+.Timer {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	width: 400px;
+	background: black;
+	text-align: center;
+	color: yellow;
+}
+.inCodewar {
+	color: chartreuse ;
+	font-weight: bold;
+}

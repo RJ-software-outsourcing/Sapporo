@@ -33,6 +33,21 @@ App = React.createClass({
 	renderDashboard () {
 		React.render(<Dashboard />, document.getElementById("main"));
 	},
+	renderAdmin() {
+		React.render(<Admin />, document.getElementById("main"));
+	},
+	renderAdminButton () {
+		if (this.data.currentUser.hasOwnProperty('username')) {
+			if (this.data.currentUser.username === 'admin') {
+				return (
+					<a className="mdl-navigation__link" onClick={this.renderAdmin}>
+						administrator
+					</a>
+				);
+			}
+		}
+		return '';
+	},
 	render() {
 		return (
 			<div className="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
@@ -44,7 +59,9 @@ App = React.createClass({
 						<a className="mdl-navigation__link" onClick={this.renderDashboard}>
 							Dashboard
 						</a>
+						{this.renderAdminButton()}
 					</nav>
+
 					<span className="mdl-layout-title">Problems</span>
 					<nav className="mdl-navigation">
 						{this.data.currentUser? this.renderProblems():''}

@@ -37,16 +37,17 @@ App = React.createClass({
 		React.render(<Admin />, document.getElementById("main"));
 	},
 	renderAdminButton () {
-		if (this.data.currentUser.hasOwnProperty('username')) {
-			if (this.data.currentUser.username === 'admin') {
+		try {
+		    if (this.data.currentUser.username === 'admin') {
 				return (
 					<a className="mdl-navigation__link" onClick={this.renderAdmin}>
-						administrator
+						Administrator
 					</a>
 				);
-			}
+		    }
+		} catch(e) {
+			return;
 		}
-		return '';
 	},
 	render() {
 		return (

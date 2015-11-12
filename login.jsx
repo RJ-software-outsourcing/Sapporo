@@ -34,18 +34,25 @@ Login = React.createClass({
       problems: {}
     });
   },
+   componentDidMount(){
+        componentHandler.upgradeDom();
 
+    },
+
+    componentDidUpdate(){
+        componentHandler.upgradeDom();
+    },
   render () {
     return (
       <div className="login mdl-shadow--2dp">
 
           <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input className="mdl-textfield__input" type="text" ref="username" />
+            <input className="mdl-textfield__input" type="text" ref="username" id="usernameText"/>
             <label className="mdl-textfield__label">User Name</label>
           </div>
           <br/>
           <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input className="mdl-textfield__input" type="password" ref="password" />
+            <input className="mdl-textfield__input" type="password" ref="password" id="passwordText"/>
             <label className="mdl-textfield__label">Password</label>
           </div>
           <br/>

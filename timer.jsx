@@ -4,12 +4,12 @@ Timer = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData () {
     return {
-      timeMessage: timeSync.find({timeSync: true}).fetch()
+      timeMessage: timeSync.findOne({timeSync: true})
     }
   },
   displayMessage () {
-    if (this.data.timeMessage.length === 1) {
-      return this.data.timeMessage[0];
+    if (this.data.timeMessage) {
+      return this.data.timeMessage;
     } else {
       return '';
     }
@@ -30,26 +30,27 @@ Timer = React.createClass({
 
 if (Meteor.isServer) {
 
-  function getStartTime () {
+  function getStartTime (timeSetting) {
     var _time = (new Date);
-    _time.setHours(11); //Start CodeWar in every hour
-    _time.setMinutes(0);
+    _time.setHours(timeSetting.startHour); //Start CodeWar in every hour
+    _time.setMinutes(timeSetting.startMinute);
     _time.setSeconds(0);
     return _time;
   };
 
-  function getEndTime () {
+  function getEndTime (timeSetting) {
     var _time = (new Date);
-    _time.setHours(22); //End CodeWar in every hour
-    _time.setMinutes(0);
+    _time.setHours(timeSetting.endHour); //End CodeWar in every hour
+    _time.setMinutes(timeSetting.endMinute);
     _time.setSeconds(0);
     return _time;
   };
 
   function codewarSchedule () {
     var now = (new Date);
-    var start = getStartTime();
-    var end = getEndTime();
+    var timeSetting = timeSync.findOne({timeSync:true});
+    var start = getStartTime(timeSetting);
+    var end = getEndTime(timeSetting);
 
     var started = Math.ceil((start.getTime() - now.getTime())/1000);
     var ended = Math.ceil((end.getTime() - now.getTime())/1000);

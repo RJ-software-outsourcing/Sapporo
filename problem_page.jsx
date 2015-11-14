@@ -17,7 +17,7 @@ ProblemPage = React.createClass({
     this.setState({
       problem: data
     }, function () {
-      localStorage.setItem('currentProblem', this.state.problem.title);
+      localStorage.setItem('currentProblem', this.state.problem._id);
       this.state.editor.on("change", function (cm, change) {
         localStorage.setItem(localStorage.getItem('currentProblem'), cm.getValue());
       });
@@ -45,6 +45,7 @@ ProblemPage = React.createClass({
         <div className="problemTitle mdl-layout--large-screen-only mdl-shadow--2dp">
           <h4>{this.state.problem.title}</h4>
         </div>
+        <span>{this.state.problem._id}</span>
         <textarea className="problemDescription" readOnly value={this.state.problem.content}></textarea>
         <textarea id="demotext" name="demotext"></textarea>
         <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"

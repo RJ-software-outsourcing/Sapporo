@@ -12,7 +12,7 @@ App = React.createClass({
 		}
 	},
 	renderProblems () {
-		return this.data.problems.map(
+		return this.data.problems.map (
 			problem => {
 				if (this.data.counter[0].coding) {
 					return (

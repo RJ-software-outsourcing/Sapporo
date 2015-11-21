@@ -11,7 +11,10 @@ Timer = React.createClass({
     if (this.data.timeMessage) {
       return this.data.timeMessage;
     } else {
-      return '';
+      return {
+        message: "Timer hasn't been initialized",
+        coding: false
+      };
     }
   },
   render() {

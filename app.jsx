@@ -7,19 +7,23 @@ App = React.createClass({
 	getMeteorData () {
 		return {
 			problems: Problems.find({}).fetch(),
-			counter: timeSync.find({timeSync: true}).fetch(),
+			counter: timeSync.findOne({timeSync: true}),
 			currentUser: Meteor.user(),
 		}
 	},
 	renderProblems () {
 		return this.data.problems.map (
 			problem => {
-				if (this.data.counter[0].coding) {
-					return (
-						<a className="mdl-navigation__link" onClick={this.renderProblemPage.bind(this, problem)}>
-							{problem.title}
-						</a>
-					);
+				try {
+					if (this.data.counter.coding) {
+						return (
+							<a className="mdl-navigation__link" onClick={this.renderProblemPage.bind(this, problem)}>
+								{problem.title}
+							</a>
+						);
+					}
+				} catch (e) {
+
 				}
 			}
 		);
@@ -29,6 +33,9 @@ App = React.createClass({
 	},
 	componentDidMount () {
 		this.renderDashboard();
+	},
+	componentDidUpdate(){
+	  componentHandler.upgradeDom();
 	},
 	renderDashboard () {
 		React.render(<Dashboard />, document.getElementById("main"));

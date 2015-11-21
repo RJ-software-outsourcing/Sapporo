@@ -13,9 +13,10 @@ Admin = React.createClass({
     return this.data.problems.map (
         problem => {
           return (
-            <div>
-              <a>{problem.title}</a>
-            </div>
+            <tr>
+              <td>{problem.score}</td>
+              <td className="mdl-data-table__cell--non-numeric">{problem.title}</td>
+            </tr>
           );
         }
     );
@@ -23,25 +24,43 @@ Admin = React.createClass({
 
   insertProblem () {
     var problemObj = {};
-    problemObj.title = React.findDOMNode(this.refs.problemTitle).value.trim();
-    problemObj.content = React.findDOMNode(this.refs.problemContent).value.trim();
+    problemObj.title   = React.findDOMNode(this.refs.problemTitle).value.trim();
+    //problemObj.content = React.findDOMNode(this.refs.problemContent).value.trim();
+    problemObj.score   = parseInt(React.findDOMNode(this.refs.problemScore).value.trim());
     Meteor.call('insertProblem', problemObj);
   },
-
-  renderFakeInsert () {
+  renderProblemConfig () {
     return (
-      <div>
-        <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-          <input className="mdl-textfield__input" type="text" ref="problemTitle"/>
-          <label className="mdl-textfield__label">Title</label>
+      <table className="mdl-data-table mdl-js-data-table problemTableAndInsert">
+        <thead>
+          <tr>
+            <th>Score</th>
+            <th className="mdl-data-table__cell--non-numeric">Title</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.problemSetting()}
+        </tbody>
+      </table>
+    );
+  },
+  renderProblemInsert () {
+    return (
+        <div className="mdl-card problemTableAndInsert" style={{display:'inline-block'}}>
+          <div className="mdl-textfield mdl-js-textfield" style={{width: '10%'}}>
+            <input className="mdl-textfield__input" type="number" min="0" max="100" ref="problemScore"/>
+            <label className="mdl-textfield__label">Score</label>
+            <span className="mdl-textfield__error">maximum: 100</span>
+          </div>
+          <div className="mdl-textfield mdl-js-textfield" style={{width: '50%', margin: '0 5% 0 2%'}}>
+            <input className="mdl-textfield__input" type="text" ref="problemTitle"/>
+            <label className="mdl-textfield__label">Title</label>
+          </div>
+          <button onClick={this.insertProblem}
+            className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+            Insert New Problem
+          </button>
         </div>
-        <br/>
-        <div className="mdl-textfield mdl-js-textfield">
-          <textarea className="mdl-textfield__input" type="text" rows= "10" ref="problemContent" ></textarea>
-          <label className="mdl-textfield__label">Descriptions</label>
-        </div>
-        <button onClick={this.insertProblem}>Insert fake problem</button>
-      </div>
     );
   },
 
@@ -144,22 +163,24 @@ Admin = React.createClass({
 
   render() {
     return (
-      <div className="mdl-tabs mdl-js-tabs mdl-js-ripple-effect" id="adminTab">
-        <div className="mdl-tabs__tab-bar">
-            <a href="#siteConfig"     className="mdl-tabs__tab is-active">Site Config</a>
-            <a href="#userAccounts"   className="mdl-tabs__tab">User Account</a>
-            <a href="#problemsConfig" className="mdl-tabs__tab">Problems</a>
-        </div>
+      <div className="dashboard">
+        <div className="mdl-tabs mdl-js-tabs mdl-js-ripple-effect dashboardMain" id="adminTab">
+          <div className="mdl-tabs__tab-bar">
+              <a href="#siteConfig"     className="mdl-tabs__tab is-active"><b>Site Config</b></a>
+              <a href="#userAccounts"   className="mdl-tabs__tab"><b>User Account</b></a>
+              <a href="#problemsConfig" className="mdl-tabs__tab"><b>Problems</b></a>
+          </div>
 
-        <div className="mdl-tabs__panel is-active" id="siteConfig">
-          {this.renderSiteConfig()}
-        </div>
-        <div className="mdl-tabs__panel" id="userAccounts">
-          <p>User Account</p>
-        </div>
-        <div className="mdl-tabs__panel" id="problemsConfig">
-          {this.problemSetting()}
-          {this.renderFakeInsert()}
+          <div className="mdl-tabs__panel is-active" id="siteConfig">
+            {this.renderSiteConfig()}
+          </div>
+          <div className="mdl-tabs__panel" id="userAccounts">
+            <p>User Account</p>
+          </div>
+          <div className="mdl-tabs__panel" id="problemsConfig">
+            {this.renderProblemInsert()}
+            {this.renderProblemConfig()}
+          </div>
         </div>
       </div>
     );
@@ -185,5 +206,5 @@ if (Meteor.isServer) {
       });
     }
   });
-
 }
+

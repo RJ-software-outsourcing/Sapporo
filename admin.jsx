@@ -21,13 +21,11 @@ Admin = React.createClass({
     );
   },
 
-  insertFakeProblem () {
-    var problemTitle = React.findDOMNode(this.refs.problemTitle).value.trim();
-    var problemContent = React.findDOMNode(this.refs.problemContent).value.trim();
-    Problems.insert({
-      title: problemTitle,
-      content: problemContent
-    });
+  insertProblem () {
+    var problemObj = {};
+    problemObj.title = React.findDOMNode(this.refs.problemTitle).value.trim();
+    problemObj.content = React.findDOMNode(this.refs.problemContent).value.trim();
+    Meteor.call('insertProblem', problemObj);
   },
 
   renderFakeInsert () {
@@ -42,7 +40,7 @@ Admin = React.createClass({
           <textarea className="mdl-textfield__input" type="text" rows= "10" ref="problemContent" ></textarea>
           <label className="mdl-textfield__label">Descriptions</label>
         </div>
-        <button onClick={this.insertFakeProblem}>Insert fake problem</button>
+        <button onClick={this.insertProblem}>Insert fake problem</button>
       </div>
     );
   },
@@ -77,6 +75,10 @@ Admin = React.createClass({
           Current Schedule: {this.data.timeControl.startHour}:{this.data.timeControl.endMinute}
            to {this.data.timeControl.endHour}:{this.data.timeControl.endMinute}
         </span><br/>
+        <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
+                onClick={this.applySiteConfig}>
+          Apply
+        </button>
       </div>
 
     );
@@ -159,11 +161,29 @@ Admin = React.createClass({
           {this.problemSetting()}
           {this.renderFakeInsert()}
         </div>
-        <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
-                onClick={this.applySiteConfig}>
-          Apply
-        </button>
       </div>
     );
   }
 });
+
+if (Meteor.isServer) {
+  //insert new problem and attach new problem id under all userData
+  Meteor.methods({
+    insertProblem (problemObj) {
+      Problems.insert(problemObj, function (err, id) {
+        if (err) {
+          console.log(err);
+        }
+        console.log(id);
+        var tmp = {};
+        tmp[id] = [];
+        userDataCollection.update({}, {
+          $set: tmp
+        }, {
+          multi:true
+        });
+      });
+    }
+  });
+
+}

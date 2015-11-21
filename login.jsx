@@ -27,11 +27,12 @@ Login = React.createClass({
     Accounts.createUser({
       username : username,
       password : password
-    });
-
-    userDataCollection.insert({
-      username: username,
-      problems: {}
+    }, function (err) {
+      if (err) {
+        alert("Failed to create new user");
+      } else {
+        Meteor.call('createUserData', username);
+      }
     });
   },
   componentDidMount(){
@@ -66,8 +67,20 @@ Login = React.createClass({
       </div>
     );
   },
-
-  componentDidUpdate () {
-    componentHandler.upgradeDom();
-  },
 });
+
+if (Meteor.isServer) {
+  Meteor.methods({
+    //Create new userData
+    createUserData (username) {
+      var userDataObj = {
+        username: username
+      }
+      Problems.find({}).fetch().forEach(function (item) {
+        //Create arrays for each existing problems. It will be used to save logs of each problem.
+        userDataObj[item._id] = [];
+      });
+      userDataCollection.insert(userDataObj);
+    }
+  });
+}

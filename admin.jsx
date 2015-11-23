@@ -13,7 +13,7 @@ Admin = React.createClass({
     return this.data.problems.map (
         problem => {
           return (
-            <tr>
+            <tr onClick={this.clickProblem.bind(this, problem)}>
               <td>{problem.score}</td>
               <td className="mdl-data-table__cell--non-numeric">{problem.title}</td>
             </tr>
@@ -21,7 +21,9 @@ Admin = React.createClass({
         }
     );
   },
-
+  clickProblem (problem) {
+    (React.render(<ProblemConfig />, document.getElementById("modalArea"))).update(problem);
+  },
   insertProblem () {
     var problemObj = {};
     problemObj.title   = React.findDOMNode(this.refs.problemTitle).value.trim();
@@ -208,3 +210,30 @@ if (Meteor.isServer) {
   });
 }
 
+ProblemConfig = React.createClass({
+  getInitialState () {
+    return {
+      problem: {},
+    }
+  },
+  update (data) {
+    this.setState({
+      problem: data
+    }, function () {
+
+    });
+  },
+  cancel () {
+    React.unmountComponentAtNode(document.getElementById('modalArea'));
+  },
+  render() {
+    return (
+      <div className="problemConfigBG">
+        <div className="problemConfig">
+          {this.state.problem.title}
+          <button onClick={this.cancel}>Cancel</button>
+        </div>
+      </div>
+    );
+  }
+});

@@ -75,11 +75,13 @@ body {
 	opacity: 0.85;
 }
 .problemConfig {
-	width: 86%;
-	margin-left: 7%;
+	width: 60%;
+	padding: 2vh 4%;
+	margin-left: 16%;
 	height: 90vh;
-	margin-top: 5vh;
+	margin-top: 3vh;
 	background-color: white;
+	overflow: scroll;
 }
 .problemConfigBG {
 	z-index: 100;

@@ -14,7 +14,7 @@ Admin = React.createClass({
         problem => {
           return (
             <tr onClick={this.clickProblem.bind(this, problem)}>
-              <td>{problem.score}</td>
+              <td style={{color: 'green'}}>{problem.score}</td>
               <td className="mdl-data-table__cell--non-numeric">{problem.title}</td>
             </tr>
           );
@@ -29,6 +29,10 @@ Admin = React.createClass({
     problemObj.title   = React.findDOMNode(this.refs.problemTitle).value.trim();
     //problemObj.content = React.findDOMNode(this.refs.problemContent).value.trim();
     problemObj.score   = parseInt(React.findDOMNode(this.refs.problemScore).value.trim());
+    if (typeof(problemObj.score) !== 'number') {
+      alert('please enter a valid score');
+      return;
+    }
     Meteor.call('insertProblem', problemObj);
   },
   renderProblemConfig () {
@@ -54,7 +58,7 @@ Admin = React.createClass({
             <label className="mdl-textfield__label">Score</label>
             <span className="mdl-textfield__error">maximum: 100</span>
           </div>
-          <div className="mdl-textfield mdl-js-textfield" style={{width: '50%', margin: '0 5% 0 2%'}}>
+          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '50%', margin: '0 5% 0 2%'}}>
             <input className="mdl-textfield__input" type="text" ref="problemTitle"/>
             <label className="mdl-textfield__label">Title</label>
           </div>
@@ -190,8 +194,9 @@ Admin = React.createClass({
 });
 
 if (Meteor.isServer) {
-  //insert new problem and attach new problem id under all userData
+
   Meteor.methods({
+    //insert new problem and attach new problem id under all userData
     insertProblem (problemObj) {
       Problems.insert(problemObj, function (err, id) {
         if (err) {
@@ -203,8 +208,27 @@ if (Meteor.isServer) {
         userDataCollection.update({}, {
           $set: tmp
         }, {
-          multi:true
+          multi: true
         });
+      });
+    },
+    //Delete a problem and remove this id under all userData as well
+    deleteProblem (id) {
+      Problems.remove({
+        _id: id
+      }, function (err) {
+        if (err) {
+          console.log(err);
+          return;
+        } else {
+          var tmp = {};
+          tmp[id] = "";
+          userDataCollection.update({}, {
+            $unset: tmp
+          }, {
+            multi: true
+          });
+          }
       });
     }
   });
@@ -213,25 +237,71 @@ if (Meteor.isServer) {
 ProblemConfig = React.createClass({
   getInitialState () {
     return {
-      problem: {},
+      title: '',
+      score: 0
     }
   },
   update (data) {
+    //console.log(typeof(data.score));
     this.setState({
-      problem: data
+      title: data.title,
+      score: data.score,
+      id: data._id
     }, function () {
 
     });
   },
-  cancel () {
+  handleTitle (event) {
+    this.setState({title: event.target.value});
+  },
+  handleScore (event) {
+    this.setState({score:event.target.value});
+  },
+  closeDialog () {
     React.unmountComponentAtNode(document.getElementById('modalArea'));
+  },
+  updateProblem () {
+
+  },
+  deleteProblem (id) {
+    if (confirm("Are you sure?")) {
+      Meteor.call('deleteProblem', id);
+      this.closeDialog();
+    }
+    return;
+  },
+  componentDidUpdate() {
+      componentHandler.upgradeDom();
   },
   render() {
     return (
       <div className="problemConfigBG">
         <div className="problemConfig">
-          {this.state.problem.title}
-          <button onClick={this.cancel}>Cancel</button>
+          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '10%'}}>
+            <input className="mdl-textfield__input" type="number" min="0" max="100" value={this.state.score} onChange={this.handleScore}/>
+            <label className="mdl-textfield__label">Score</label>
+            <span className="mdl-textfield__error">maximum: 100</span>
+          </div><br/>
+          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '100%'}}>
+            <input className="mdl-textfield__input" type="text" value={this.state.title} onChange={this.handleTitle}/>
+            <label className="mdl-textfield__label">Title</label>
+           </div><br/>
+          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
+            <textarea className="mdl-textfield__input" type="text" rows= "15"></textarea>
+            <label className="mdl-textfield__label">Problem Description</label>
+          </div>
+          <button onClick={this.closeDialog}
+            className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">
+            Cancel
+          </button>
+          <button onClick={this.updateProblem}
+            className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary">
+            Update
+          </button>
+          <button onClick={this.deleteProblem.bind(this, this.state.id)}
+            className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+            Delete
+          </button>
         </div>
       </div>
     );

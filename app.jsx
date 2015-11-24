@@ -23,7 +23,7 @@ App = React.createClass({
 						);
 					}
 				} catch (e) {
-
+					return;
 				}
 			}
 		);

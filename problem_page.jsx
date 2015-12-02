@@ -59,24 +59,20 @@ ProblemPage = React.createClass({
 
 if (Meteor.isServer) {
 
-  Meteor.methods({
-    test (code, problemId) {
-      var userData = userDataCollection.findOne({username: Meteor.user().username});
-      console.log(problemId);
-      console.log(userData);
-    }
-  });
+    var docker = Meteor.npmRequire('dockerode');
+    var docker1 = new docker();
 
-  var fakeValidation = function () {
-    var threshold = 0.6;
-    var randomNumber = Math.random();
-    if (randomNumber <= 0.6) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+    Meteor.methods({
+        test (code, problemId) {
+          var userData = userDataCollection.findOne({username: Meteor.user().username});
+          console.log(problemId);
+          console.log(userData);
+
+          docker1.listContainers({all:true}, function (err, containers) {
+              console.log('Container amount: ' + containers.length)
+              return containers.length;
+          });
+        }
+    });
 
 }
-
-

@@ -9,7 +9,7 @@ App = React.createClass({
 			problems: Problems.find({}).fetch(),
 			counter: timeSync.findOne({timeSync: true}),
 			currentUser: Meteor.user(),
-		}
+		};
 	},
 	renderProblems () {
 		return this.data.problems.map (

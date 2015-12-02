@@ -34,6 +34,7 @@ ProblemPage = React.createClass({
     var code = this.state.editor.getValue();
     Meteor.call('test', code, this.state.problem._id, function (err, result) {
       console.log(result);
+      alert("Returned Status Code: " + result);
     });
   },
   render() {
@@ -58,20 +59,22 @@ ProblemPage = React.createClass({
 });
 
 if (Meteor.isServer) {
-
-    var docker = Meteor.npmRequire('dockerode');
-    var docker1 = new docker();
+    Future = Meteor.npmRequire('fibers/future');
+    docker = Meteor.npmRequire('dockerode');
+    docker1 = new docker();
 
     Meteor.methods({
         test (code, problemId) {
-          var userData = userDataCollection.findOne({username: Meteor.user().username});
-          console.log(problemId);
-          console.log(userData);
+            var future = new Future();
 
-          docker1.listContainers({all:true}, function (err, containers) {
-              console.log('Container amount: ' + containers.length)
-              return containers.length;
-          });
+            var userData = userDataCollection.findOne({username: Meteor.user().username});
+            console.log(problemId);
+            console.log(userData);
+
+            docker1.run('ubuntu', ['bash', '-c', 'uname -a'], process.stdout, function (err, data, container) {
+                future.return(data.StatusCode);
+            })
+            return future.wait();
         }
     });
 

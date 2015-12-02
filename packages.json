@@ -1,3 +1,4 @@
 {
-    "dockerode" : "2.2.6"
+    "dockerode" : "2.2.6",
+    "fibers"    : "1.0.8"
 }

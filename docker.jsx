@@ -1,4 +1,5 @@
 if (Meteor.isServer) {
+
     Future = Meteor.npmRequire('fibers/future');
     docker = Meteor.npmRequire('dockerode');
     docker1 = new docker();
@@ -30,5 +31,4 @@ if (Meteor.isServer) {
             return future.wait();
         }
     });
-
 }

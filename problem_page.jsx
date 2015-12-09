@@ -1,3 +1,30 @@
+TestConsole = React.createClass({
+    getInitialState() {
+        return {
+            mine: 'dddd',
+            correct: 'sssss',
+            isSuccess: false
+        };
+    },
+    update (result) {
+        this.setState({
+            mine: result.mine,
+            correct: result.correct,
+            isSuccess: result.isSuccess
+        })
+    },
+    render() {
+        return (
+            <div className="mdl-shadow--2dp testCard">
+                <span>Success/Failed</span>
+                <div className="testConsole">
+                    <textarea value={"Your result:\n\n" + this.state.mine}></textarea>
+                    <textarea value={"Correct Answer: \n\n" + this.state.correct}></textarea>
+                </div>
+            </div>
+        );
+    }
+});
 
 //Problem page
 ProblemPage = React.createClass({
@@ -5,8 +32,8 @@ ProblemPage = React.createClass({
     return {
       problem: {},
       editor: {},
-      language: 'python'
-    }
+      language: 'python',
+    };
   },
   componentDidMount () {
       this.state.editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
@@ -19,18 +46,18 @@ ProblemPage = React.createClass({
     this.setState({
       problem: data
     }, function () {
-      localStorage.setItem('currentProblem', this.state.problem._id);
-      this.state.editor.on("change", function (cm, change) {
+        React.unmountComponentAtNode(document.getElementById('testResultRender'));
+        localStorage.setItem('currentProblem', this.state.problem._id);
+        this.state.editor.on("change", function (cm, change) {
         localStorage.setItem(localStorage.getItem('currentProblem'), cm.getValue());
-      });
-      var savedText = localStorage.getItem(localStorage.getItem('currentProblem'));
-      if (savedText) {
+        });
+        var savedText = localStorage.getItem(localStorage.getItem('currentProblem'));
+        if (savedText) {
         this.state.editor.setValue(savedText);
-      } else {
+        } else {
         this.state.editor.setValue('');
-      }
+        }
     });
-    //this.state.editor.setValue(Session.get(this.state.problem.title));
   },
   languageChange (event) {
       this.setState({ language: event.target.value });
@@ -39,9 +66,15 @@ ProblemPage = React.createClass({
   },
   test() {
     var code = this.state.editor.getValue();
+    var output = {
+        mine: 'Not available',
+        correct: 'Not availble',
+        isSuccess: false
+    }
     Meteor.call('dockerRunSample', code, this.state.problem._id, function (err, result) {
-      console.log(result);
-      alert("Returned Status Code: " + result);
+        var mine = result
+        output.mine = result;
+        (React.render(<TestConsole />, document.getElementById("testResultRender"))).update(output);
     });
   },
   render() {
@@ -69,6 +102,10 @@ ProblemPage = React.createClass({
                 test
             </button>
         </div>
+
+        <div id="testResultRender">
+        </div>
+
         <div className="editorDiv">
             <textarea id="editor" name="editor"></textarea>
         </div>

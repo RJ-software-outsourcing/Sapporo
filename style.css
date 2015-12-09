@@ -17,9 +17,33 @@ body {
 	background-color: white;
 	border: none;
 }
+.testCard {
+	width: 93%;
+	padding: 10px 1%;
+	margin: 10px 0px 0px 2.5%;
+	height: 130px;
+	background-color: white;
+	text-align: center;
+}
+.testConsole {
+	height: 100px;
+	margin-top: 10px;
+	text-align: center;
+}
+.testConsole textarea{
+	width: 47%;
+	padding: 0.5%;
+	margin: 0px 0.5% 0 0.5%;
+	height: 80px;
+	overflow-y: scroll;
+	background-color: white;
+	color: black;
+	text-decoration: underline;
+	border: 0px;
+}
 .editorDiv {
 	width: 95%;
-	margin: 20px 0px 10px 2.5%;
+	margin: 10px 0px 10px 2.5%;
 }
 .problemPageButtons {
 	width: 95%;

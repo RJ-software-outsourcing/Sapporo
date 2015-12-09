@@ -31,8 +31,8 @@ ProblemPage = React.createClass({
     });
     //this.state.editor.setValue(Session.get(this.state.problem.title));
   },
-  languageChange () {
-
+  languageChange (event) {
+      this.setState({ language: event.target.value });
   },
   test() {
     var code = this.state.editor.getValue();

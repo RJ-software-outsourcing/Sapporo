@@ -5,12 +5,13 @@ ProblemPage = React.createClass({
     return {
       problem: {},
       editor: {},
-      language: ''
+      language: 'python'
     }
   },
   componentDidMount () {
       this.state.editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
         lineNumbers: true,
+        mode: this.state.language
       });
       this.state.editor.setOption("theme", "blackboard");
   },
@@ -33,6 +34,8 @@ ProblemPage = React.createClass({
   },
   languageChange (event) {
       this.setState({ language: event.target.value });
+      this.state.editor.setOption("mode", event.target.value );
+      console.log(this.state.editor.getOption("mode"));
   },
   test() {
     var code = this.state.editor.getValue();
@@ -56,7 +59,7 @@ ProblemPage = React.createClass({
             <select name="language" value={this.state.language} onChange={this.languageChange}>
                 <option value="python">Python</option>
                 <option value="javascript">Javascript (Node.JS)</option>
-                <option value="c">C</option>
+                <option value="text/x-csrc">C</option>
             </select>
             <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
                 Submit

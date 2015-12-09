@@ -13,9 +13,21 @@ body {
 }
 .problemDescription {
 	width: 95%;
-	margin: 20px 0px 10px 2.5%;
+	margin: 20px 0px 0px 2.5%;
 	background-color: white;
 	border: none;
+}
+.editorDiv {
+	width: 95%;
+	margin: 20px 0px 10px 2.5%;
+}
+.problemPageButtons {
+	width: 95%;
+	margin-left: 2.5%;
+	min-height: 35px;
+}
+.problemPageButtons button {
+	float: right;
 }
 .logoSection {
 	text-align: center;

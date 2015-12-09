@@ -4,11 +4,12 @@ ProblemPage = React.createClass({
   getInitialState () {
     return {
       problem: {},
-      editor: {}
+      editor: {},
+      language: ''
     }
   },
   componentDidMount () {
-      this.state.editor = CodeMirror.fromTextArea(document.getElementById("demotext"), {
+      this.state.editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
         lineNumbers: true,
       });
       this.state.editor.setOption("theme", "blackboard");
@@ -30,9 +31,12 @@ ProblemPage = React.createClass({
     });
     //this.state.editor.setValue(Session.get(this.state.problem.title));
   },
+  languageChange () {
+
+  },
   test() {
     var code = this.state.editor.getValue();
-    Meteor.call('test', code, this.state.problem._id, function (err, result) {
+    Meteor.call('dockerRunSample', code, this.state.problem._id, function (err, result) {
       console.log(result);
       alert("Returned Status Code: " + result);
     });
@@ -46,36 +50,27 @@ ProblemPage = React.createClass({
         <div className="problemTitle mdl-layout--large-screen-only mdl-shadow--2dp">
           <h4>{this.state.problem.title}</h4>
         </div>
-        <span>{this.state.problem._id}</span>
         <textarea className="problemDescription" readOnly value={this.state.problem.content}></textarea>
-        <textarea id="demotext" name="demotext"></textarea>
-        <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                onClick={this.test}>
-          test
-        </button>
+        <div className="problemPageButtons">
+            <span>Language:</span>
+            <select name="language" value={this.state.language} onChange={this.languageChange}>
+                <option value="python">Python</option>
+                <option value="javascript">Javascript (Node.JS)</option>
+                <option value="c">C</option>
+            </select>
+            <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                Submit
+            </button>
+            <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
+                    onClick={this.test}>
+                test
+            </button>
+        </div>
+        <div className="editorDiv">
+            <textarea id="editor" name="editor"></textarea>
+        </div>
+        <span>{this.state.problem._id}</span>
       </div>
     );
   },
 });
-
-if (Meteor.isServer) {
-    Future = Meteor.npmRequire('fibers/future');
-    docker = Meteor.npmRequire('dockerode');
-    docker1 = new docker();
-
-    Meteor.methods({
-        test (code, problemId) {
-            var future = new Future();
-
-            var userData = userDataCollection.findOne({username: Meteor.user().username});
-            console.log(problemId);
-            console.log(userData);
-
-            docker1.run('ubuntu', ['bash', '-c', 'uname -a'], process.stdout, function (err, data, container) {
-                future.return(data.StatusCode);
-            })
-            return future.wait();
-        }
-    });
-
-}

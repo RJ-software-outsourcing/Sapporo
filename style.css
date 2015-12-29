@@ -41,6 +41,14 @@ body {
 	text-decoration: underline;
 	border: 0px;
 }
+.testSuccess {
+	color: green;
+	font-weight: bold;
+}
+.testFailed {
+	color: red;
+	font-weight: bold;
+}
 .editorDiv {
 	width: 95%;
 	margin: 10px 0px 10px 2.5%;

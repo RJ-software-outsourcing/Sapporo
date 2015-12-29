@@ -16,7 +16,10 @@ TestConsole = React.createClass({
     render() {
         return (
             <div className="mdl-shadow--2dp testCard">
-                <span>Success/Failed</span>
+                {
+                    this.state.isSuccess?
+                    <span className="testSuccess">Success</span>:<span className="testFailed">Failed</span>
+                }
                 <div className="testConsole">
                     <textarea value={"Your result:\n\n" + this.state.mine}></textarea>
                     <textarea value={"Correct Answer: \n\n" + this.state.correct}></textarea>
@@ -49,29 +52,29 @@ ProblemPage = React.createClass({
         React.unmountComponentAtNode(document.getElementById('testResultRender'));
         localStorage.setItem('currentProblem', this.state.problem._id);
         this.state.editor.on("change", function (cm, change) {
-        localStorage.setItem(localStorage.getItem('currentProblem'), cm.getValue());
+            localStorage.setItem(localStorage.getItem('currentProblem'), cm.getValue());
         });
         var savedText = localStorage.getItem(localStorage.getItem('currentProblem'));
         if (savedText) {
-        this.state.editor.setValue(savedText);
+            this.state.editor.setValue(savedText);
         } else {
-        this.state.editor.setValue('');
+            this.state.editor.setValue('');
         }
     });
   },
   languageChange (event) {
       this.setState({ language: event.target.value });
       this.state.editor.setOption("mode", event.target.value );
-      console.log(this.state.editor.getOption("mode"));
   },
   test() {
     var code = this.state.editor.getValue();
+    var lang = this.state.language;
     var output = {
         mine: 'Not available',
         correct: 'Not availble',
         isSuccess: false
     }
-    Meteor.call('dockerRunSample', code, this.state.problem._id, function (err, result) {
+    Meteor.call('dockerRunSample', code, this.state.problem._id, lang, function (err, result) {
         var mine = result
         output.mine = result;
         (React.render(<TestConsole />, document.getElementById("testResultRender"))).update(output);

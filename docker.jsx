@@ -55,8 +55,8 @@ if (Meteor.isServer) {
             console.log(lang);
 
             var file = saveScriptToFile(Meteor.user().username, problemId, lang, code);
-
-            docker1.run('python', ['python', file.name],
+            var dockerMountPath = '/usr/src/myapp/';
+            docker1.run('python', ['python', path.join(dockerMountPath, file.name)],
                 [stdout, stderr], {Tty:false}, function (error, data, container) {
                 if (err) { //Error from container
                     future.return(err);
@@ -69,7 +69,7 @@ if (Meteor.isServer) {
                 }
 
             }).on('container', function (container) {
-                container.defaultOptions.start.Binds = ['-it --rm -v "'+ file.folder +'":/usr/src/myapp -w /usr/src/myapp'];
+                container.defaultOptions.start.Binds = [file.folder +':'+ dockerMountPath + ':rw'];
             });
             return future.wait();
         }

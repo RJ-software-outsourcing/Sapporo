@@ -24,7 +24,7 @@ body {
 .problemDescription {
 	margin-top: 10px;
 	width: 100%;
-	height: 400px;
+	height: 300px;
 	background-color: white;
 	border: none;
 }
@@ -69,14 +69,6 @@ body {
 .problemPageButtons button {
 	float: right;
 }
-.logoSection {
-	text-align: center;
-	background-color: #425563;
-	padding: 20px 0px;
-}
-.logo {
-	width: 50%;
-}
 .dashboard {
 	text-align: center;
 	background-image: url("/background.jpg");
@@ -99,11 +91,15 @@ body {
 	padding: 40px 0px;
 	width: 60%;
 	margin-left: 20%;
-	margin-top: 200px;
+	margin-top: 150px;
 }
 .AccountsUIWrapper {
 	text-align: left;
 	margin: 5px;
+}
+.AccountsUIWrapper div{
+	width: 200px;
+	margin: 1px;
 }
 .Timer {
 	text-align: center;

@@ -21,11 +21,10 @@ Timer = React.createClass({
     return (
       <div className="Timer">
         {(this.displayMessage()).coding?
-          <span className="inCodewar">比賽進行中</span>:<span>比賽停止中</span>
+          <span className="inCodewar">Game is ON</span>:<span>STOP</span>
         }
         <br/>
         <span>{(this.displayMessage()).message}</span>
-
       </div>
     );
   }
@@ -112,5 +111,3 @@ if (Meteor.isServer) {
 
 
 }
-
-

@@ -1,16 +1,22 @@
 if (Meteor.isServer) {
 
+    // Use NPM.require for Native nodeJS modules
+    // Use Meteor.npmRequire for third-party NPM moudles installed by Meteor
     fs = Npm.require('fs');
     path = Npm.require('path');
     Future = Meteor.npmRequire('fibers/future');
     docker = Meteor.npmRequire('dockerode');
+
+    // This is standard way to get local Docker instance
+    // We might do something more advanced to obtain our Docker instance
+    // Such as configuring distributed Docker instances via HTTP
     docker1 = new docker();
 
     rootPath = process.env.PWD;
     var submittedPath = path.join(rootPath, '/submitted');
 
     if (!fs.existsSync(submittedPath)) {
-        console.log('"submitted" folder is created to hold user submissions');
+        console.log('"submitted" folder is created to store user submissions');
         fs.mkdirSync(submittedPath);
     }
 
@@ -65,7 +71,7 @@ if (Meteor.isServer) {
                 } else if (output) {
                     future.return(output);
                 } else {
-                    future.return('UNKNOWN DOCKER ERROR');
+                    future.return('No result');
                 }
 
             }).on('container', function (container) {
@@ -75,7 +81,3 @@ if (Meteor.isServer) {
         }
     });
 }
-
-/*
-docker run -it --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp python python test.py
-*/

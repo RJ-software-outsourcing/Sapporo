@@ -1,8 +1,8 @@
 TestConsole = React.createClass({
     getInitialState() {
         return {
-            mine: 'dddd',
-            correct: 'sssss',
+            mine: '',
+            correct: '',
             isSuccess: false
         };
     },
@@ -76,7 +76,6 @@ ProblemPage = React.createClass({
         isSuccess: false
     }
     Meteor.call('dockerRunSample', code, this.state.problem._id, lang, function (err, result) {
-        var mine = result
         output.mine = result;
         (React.render(<TestConsole />, document.getElementById("testResultRender"))).update(output);
     });
@@ -94,8 +93,8 @@ ProblemPage = React.createClass({
             <div className="problemPageButtons">
                 <span>Language:</span>
                 <select name="language" value={this.state.language} onChange={this.languageChange}>
-                    <option value="python">Python</option>
-                    <option value="javascript">Javascript (Node.JS)</option>
+                    <option value="python">Python 3</option>
+                    <option value="javascript">Javascript (Node.js)</option>
                     <option value="text/x-csrc">C</option>
                 </select>
                 <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">

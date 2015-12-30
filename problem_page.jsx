@@ -44,6 +44,7 @@ ProblemPage = React.createClass({
         mode: this.state.language
       });
       this.state.editor.setOption("theme", "blackboard");
+      this.state.editor.setSize('100%', 600);
   },
   update (data) {
     this.setState({
@@ -82,37 +83,37 @@ ProblemPage = React.createClass({
   },
   render() {
     return (
-      <div>
-        <div className="problemTitle problemTitleSmall mdl-layout--small-screen-only mdl-shadow--2dp">
-          <h4>{this.state.problem.title}</h4>
-        </div>
-        <div className="problemTitle mdl-layout--large-screen-only mdl-shadow--2dp">
-          <h4>{this.state.problem.title}</h4>
-        </div>
+      <div id='problemPanel'>
+        <div id='leftPanel'>
+            <div className="problemTitle">
+                <span>{this.state.problem.title}</span>
+            </div>
         <textarea className="problemDescription" readOnly value={this.state.problem.content}></textarea>
-        <div className="problemPageButtons">
-            <span>Language:</span>
-            <select name="language" value={this.state.language} onChange={this.languageChange}>
-                <option value="python">Python</option>
-                <option value="javascript">Javascript (Node.JS)</option>
-                <option value="text/x-csrc">C</option>
-            </select>
-            <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                Submit
-            </button>
-            <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
-                    onClick={this.test}>
-                test
-            </button>
         </div>
+        <div id='rightPanel'>
+            <div className="problemPageButtons">
+                <span>Language:</span>
+                <select name="language" value={this.state.language} onChange={this.languageChange}>
+                    <option value="python">Python</option>
+                    <option value="javascript">Javascript (Node.JS)</option>
+                    <option value="text/x-csrc">C</option>
+                </select>
+                <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                    Submit
+                </button>
+                <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"
+                        onClick={this.test}>
+                    test
+                </button>
+            </div>
+            <div id="testResultRender">
+            </div>
 
-        <div id="testResultRender">
+            <div className="editorDiv">
+                <textarea id="editor" name="editor"></textarea>
+            </div>
+            <span>{this.state.problem._id}</span>
         </div>
-
-        <div className="editorDiv">
-            <textarea id="editor" name="editor"></textarea>
-        </div>
-        <span>{this.state.problem._id}</span>
       </div>
     );
   },

@@ -230,6 +230,13 @@ if (Meteor.isServer) {
           });
           }
       });
+    },
+    updateProblem (problem) {
+      Problems.update({
+          _id: problem._id
+      }, {
+          $set: problem
+      });
     }
   });
 }
@@ -246,7 +253,8 @@ ProblemConfig = React.createClass({
     this.setState({
       title: data.title,
       score: data.score,
-      id: data._id
+      id: data._id,
+      content: data.content
     }, function () {
 
     });
@@ -257,11 +265,20 @@ ProblemConfig = React.createClass({
   handleScore (event) {
     this.setState({score:event.target.value});
   },
+  handleContent (event) {
+    this.setState({content:event.target.value});
+  },
   closeDialog () {
     React.unmountComponentAtNode(document.getElementById('modalArea'));
   },
   updateProblem () {
-
+      var problem = {
+          title: this.state.title,
+          score: this.state.score,
+          _id: this.state.id,
+          content: this.state.content
+      }
+      Meteor.call('updateProblem', problem);
   },
   deleteProblem (id) {
     if (confirm("Are you sure?")) {
@@ -287,7 +304,7 @@ ProblemConfig = React.createClass({
             <label className="mdl-textfield__label">Title</label>
            </div><br/>
           <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
-            <textarea className="mdl-textfield__input" type="text" rows= "15"></textarea>
+            <textarea className="mdl-textfield__input" type="text" rows= "15" value={this.state.content} onChange={this.handleContent}></textarea>
             <label className="mdl-textfield__label">Problem Description</label>
           </div>
           <button onClick={this.closeDialog}

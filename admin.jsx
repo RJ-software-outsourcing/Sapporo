@@ -242,11 +242,11 @@ if (Meteor.isServer) {
 }
 
 ProblemConfig = React.createClass({
-  getInitialState () {
+    getInitialState () {
     return {
     }
-  },
-  update (data) {
+    },
+    update (data) {
     //console.log(typeof(data.score));
     this.setState({
       title: data.title,
@@ -260,32 +260,32 @@ ProblemConfig = React.createClass({
     }, function () {
 
     });
-  },
-  handleTitle (event) {
+    },
+    handleTitle (event) {
     this.setState({title: event.target.value});
-  },
-  handleScore (event) {
+    },
+    handleScore (event) {
     this.setState({score:event.target.value});
-  },
-  handleContent (event) {
+    },
+    handleContent (event) {
     this.setState({content:event.target.value});
-  },
-  handleInput (event) {
+    },
+    handleInput (event) {
       this.setState({input:event.target.value});
-  },
-  handleOutput (event) {
+    },
+    handleOutput (event) {
       this.setState({output:event.target.value});
-  },
-  handleTestInput (event) {
+    },
+    handleTestInput (event) {
       this.setState({testInput:event.target.value});
-  },
-  handleTestOutput (event) {
+    },
+    handleTestOutput (event) {
       this.setState({testOutput:event.target.value});
-  },
-  closeDialog () {
+    },
+    closeDialog () {
     React.unmountComponentAtNode(document.getElementById('modalArea'));
-  },
-  updateProblem () {
+    },
+    updateProblem () {
       var problem = {
           title: this.state.title,
           score: this.state.score,
@@ -298,64 +298,70 @@ ProblemConfig = React.createClass({
       }
       Meteor.call('updateProblem', problem);
       this.closeDialog();
-  },
-  deleteProblem (id) {
+    },
+    deleteProblem (id) {
     if (confirm("Are you sure?")) {
       Meteor.call('deleteProblem', id);
       this.closeDialog();
     }
     return;
-  },
-  componentDidUpdate() {
+    },
+    componentDidUpdate() {
       componentHandler.upgradeDom();
-  },
-  render() {
+    },
+    render() {
     return (
-      <div className="modalBG">
-        <div className="problemConfig">
-          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '10%'}}>
-            <input className="mdl-textfield__input" type="number" min="0" max="100" value={this.state.score} onChange={this.handleScore}/>
-            <label className="mdl-textfield__label">Score</label>
-            <span className="mdl-textfield__error">maximum: 100</span>
-          </div>
-          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '90%'}}>
-            <input className="mdl-textfield__input" type="text" value={this.state.title} onChange={this.handleTitle}/>
-            <label className="mdl-textfield__label">Title</label>
-          </div>
-          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
-            <textarea className="mdl-textfield__input" type="text" rows= "12" value={this.state.content} onChange={this.handleContent}></textarea>
-            <label className="mdl-textfield__label">Problem Description</label>
-          </div>
-          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
-            <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.input} onChange={this.handleInput}></textarea>
-            <label className="mdl-textfield__label">Input Description</label>
-          </div>
-          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
-            <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.output} onChange={this.handleOutput}></textarea>
-            <label className="mdl-textfield__label">Output Description</label>
-          </div>
-          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '49%'}}>
-            <input className="mdl-textfield__input" type="text" value={this.state.testInput} onChange={this.handleTestInput}/>
-            <label className="mdl-textfield__label">Test Input</label>
-          </div>
-          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '100%'}}>
-            <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.testOutput} onChange={this.handleTestOutput}></textarea>
-            <label className="mdl-textfield__label">Test Output</label>
-          </div>
-          <button onClick={this.closeDialog}
-            className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">
-            Cancel
-          </button>
-          <button onClick={this.updateProblem}
-            className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary">
-            Update
-          </button>
-          <button onClick={this.deleteProblem.bind(this, this.state.id)}
-            className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-            Delete
-          </button>
+        <div className="modalBG">
+            <div className="problemConfig">
+                <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '10%'}}>
+                    <input className="mdl-textfield__input" type="number" min="0" max="100" value={this.state.score} onChange={this.handleScore}/>
+                    <label className="mdl-textfield__label">Score</label>
+                    <span className="mdl-textfield__error">maximum: 100</span>
+                </div>
+                <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '90%'}}>
+                    <input className="mdl-textfield__input" type="text" value={this.state.title} onChange={this.handleTitle}/>
+                    <label className="mdl-textfield__label">Title</label>
+                </div>
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
+                    <textarea className="mdl-textfield__input" type="text" rows= "12" value={this.state.content} onChange={this.handleContent}></textarea>
+                    <label className="mdl-textfield__label">Problem Description</label>
+                </div>
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
+                    <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.input} onChange={this.handleInput}></textarea>
+                    <label className="mdl-textfield__label">Input Description</label>
+                </div>
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
+                    <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.output} onChange={this.handleOutput}></textarea>
+                    <label className="mdl-textfield__label">Output Description</label>
+                </div>
+                <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '49%'}}>
+                    <input className="mdl-textfield__input" type="text" value={this.state.testInput} onChange={this.handleTestInput}/>
+                    <label className="mdl-textfield__label">Test Input</label>
+                </div>
+                <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '100%'}}>
+                    <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.testOutput} onChange={this.handleTestOutput}></textarea>
+                    <label className="mdl-textfield__label">Test Output</label>
+                </div>
+                <div>
+                    <button
+                        className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">
+                        Add verification case
+                    </button>
+                </div>
+                <button onClick={this.closeDialog}
+                    className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">
+                    Cancel
+                </button>
+                <button onClick={this.updateProblem}
+                    className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary">
+                    Update
+                </button>
+                <button onClick={this.deleteProblem.bind(this, this.state.id)}
+                    className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                    Delete
+                </button>
+            </div>
         </div>
-      </div>
     );
-  }
+    }
 });

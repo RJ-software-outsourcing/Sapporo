@@ -292,7 +292,7 @@ ProblemConfig = React.createClass({
   },
   render() {
     return (
-      <div className="problemConfigBG">
+      <div className="modalBG">
         <div className="problemConfig">
           <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '10%'}}>
             <input className="mdl-textfield__input" type="number" min="0" max="100" value={this.state.score} onChange={this.handleScore}/>

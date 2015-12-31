@@ -1,6 +1,10 @@
 /* CSS declarations go here */
+
 body {
 	background-color: #EEE;
+	height: 100vh;
+	width: 100%;
+	overflow:scroll;
 }
 
 #leftPanel {
@@ -36,20 +40,13 @@ body {
 	text-align: center;
 }
 .testConsole {
-	width: 100%;
-	height: 100px;
-	margin-top: 10px;
-	text-align: center;
-}
-.testConsole textarea{
-	width: 47%;
-	padding: 0.5%;
-	height: 80px;
-	overflow-y: scroll;
+	width: 80%;
+	margin-left: 10%;
+	height: 80vh;
+	margin-top: 10vh;
+	padding: 1px 5px;
 	background-color: white;
-	color: black;
-	text-decoration: underline;
-	border: 0px;
+	text-align: center;
 }
 .testSuccess {
 	color: green;
@@ -58,6 +55,28 @@ body {
 .testFailed {
 	color: red;
 	font-weight: bold;
+}
+.testResultTitle {
+	overflow: auto;
+}
+.testResultTitle div {
+	width: 46%;
+	text-align: center;
+}
+.testConsole textarea {
+	width: 44%;
+	height: 50vh;
+	background-color: black;
+	color: #66FF33;
+	padding: 1%;
+}
+.testMyAnswer {
+	float: left;
+	margin-left: 2%;
+}
+.testCorrectAnswer {
+	float: right;
+	margin-right: 2%;
 }
 .editorDiv {
 	margin-top: 10px;
@@ -125,7 +144,7 @@ body {
 	background-color: white;
 	overflow: scroll;
 }
-.problemConfigBG {
+.modalBG {
 	z-index: 100;
 	position: absolute;
 	top:0;

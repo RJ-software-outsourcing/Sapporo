@@ -295,7 +295,8 @@ ProblemConfig = React.createClass({
           input: this.state.input,
           output: this.state.output,
           testInput: this.state.testInput,
-          testOutput: this.state.testOutput
+          testOutput: this.state.testOutput,
+          verificationCases: this.state.verificationCases
         }
         Meteor.call('updateProblem', problem);
         this.closeDialog();
@@ -307,17 +308,31 @@ ProblemConfig = React.createClass({
         }
         return;
     },
+    handleVerificationInput (key, event) {
+        var tmpArray = this.state.verificationCases;
+        tmpArray[key].input = event.target.value;
+        this.setState({verificationCases:tmpArray});
+    },
+    handleVerificationOutput (key, event) {
+        var tmpArray = this.state.verificationCases;
+        tmpArray[key].output = event.target.value;
+        this.setState({verificationCases:tmpArray});
+    },
     renderVerificationCases() {
         return this.state.verificationCases.map (
             (cases, key) => {
                 return (
-                    <div style={{overflow:'auto'}}>
-                        <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '40%'}}>
-                            <input className="mdl-textfield__input" type="text" value={cases.input}/>
+                    <div style={{overflow:'auto', borderBottom: '2px solid white', backgroundColor:'#F9F9F9', width:'98%', padding:'0px 1% 0px 1%'}}>
+                        <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '35%', float:'left', marginRught:'10px'}}>
+                            <input className="mdl-textfield__input" type="text" value={cases.input} onChange={this.handleVerificationInput.bind(this, key)}/>
                             <label className="mdl-textfield__label">Input {key+1}</label>
                         </div>
-                        <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '49%', float:'right'}}>
-                            <textarea className="mdl-textfield__input" type="text" rows= "6" value={cases.output}></textarea>
+                        <button style={{float:'right', margin:'10px'}} onClick={this.removeVerificationCase.bind(this, key)}
+                            className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">
+                            remove
+                        </button>
+                        <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '45%', float:'left'}}>
+                            <textarea className="mdl-textfield__input" type="text" rows= "4" value={cases.output} onChange={this.handleVerificationOutput.bind(this, key)}></textarea>
                             <label className="mdl-textfield__label">Output {key+1}</label>
                         </div>
                     </div>
@@ -330,6 +345,11 @@ ProblemConfig = React.createClass({
             input: '',
             output: ''
         }])})
+    },
+    removeVerificationCase(key){
+        var tmpArray = this.state.verificationCases
+        tmpArray.splice(key, 1);
+        this.setState({verificationCases:tmpArray});
     },
     componentDidUpdate() {
         componentHandler.upgradeDom();
@@ -374,18 +394,20 @@ ProblemConfig = React.createClass({
                         </button>
                         {this.state.verificationCases? this.renderVerificationCases():''}
                     </div>
-                    <button onClick={this.closeDialog}
-                        className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">
-                        Cancel
-                    </button>
-                    <button onClick={this.updateProblem}
-                        className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary">
-                        Update
-                    </button>
-                    <button onClick={this.deleteProblem.bind(this, this.state.id)}
-                        className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                        Delete
-                    </button>
+                    <div style={{marginTop:'20px'}}>
+                        <button onClick={this.closeDialog}
+                            className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">
+                            Cancel
+                        </button>
+                        <button onClick={this.updateProblem}
+                            className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary">
+                            Update
+                        </button>
+                        <button onClick={this.deleteProblem.bind(this, this.state.id)}
+                            className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                            Delete
+                        </button>
+                    </div>
                 </div>
             </div>
         );

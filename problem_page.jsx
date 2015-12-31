@@ -44,9 +44,8 @@ ProblemPage = React.createClass({
         isSuccess: false
     }
     React.render(<Loading />, document.getElementById("modalArea"));
-    Meteor.call('dockerRunSample', code, this.state.problem._id, lang, function (err, result) {
-        output.mine = result;
-        (React.render(<TestConsole />, document.getElementById("modalArea"))).update(output);
+    Meteor.call('testCode', code, this.state.problem._id, lang, function (err, result) {
+        (React.render(<TestConsole />, document.getElementById("modalArea"))).update(result);
     });
   },
   render() {
@@ -97,15 +96,14 @@ ProblemPage = React.createClass({
 TestConsole = React.createClass({
     getInitialState() {
         return {
-            mine: '',
-            correct: '',
-            isSuccess: false
         };
     },
     update (result) {
         this.setState({
-            mine: result.mine,
-            correct: result.correct,
+            err: result.err,
+            expectedOutput: result.expectedOutput,
+            input: result.input,
+            output: result.output,
             isSuccess: result.isSuccess
         })
     },
@@ -123,14 +121,17 @@ TestConsole = React.createClass({
                     this.state.isSuccess?
                     <h3 className="testSuccess">Success</h3>:<h3 className="testFailed">Failed</h3>
                 }
+                <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '80%'}}>
+                  <input className="mdl-textfield__input" type="text" value={this.state.input}/>
+                  <label className="mdl-textfield__label">Test Input</label>
+                </div>
                 <div className="testResultTitle">
                     <div style={{float:'left'}}>Your result:</div>
                     <div style={{float:'right'}}>Expected answer:</div>
                 </div>
-                <textarea className="testMyAnswer" value={this.state.mine}></textarea>
-                <textarea className="testCorrectAnswer" value={this.state.correct}></textarea>
-                <button onClick={this.closeDialog} style={{marginTop:'2vh'}}
-                    className="mdl-button mdl-js-button mdl-js-ripple-effect">
+                <textarea className="testMyAnswer" value={this.state.output}></textarea>
+                <textarea className="testCorrectAnswer" value={this.state.expectedOutput}></textarea>
+                <button onClick={this.closeDialog} className="mdl-button mdl-js-button mdl-js-ripple-effect">
                     close
                 </button>
             </div>

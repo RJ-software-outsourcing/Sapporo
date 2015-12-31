@@ -6,7 +6,7 @@ if (Meteor.isServer) {
     path = Npm.require('path');
     Future = Meteor.npmRequire('fibers/future');
     docker = Meteor.npmRequire('dockerode');
-
+    stream = Meteor.npmRequire('stream'),
     // This is standard way to get local Docker instance
     // We might do something more advanced to obtain our Docker instance
     // Such as configuring distributed Docker instances via HTTP
@@ -39,45 +39,60 @@ if (Meteor.isServer) {
         };
     };
 
-    Meteor.methods({
-        dockerRunSample (code, problemId, lang) {
-            var future = new Future(),
-                stream = Meteor.npmRequire('stream'),
-                stdout = stream.Writable(),
-                stderr = stream.Writable(),
-                output = '',
-                err    = '';
-
-            stdout._write = function (chunk, encoding, done) {
-              output = output + chunk.toString();
-              done();
-            };
-            stderr._write = function (chunk, encoding, done) {
-              err = err + chunk.toString();
-              done();
-            };
-            var userData = userDataCollection.findOne({username: Meteor.user().username});
-            console.log(problemId);
-            console.log(lang);
-
-            var file = saveScriptToFile(Meteor.user().username, problemId, lang, code);
-            var dockerMountPath = '/usr/src/myapp/';
-            docker1.run('python', ['python', path.join(dockerMountPath, file.name)],
-                [stdout, stderr], {Tty:false}, function (error, data, container) {
-                if (err) { //Error from container
-                    future.return(err);
-                } else if (error) { // Error from Docker
-                    future.return(error.toString());
-                } else if (output) {
-                    future.return(output);
-                } else {
-                    future.return('No result');
+    execute = function (dockerObj, fileObj, lang, input, expectedOutput) {
+        var future = new Future(),
+            stdout = stream.Writable(),
+            stderr = stream.Writable(),
+            output = '',
+            err    = '';
+        stdout._write = function (chunk, encoding, done) {
+          output = output + chunk.toString();
+          done();
+        };
+        stderr._write = function (chunk, encoding, done) {
+          err = err + chunk.toString();
+          done();
+        };
+        var dockerMountPath = '/usr/src/myapp/';
+        var dockerInput = ['python', path.join(dockerMountPath, fileObj.name)].concat(input.split(" "));
+        dockerObj.run('python', dockerInput,
+            [stdout, stderr], {Tty:false}, function (error, data, container) {
+            var returnData = {
+                isSuccess: false,
+                expectedOutput: expectedOutput,
+                input: input
+            }
+            if (err) { //Error from container
+                returnData.err = err;
+            } else if (error) { // Error from Docker
+                returnData.err = error.toString();
+            } else if (output) {
+                if (expectedOutput.localeCompare(output) === 0) {
+                    returnData.isSuccess = true;
                 }
+                returnData.output = output;
+            } else {
+                returnData.err = 'No result';
+            }
+            console.log(returnData);
+            future.return(returnData);
+        }).on('container', function (container) {
+            container.defaultOptions.start.Binds = [fileObj.folder +':'+ dockerMountPath + ':rw'];
+        });
+        return future.wait();
+    }
 
-            }).on('container', function (container) {
-                container.defaultOptions.start.Binds = [file.folder +':'+ dockerMountPath + ':rw'];
-            });
-            return future.wait();
+    Meteor.methods({
+        testCode (code, problemId, lang) {
+
+            var userData = userDataCollection.findOne({username: Meteor.user().username});
+            var problemData = Problems.findOne({_id:problemId});
+            //console.log(problemId);
+            //console.log(problemData.testInput);
+            //console.log(problemData.testOutput);
+            //console.log(lang);
+            var file = saveScriptToFile(Meteor.user().username, problemId, lang, code);
+            return execute(docker1, file, lang, problemData.testInput, problemData.testOutput);
         }
     });
 }

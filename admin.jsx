@@ -317,8 +317,8 @@ ProblemConfig = React.createClass({
             <input className="mdl-textfield__input" type="number" min="0" max="100" value={this.state.score} onChange={this.handleScore}/>
             <label className="mdl-textfield__label">Score</label>
             <span className="mdl-textfield__error">maximum: 100</span>
-          </div><br/>
-          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '100%'}}>
+          </div>
+          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '90%'}}>
             <input className="mdl-textfield__input" type="text" value={this.state.title} onChange={this.handleTitle}/>
             <label className="mdl-textfield__label">Title</label>
           </div>

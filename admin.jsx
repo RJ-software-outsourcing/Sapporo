@@ -326,15 +326,15 @@ ProblemConfig = React.createClass({
             <textarea className="mdl-textfield__input" type="text" rows= "12" value={this.state.content} onChange={this.handleContent}></textarea>
             <label className="mdl-textfield__label">Problem Description</label>
           </div>
-          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
             <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.input} onChange={this.handleInput}></textarea>
             <label className="mdl-textfield__label">Input Description</label>
           </div>
-          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
             <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.output} onChange={this.handleOutput}></textarea>
             <label className="mdl-textfield__label">Output Description</label>
           </div>
-          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '50%'}}>
+          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '49%'}}>
             <input className="mdl-textfield__input" type="text" value={this.state.testInput} onChange={this.handleTestInput}/>
             <label className="mdl-textfield__label">Test Input</label>
           </div>

@@ -13,7 +13,7 @@ ProblemPage = React.createClass({
         mode: this.state.language
       });
       this.state.editor.setOption("theme", "blackboard");
-      this.state.editor.setSize('100%', 600);
+      this.state.editor.setSize('100%', 560);
   },
   update (data) {
     this.setState({
@@ -58,13 +58,13 @@ ProblemPage = React.createClass({
             <div >
                 <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
                   <textarea className="mdl-textfield__input" type="text" rows= "18" readonly value={this.state.problem.content}></textarea>
-                  <label className="mdl-textfield__label">Problem Description</label>
+                  <label className="mdl-textfield__label">Summary</label>
                 </div>
-                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
                   <textarea className="mdl-textfield__input" type="text" rows= "10" readonly value={this.state.problem.input}></textarea>
                   <label className="mdl-textfield__label">Input example</label>
                 </div>
-                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
                   <textarea className="mdl-textfield__input" type="text" rows= "10" readonly value={this.state.problem.output}></textarea>
                   <label className="mdl-textfield__label">Output example</label>
                 </div>

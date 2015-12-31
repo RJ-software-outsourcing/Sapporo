@@ -39,6 +39,20 @@ if (Meteor.isServer) {
         };
     };
 
+    resultCompare = function (output, expectedOutput) {
+        if (expectedOutput.localeCompare(output) === 0) {
+            return true;
+        } else {
+            expectedOutput = expectedOutput.trim().replace(/\n$/, '');
+            output = output.trim().replace(/\n$/, '');
+            if(expectedOutput.localeCompare(output) === 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
+
     execute = function (dockerObj, fileObj, lang, input, expectedOutput) {
         var future = new Future(),
             stdout = stream.Writable(),
@@ -46,12 +60,12 @@ if (Meteor.isServer) {
             output = '',
             err    = '';
         stdout._write = function (chunk, encoding, done) {
-          output = output + chunk.toString();
-          done();
+            output = output + chunk.toString();
+            done();
         };
         stderr._write = function (chunk, encoding, done) {
-          err = err + chunk.toString();
-          done();
+            err = err + chunk.toString();
+            done();
         };
         var dockerMountPath = '/usr/src/myapp/';
         var dockerInput = ['python', path.join(dockerMountPath, fileObj.name)].concat(input.split(" "));
@@ -64,12 +78,10 @@ if (Meteor.isServer) {
             }
             if (err) { //Error from container
                 returnData.err = err;
-            } else if (error) { // Error from Docker
+            } else if (error) { //Error from Docker
                 returnData.err = error.toString();
             } else if (output) {
-                if (expectedOutput.localeCompare(output) === 0) {
-                    returnData.isSuccess = true;
-                }
+                returnData.isSuccess = resultCompare(output, expectedOutput);
                 returnData.output = output;
             } else {
                 returnData.err = 'No result';

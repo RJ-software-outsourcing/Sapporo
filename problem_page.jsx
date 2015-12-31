@@ -55,14 +55,19 @@ ProblemPage = React.createClass({
             <div className="problemTitle">
                 <span>{this.state.problem.title}</span>
             </div>
-            <textarea className="problemDescription mdl-shadow--4dp" readOnly value={this.state.problem.content}></textarea>
-            <div className="input">
-                <span>Input</span>
-                <textarea className="mdl-shadow--4dp" readOnly value={this.state.problem.input}></textarea>
-            </div>
-            <div className="output">
-                <span>Output</span>
-                <textarea className="mdl-shadow--4dp" readOnly value={this.state.problem.output}></textarea>
+            <div >
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
+                  <textarea className="mdl-textfield__input" type="text" rows= "18" readonly value={this.state.problem.content}></textarea>
+                  <label className="mdl-textfield__label">Problem Description</label>
+                </div>
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+                  <textarea className="mdl-textfield__input" type="text" rows= "10" readonly value={this.state.problem.input}></textarea>
+                  <label className="mdl-textfield__label">Input example</label>
+                </div>
+                <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+                  <textarea className="mdl-textfield__input" type="text" rows= "10" readonly value={this.state.problem.output}></textarea>
+                  <label className="mdl-textfield__label">Output example</label>
+                </div>
             </div>
         </div>
         <div id='rightPanel'>
@@ -103,7 +108,7 @@ TestConsole = React.createClass({
             err: result.err,
             expectedOutput: result.expectedOutput,
             input: result.input,
-            output: result.output,
+            output: result.output? result.output:result.err,
             isSuccess: result.isSuccess
         })
     },
@@ -131,7 +136,8 @@ TestConsole = React.createClass({
                 </div>
                 <textarea className="testMyAnswer" value={this.state.output}></textarea>
                 <textarea className="testCorrectAnswer" value={this.state.expectedOutput}></textarea>
-                <button onClick={this.closeDialog} className="mdl-button mdl-js-button mdl-js-ripple-effect">
+                <button onClick={this.closeDialog} style={{margin:'20px'}}
+                    className="mdl-button mdl-js-button mdl-js-ripple-effect">
                     close
                 </button>
             </div>

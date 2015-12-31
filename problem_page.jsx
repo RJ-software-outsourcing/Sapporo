@@ -1,36 +1,3 @@
-/*
-TestConsole = React.createClass({
-    getInitialState() {
-        return {
-            mine: '',
-            correct: '',
-            isSuccess: false
-        };
-    },
-    update (result) {
-        this.setState({
-            mine: result.mine,
-            correct: result.correct,
-            isSuccess: result.isSuccess
-        })
-    },
-    render() {
-        return (
-            <div className="mdl-shadow--2dp testCard">
-                {
-                    this.state.isSuccess?
-                    <span className="testSuccess">Success</span>:<span className="testFailed">Failed</span>
-                }
-                <div className="testConsole">
-                    <textarea value={"Your result:\n\n" + this.state.mine}></textarea>
-                    <textarea value={"Correct Answer: \n\n" + this.state.correct}></textarea>
-                </div>
-            </div>
-        );
-    }
-});
-*/
-
 //Problem page
 ProblemPage = React.createClass({
   getInitialState () {
@@ -52,7 +19,6 @@ ProblemPage = React.createClass({
     this.setState({
       problem: data
     }, function () {
-        React.unmountComponentAtNode(document.getElementById('testResultRender'));
         localStorage.setItem('currentProblem', this.state.problem._id);
         this.state.editor.on("change", function (cm, change) {
             localStorage.setItem(localStorage.getItem('currentProblem'), cm.getValue());
@@ -77,6 +43,7 @@ ProblemPage = React.createClass({
         correct: 'Not availble',
         isSuccess: false
     }
+    React.render(<Loading />, document.getElementById("modalArea"));
     Meteor.call('dockerRunSample', code, this.state.problem._id, lang, function (err, result) {
         output.mine = result;
         (React.render(<TestConsole />, document.getElementById("modalArea"))).update(output);
@@ -89,11 +56,19 @@ ProblemPage = React.createClass({
             <div className="problemTitle">
                 <span>{this.state.problem.title}</span>
             </div>
-        <textarea className="problemDescription" readOnly value={this.state.problem.content}></textarea>
+            <textarea className="problemDescription mdl-shadow--4dp" readOnly value={this.state.problem.content}></textarea>
+            <div className="input">
+                <span>Input</span>
+                <textarea className="mdl-shadow--4dp" readOnly value={this.state.problem.input}></textarea>
+            </div>
+            <div className="output">
+                <span>Output</span>
+                <textarea className="mdl-shadow--4dp" readOnly value={this.state.problem.output}></textarea>
+            </div>
         </div>
         <div id='rightPanel'>
             <div className="problemPageButtons">
-                <span>Language:</span>
+                <span style={{fontWeight:'bold',color:'#546E7A'}}>Language:&nbsp;</span>
                 <select name="language" value={this.state.language} onChange={this.languageChange}>
                     <option value="python">Python 3</option>
                     <option value="javascript">Javascript (Node.js)</option>
@@ -154,11 +129,27 @@ TestConsole = React.createClass({
                 </div>
                 <textarea className="testMyAnswer" value={this.state.mine}></textarea>
                 <textarea className="testCorrectAnswer" value={this.state.correct}></textarea>
-                <button onClick={this.closeDialog} style={{marginTop:'2vh'}} 
+                <button onClick={this.closeDialog} style={{marginTop:'2vh'}}
                     className="mdl-button mdl-js-button mdl-js-ripple-effect">
                     close
                 </button>
             </div>
+        </div>
+    );
+    }
+});
+
+
+Loading = React.createClass({
+    componentDidUpdate() {
+      componentHandler.upgradeDom();
+    },
+    render() {
+    return (
+        <div className="modalBG">
+            <div className="mdl-spinner mdl-js-spinner is-active"
+                style={{width:'100px', height: '100px', left: '50%', marginLeft:'-50px', top: '50vh', marginTop:'-50px'}}
+            ></div>
         </div>
     );
     }

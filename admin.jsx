@@ -244,8 +244,6 @@ if (Meteor.isServer) {
 ProblemConfig = React.createClass({
   getInitialState () {
     return {
-      title: '',
-      score: 0
     }
   },
   update (data) {
@@ -254,7 +252,11 @@ ProblemConfig = React.createClass({
       title: data.title,
       score: data.score,
       id: data._id,
-      content: data.content
+      content: data.content,
+      input: data.input,
+      output: data.output,
+      testInput: data.testInput,
+      testOutput: data.testOutput
     }, function () {
 
     });
@@ -268,6 +270,18 @@ ProblemConfig = React.createClass({
   handleContent (event) {
     this.setState({content:event.target.value});
   },
+  handleInput (event) {
+      this.setState({input:event.target.value});
+  },
+  handleOutput (event) {
+      this.setState({output:event.target.value});
+  },
+  handleTestInput (event) {
+      this.setState({testInput:event.target.value});
+  },
+  handleTestOutput (event) {
+      this.setState({testOutput:event.target.value});
+  },
   closeDialog () {
     React.unmountComponentAtNode(document.getElementById('modalArea'));
   },
@@ -276,9 +290,14 @@ ProblemConfig = React.createClass({
           title: this.state.title,
           score: this.state.score,
           _id: this.state.id,
-          content: this.state.content
+          content: this.state.content,
+          input: this.state.input,
+          output: this.state.output,
+          testInput: this.state.testInput,
+          testOutput: this.state.testOutput
       }
       Meteor.call('updateProblem', problem);
+      this.closeDialog();
   },
   deleteProblem (id) {
     if (confirm("Are you sure?")) {
@@ -302,10 +321,26 @@ ProblemConfig = React.createClass({
           <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '100%'}}>
             <input className="mdl-textfield__input" type="text" value={this.state.title} onChange={this.handleTitle}/>
             <label className="mdl-textfield__label">Title</label>
-           </div><br/>
+          </div>
           <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
-            <textarea className="mdl-textfield__input" type="text" rows= "15" value={this.state.content} onChange={this.handleContent}></textarea>
+            <textarea className="mdl-textfield__input" type="text" rows= "12" value={this.state.content} onChange={this.handleContent}></textarea>
             <label className="mdl-textfield__label">Problem Description</label>
+          </div>
+          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+            <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.input} onChange={this.handleInput}></textarea>
+            <label className="mdl-textfield__label">Input Description</label>
+          </div>
+          <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '50%'}}>
+            <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.output} onChange={this.handleOutput}></textarea>
+            <label className="mdl-textfield__label">Output Description</label>
+          </div>
+          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '50%'}}>
+            <input className="mdl-textfield__input" type="text" value={this.state.testInput} onChange={this.handleTestInput}/>
+            <label className="mdl-textfield__label">Test Input</label>
+          </div>
+          <div className="mdl-textfield mdl-textfield--floating-label mdl-js-textfield" style={{width: '100%'}}>
+            <textarea className="mdl-textfield__input" type="text" rows= "6" value={this.state.testOutput} onChange={this.handleTestOutput}></textarea>
+            <label className="mdl-textfield__label">Test Output</label>
           </div>
           <button onClick={this.closeDialog}
             className="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary">

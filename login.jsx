@@ -74,7 +74,8 @@ if (Meteor.isServer) {
     //Create new userData
     createUserData (username) {
       var userDataObj = {
-        username: username
+        username: username,
+        pass: []
       }
       Problems.find({}).fetch().forEach(function (item) {
         //Create arrays for each existing problems. It will be used to save logs of each problem.

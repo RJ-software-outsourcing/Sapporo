@@ -62,6 +62,36 @@ if (Meteor.isServer) {
         }
     };
 
+    updateResult = function (user, problemId, file, isSuccess) {
+        var result = {};
+        var alreadyPass = false; //Use this var because ForEach is unbreakable.
+        user.pass.forEach(function (item) {
+            console.log(item);
+            if (item === problemId) {
+                console.log('Not updating. Already pass problem: ' + problemId);
+                alreadyPass = true;
+            }
+        });
+        if (alreadyPass) {
+            return false;
+        }
+        result[problemId] = user[problemId];
+        result[problemId].push({
+            success: isSuccess,
+            file: path.join(file.folder, file.name)
+        });
+        if (isSuccess) {
+            result.pass = user.pass;
+            result.pass.push(problemId);
+        }
+        userDataCollection.update({
+            _id:user._id
+        }, {
+            $set: result
+        });
+        console.log(userDataCollection.findOne({username: user.username}));
+    };
+
     execute = function (dockerObj, fileObj, lang, input, expectedOutput) {
         var future = new Future(),
             stdout = stream.Writable(),
@@ -111,10 +141,6 @@ if (Meteor.isServer) {
 
             var userData = userDataCollection.findOne({username: Meteor.user().username});
             var problemData = Problems.findOne({_id:problemId});
-            //console.log(problemId);
-            //console.log(problemData.testInput);
-            //console.log(problemData.testOutput);
-            //console.log(lang);
             var isTest = true;
             var file = saveScriptToFile(Meteor.user().username, problemId, isTest, code);
             return execute(docker1, file, lang, problemData.testInput, problemData.testOutput);
@@ -134,10 +160,12 @@ if (Meteor.isServer) {
                 var result = execute(docker1, file, lang, item.input, item.output);
                 if (!result.isSuccess) {
                     console.log('submit failed');
+                    updateResult(userData, problemId, file, false);
                     return false;
                 }
             }
             console.log('submit pass');
+            updateResult(userData, problemId, file, true);
             return true;
         }
     });

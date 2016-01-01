@@ -138,8 +138,9 @@ button {
 	background-position: center center;
 	background-repeat: no-repeat;
 	background-size: cover;
+    background-attachment: fixed;
 	height: 100vh;
-	overflow: hidden;
+	overflow: auto;
 }
 .dashboardMain {
 	overflow: scroll;
@@ -148,6 +149,11 @@ button {
 	padding: 0vh 1%;
 	height: 98vh;
 	margin-top: 1vh;
+}
+.dashboardGrid div{
+    background: white;
+    color: #546E7A;
+    padding: 10px 0 10px 0;
 }
 .login {
 	background-color: white;

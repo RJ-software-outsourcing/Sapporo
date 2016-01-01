@@ -38,15 +38,23 @@ ProblemPage = React.createClass({
   test() {
     var code = this.state.editor.getValue();
     var lang = this.state.language;
-    var output = {
-        mine: 'Not available',
-        correct: 'Not availble',
-        isSuccess: false
-    }
     React.render(<Loading />, document.getElementById("modalArea"));
     Meteor.call('testCode', code, this.state.problem._id, lang, function (err, result) {
         (React.render(<TestConsole />, document.getElementById("modalArea"))).update(result);
     });
+  },
+  submit(){
+      var code = this.state.editor.getValue();
+      var lang = this.state.language;
+      React.render(<Loading />, document.getElementById("modalArea"));
+      Meteor.call('submitCode', code, this.state.problem._id, lang, function (err, result) {
+          if (result) {
+              alert('Pass');
+          } else {
+              alert('Failed');
+          }
+          React.unmountComponentAtNode(document.getElementById('modalArea'));
+      });
   },
   render() {
     return (
@@ -78,7 +86,8 @@ ProblemPage = React.createClass({
                     <option value="javascript">Javascript (Node.js)</option>
                     <option value="text/x-csrc">C</option>
                 </select>
-                <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+                <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        onClick={this.submit}>
                     Submit
                 </button>
                 <button className="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary"

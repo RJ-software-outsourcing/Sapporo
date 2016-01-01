@@ -13,20 +13,26 @@ if (Meteor.isServer) {
     docker1 = new docker();
 
     rootPath = process.env.PWD;
-    var submittedPath = path.join(rootPath, '/submitted');
+    var submittedPath = path.join(rootPath, '../submitted');
 
     if (!fs.existsSync(submittedPath)) {
         console.log('"submitted" folder is created to store user submissions');
         fs.mkdirSync(submittedPath);
     }
 
-    saveScriptToFile = function (username, problemId, lang, code) {
+    saveScriptToFile = function (username, problemId, isTest, code) {
         var userFolder    = path.join(submittedPath, username);
-        var problemFolder = path.join(userFolder, problemId);
-
         if (!fs.existsSync(userFolder)) {
             fs.mkdirSync(userFolder);
         }
+        if (isTest) {
+            userFolder = path.join(userFolder, 'test');
+            if (!fs.existsSync(userFolder)) {
+                fs.mkdirSync(userFolder);
+            }
+        }
+        var problemFolder = path.join(userFolder, problemId);
+
         if (!fs.existsSync(problemFolder)) {
             fs.mkdirSync(problemFolder);
         }
@@ -40,6 +46,9 @@ if (Meteor.isServer) {
     };
 
     resultCompare = function (output, expectedOutput) {
+        if (typeof(output) !== 'string' || typeof(expectedOutput) !== 'string') {
+            return false;
+        }
         if (expectedOutput.localeCompare(output) === 0) {
             return true;
         } else {
@@ -67,6 +76,9 @@ if (Meteor.isServer) {
             err = err + chunk.toString();
             done();
         };
+        if (typeof(input) !== 'string') {
+            input = '';
+        }
         var dockerMountPath = '/usr/src/myapp/';
         var dockerInput = ['python', path.join(dockerMountPath, fileObj.name)].concat(input.split(" "));
         dockerObj.run('python', dockerInput,
@@ -86,13 +98,13 @@ if (Meteor.isServer) {
             } else {
                 returnData.err = 'No result';
             }
-            console.log(returnData);
+            //console.log(returnData);
             future.return(returnData);
         }).on('container', function (container) {
             container.defaultOptions.start.Binds = [fileObj.folder +':'+ dockerMountPath + ':rw'];
         });
         return future.wait();
-    }
+    };
 
     Meteor.methods({
         testCode (code, problemId, lang) {
@@ -103,8 +115,30 @@ if (Meteor.isServer) {
             //console.log(problemData.testInput);
             //console.log(problemData.testOutput);
             //console.log(lang);
-            var file = saveScriptToFile(Meteor.user().username, problemId, lang, code);
+            var isTest = true;
+            var file = saveScriptToFile(Meteor.user().username, problemId, isTest, code);
             return execute(docker1, file, lang, problemData.testInput, problemData.testOutput);
+        },
+        submitCode (code, problemId, lang) {
+            var userData = userDataCollection.findOne({username: Meteor.user().username});
+            var problemData = Problems.findOne({_id:problemId});
+            var isTest = false;
+            var file = saveScriptToFile(Meteor.user().username, problemId, isTest, code);
+            if (!(problemData.verificationCases) || problemData.verificationCases.length <= 0) {
+                console.log('There is no data to verify for problem: ' + problemId);
+                return false;
+            }
+            for (var key in problemData.verificationCases) {
+                var item = problemData.verificationCases[key];
+                console.log(item);
+                var result = execute(docker1, file, lang, item.input, item.output);
+                if (!result.isSuccess) {
+                    console.log('submit failed');
+                    return false;
+                }
+            }
+            console.log('submit pass');
+            return true;
         }
     });
 }

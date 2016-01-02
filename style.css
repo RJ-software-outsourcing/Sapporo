@@ -46,6 +46,9 @@ body {
 button {
 	margin-left: 10px;
 }
+canvas {
+    margin: 10px;
+}
 #leftPanel {
 	width: 49%;
 	float: left;

@@ -6,10 +6,23 @@ App = React.createClass({
     mixins: [ReactMeteorData],
     getMeteorData () {
         return {
-            problems: Problems.find({}).fetch(),
+            problems: Problems.find({}).fetch().sort(function(a, b) {
+                return (a.score) - (b.score);
+            }),
             counter: timeSync.findOne({timeSync: true}),
             currentUser: Meteor.user(),
+            userData: Meteor.user()? userDataCollection.findOne({username: Meteor.user().username}):{},
         };
+    },
+    problemPassCheck(problemId){
+        if (!this.data.userData.pass) return;
+        for (key in this.data.userData.pass) {
+            if (this.data.userData.pass[key] === problemId) {
+                return (
+                    <b style={{color:'#46BFBD'}}>[PASS]</b>
+                );
+            }
+        }
     },
     renderProblems () {
         return this.data.problems.map (
@@ -18,7 +31,7 @@ App = React.createClass({
                     if (this.data.counter.coding) {
                         return (
                             <a className="mdl-navigation__link" onClick={this.renderProblemPage.bind(this, problem)}>
-                                {problem.title}
+                                {problem.title}<br/>{this.problemPassCheck(problem._id)} <b style={{color: '#546E7A'}}>{problem.score} points</b>
                             </a>
                         );
                     }

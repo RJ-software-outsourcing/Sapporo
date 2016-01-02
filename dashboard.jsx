@@ -51,18 +51,30 @@ DashboardInstance = React.createClass({
             }
         });
         return (
-            <div className="mdl-cell mdl-cell--4-col">
+            <div className="mdl-cell mdl-cell--2-col">
                 <span>Total Score</span>
                 <h3>{score}</h3>
             </div>
         );
     },
-    problemPass () {
-
+    submitCount () {
+        if (!this.data.userData) return;
+        var count = 0;
+        for (var property in this.data.userData) {
+            if (this.data.userData.hasOwnProperty(property)) {
+                if (property === 'username' || property === 'pass' || property === '_id') {
+                    continue;
+                } else {
+                    if (this.data.userData[property].constructor === Array) {
+                        count += this.data.userData[property].length;
+                    }
+                }
+            }
+        }
         return (
-            <div className="mdl-cell mdl-cell--4-col">
-
-                <h3>test</h3>
+            <div className="mdl-cell mdl-cell--2-col">
+                <span>Total Submissions</span>
+                <h3>{count}</h3>
             </div>
         );
     },
@@ -83,7 +95,7 @@ DashboardInstance = React.createClass({
         var data = [{
             value: left,
             color: "#CCC",
-            highlight: "#EEE",
+            highlight: "#666",
             label: "Not Yet"
         },{
             value: count,
@@ -92,14 +104,14 @@ DashboardInstance = React.createClass({
             label: "Pass"
         }];
         var ctx = this.state.problemPassChart.getContext("2d");
-        window.problemPassChart = new Chart(ctx).Pie(data);
+        window.problemPassChart = new Chart(ctx).Doughnut(data);
     },
     render() {
         return (
             <div>
                 <div className="dashboardGrid mdl-grid">
                     {this.totalScore()}
-                    {this.problemPass()}
+                    {this.submitCount()}
                     <div className="mdl-cell mdl-cell--4-col">
                     </div>
                 </div>

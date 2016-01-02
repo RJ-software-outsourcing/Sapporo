@@ -144,9 +144,8 @@ button {
 }
 .dashboardMain {
 	overflow: scroll;
-	width: 94%;
-	margin-left: 2%;
-	padding: 0vh 1%;
+	width: 98%;
+	margin-left: 1%;
 	height: 98vh;
 	margin-top: 1vh;
 }

@@ -1,5 +1,8 @@
 Analyse = React.createClass({
-
+    getInitialState () {
+        return {
+        };
+    },
     mixins: [ReactMeteorData],
         getMeteorData () {
             return {
@@ -9,11 +12,11 @@ Analyse = React.createClass({
             };
         },
     componentDidMount() {
-        componentHandler.upgradeDom();
-
+        this.drawProblemAnalyseChart();
     },
     componentDidUpdate() {
         componentHandler.upgradeDom();
+        //this.drawProblemAnalyseChart();
     },
     userTotalScore (user) {
         if (!user.pass) return;
@@ -44,11 +47,64 @@ Analyse = React.createClass({
             (user, key) => {
                 return (
                     <tr>
-                      <td>{key+1}</td>
+                      <td className="mdl-data-table__cell">{key+1}</td>
                       <td className="mdl-data-table__cell--non-numeric">{user.username}</td>
-                      <td style={{color: 'green'}}>{user.score}</td>
+                      <td className="mdl-data-table__cell" style={{color: 'green'}}>{user.score}</td>
                     </tr>
                 );
+            }
+        );
+    },
+    submitCount(problemId){
+        var count = 0;
+        this.data.allUser.forEach(function(user) {
+            if (user[problemId] && user[problemId].length > 0) {
+                count += 1;
+            }
+        });
+        return count;
+    },
+    renderProblemAnalyse() {
+        return this.data.problems.map(
+            (problem, key) => {
+                var submitCountChartId = 'submitCountId' + problem._id;
+                return (
+                    <div>
+                        <h3 style={{color:'#546E7A'}}>{problem.title}</h3>
+                        <div className="mdl-grid problemAnalyseGrid">
+                            <div className="mdl-cell mdl-cell--2-col">
+                                <span>Submitted Users</span><br/>
+                                <canvas id={submitCountChartId} width="150" height="150"></canvas>
+                            </div>
+                            <div className="mdl-cell mdl-cell--2-col">
+                                <canvas id="submitCorrectRate" width="150" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+        );
+    },
+    drawProblemAnalyseChart () {
+        var submitCount = 0;
+        if (!this.data.allUser || this.data.allUser.length === 0) return;
+        this.data.problems.map(
+            (problem, key) => {
+                submitCount = this.submitCount(problem._id);
+                var submitCountChartId = 'submitCountId'+problem._id;
+                var submitCountChart = document.getElementById(submitCountChartId).getContext("2d");
+                var data = [{
+                    value: this.data.allUser.length - submitCount,
+                    color: "#CCC",
+                    highlight: "#666",
+                    label: "Not Yet"
+                },{
+                    value: submitCount,
+                    color:"#46BFBD",
+                    highlight: "#5AD3D1",
+                    label: "Submitted"
+                }];
+                window[submitCountChartId] = new Chart(submitCountChart).Pie(data);
             }
         );
     },
@@ -57,13 +113,18 @@ Analyse = React.createClass({
             <div className="dashboard">
                 <div className="mdl-tabs mdl-js-tabs mdl-js-ripple-effect dashboardMain" id="adminTab">
                     <div className="mdl-tabs__tab-bar">
-                        <a href="#rank"     className="mdl-tabs__tab is-active"><b>rank</b></a>
-                        <a href="#problemAnalyse"   className="mdl-tabs__tab"><b>Problem Analyse</b></a>
+                        <a href="#problemAnalyse"   className="mdl-tabs__tab is-active"><b>Problem Analyse</b></a>
                         <a href="#userAnalyse" className="mdl-tabs__tab"><b>User Analyse</b></a>
+                        <a href="#rank"     className="mdl-tabs__tab"><b>rank</b></a>
                     </div>
-
-                    <div className="mdl-tabs__panel is-active" id="rank">
-                        <table className="mdl-data-table mdl-js-data-table problemTableAndInsert">
+                    <div className="mdl-tabs__panel is-active" id="problemAnalyse">
+                        {this.renderProblemAnalyse()}
+                    </div>
+                    <div className="mdl-tabs__panel" id="userAnalyse">
+                        user analyse
+                    </div>
+                    <div className="mdl-tabs__panel" id="rank">
+                        <table className="mdl-data-table mdl-js-data-table">
                             <thead>
                                 <tr>
                                     <th>Rank</th>
@@ -75,12 +136,6 @@ Analyse = React.createClass({
                                 {this.renderRank()}
                             </tbody>
                         </table>
-                    </div>
-                    <div className="mdl-tabs__panel" id="problemAnalyse">
-                        problem analyse
-                    </div>
-                    <div className="mdl-tabs__panel" id="userAnalyse">
-                        user analyse
                     </div>
                 </div>
             </div>

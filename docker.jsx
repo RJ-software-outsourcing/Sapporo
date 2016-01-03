@@ -138,7 +138,6 @@ if (Meteor.isServer) {
 
     Meteor.methods({
         testCode (code, problemId, lang) {
-
             var userData = userDataCollection.findOne({username: Meteor.user().username});
             var problemData = Problems.findOne({_id:problemId});
             var isTest = true;

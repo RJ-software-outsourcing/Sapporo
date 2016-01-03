@@ -16,7 +16,7 @@ App = React.createClass({
     },
     problemPassCheck(problemId){
         if (!this.data.userData.pass) return;
-        for (key in this.data.userData.pass) {
+        for (var key in this.data.userData.pass) {
             if (this.data.userData.pass[key] === problemId) {
                 return (
                     <b style={{color:'#46BFBD'}}>[PASS]</b>
@@ -56,12 +56,28 @@ App = React.createClass({
     renderAdmin() {
         React.render(<Admin />, document.getElementById("main"));
     },
+    renderAnalyse() {
+        React.render(<Analyse />, document.getElementById("main"));
+    },
     renderAdminButton () {
         try {
             if (this.data.currentUser.username === 'admin') {
                 return (
                     <a className="mdl-navigation__link" onClick={this.renderAdmin}>
                         Administrator
+                    </a>
+                );
+            }
+        } catch(e) {
+            return;
+        }
+    },
+    renderAnalyseButton () {
+        try {
+            if (this.data.currentUser.username === 'admin') {
+                return (
+                    <a className="mdl-navigation__link" onClick={this.renderAnalyse}>
+                        Analyse
                     </a>
                 );
             }
@@ -91,6 +107,7 @@ App = React.createClass({
 	                    Dashboard
 	                </a>
 	                {this.renderAdminButton()}
+                    {this.renderAnalyseButton()}
 				</nav>
                 <span className="mdl-layout-title">Problems:</span>
                 <nav className="mdl-navigation">

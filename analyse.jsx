@@ -12,11 +12,11 @@ Analyse = React.createClass({
             };
         },
     componentDidMount() {
-        this.drawProblemAnalyseChart();
+        this.drawProblemAnalyseChart(false);
     },
     componentDidUpdate() {
         componentHandler.upgradeDom();
-        //this.drawProblemAnalyseChart();
+        this.drawProblemAnalyseChart(true);
     },
     userTotalScore (user) {
         if (!user.pass) return;
@@ -64,10 +64,25 @@ Analyse = React.createClass({
         });
         return count;
     },
+    submitPassCount(problemId){
+        var count = 0;
+        this.data.allUser.forEach(function(user) {
+            if (user.pass && user.pass.length > 0) {
+                for (var key in user.pass) {
+                    if (user.pass[key] === problemId) {
+                        count += 1;
+                        break;
+                    }
+                }
+            }
+        });
+        return count;
+    },
     renderProblemAnalyse() {
         return this.data.problems.map(
             (problem, key) => {
                 var submitCountChartId = 'submitCountId' + problem._id;
+                var submitPassCountChartId = 'submitPassCountId' + problem._id;
                 return (
                     <div>
                         <h3 style={{color:'#546E7A'}}>{problem.title}</h3>
@@ -77,7 +92,8 @@ Analyse = React.createClass({
                                 <canvas id={submitCountChartId} width="150" height="150"></canvas>
                             </div>
                             <div className="mdl-cell mdl-cell--2-col">
-                                <canvas id="submitCorrectRate" width="150" height="150"></canvas>
+                                <span>Submission Pass Rate</span><br/>
+                                <canvas id={submitPassCountChartId} width="150" height="150"></canvas>
                             </div>
                         </div>
                     </div>
@@ -85,15 +101,18 @@ Analyse = React.createClass({
             }
         );
     },
-    drawProblemAnalyseChart () {
+    drawProblemAnalyseChart (isUpdate) {
         var submitCount = 0;
         if (!this.data.allUser || this.data.allUser.length === 0) return;
         this.data.problems.map(
             (problem, key) => {
                 submitCount = this.submitCount(problem._id);
+                submitPassCount = this.submitPassCount(problem._id);
                 var submitCountChartId = 'submitCountId'+problem._id;
                 var submitCountChart = document.getElementById(submitCountChartId).getContext("2d");
-                var data = [{
+                var submitPassCountChartId = 'submitPassCountId'+problem._id;
+                var submitPassCountChart = document.getElementById(submitPassCountChartId).getContext("2d");
+                var submitData = [{
                     value: this.data.allUser.length - submitCount,
                     color: "#CCC",
                     highlight: "#666",
@@ -104,7 +123,27 @@ Analyse = React.createClass({
                     highlight: "#5AD3D1",
                     label: "Submitted"
                 }];
-                window[submitCountChartId] = new Chart(submitCountChart).Pie(data);
+                var submitPassData = [{
+                    value: submitCount - submitPassCount,
+                    color:"#F7464A",
+                    highlight: "#FF5A5E",
+                    label: "Failed"
+                },{
+                    value: submitPassCount,
+                    color:"#46BFBD",
+                    highlight: "#5AD3D1",
+                    label: "Pass"
+                }];
+                if (isUpdate) {
+                    window[submitCountChartId].destroy();
+                    window[submitCountChartId] = new Chart(submitCountChart).Pie(submitData);
+                    window[submitPassCountChartId].destroy();
+                    window[submitPassCountChartId] = new Chart(submitPassCountChart).Pie(submitPassData);
+                } else {
+                    window[submitCountChartId] = new Chart(submitCountChart).Pie(submitData);
+                    window[submitPassCountChartId] = new Chart(submitPassCountChart).Pie(submitPassData);
+                }
+
             }
         );
     },

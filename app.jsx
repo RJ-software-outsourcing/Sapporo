@@ -51,12 +51,14 @@ App = React.createClass({
       componentHandler.upgradeDom();
     },
     renderDashboard () {
+        React.unmountComponentAtNode(document.getElementById('main'));
         React.render(<Dashboard />, document.getElementById("main"));
     },
     renderAdmin() {
         React.render(<Admin />, document.getElementById("main"));
     },
     renderAnalyse() {
+        React.unmountComponentAtNode(document.getElementById('main'));
         React.render(<Analyse />, document.getElementById("main"));
     },
     renderAdminButton () {

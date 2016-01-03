@@ -103,8 +103,10 @@ DashboardInstance = React.createClass({
             highlight: "#5AD3D1",
             label: "Pass"
         }];
-        var ctx = this.state.problemPassChart.getContext("2d");
-        window.problemPassChart = new Chart(ctx).Doughnut(data);
+            var ctx = this.state.problemPassChart.getContext("2d");
+            window.problemPassChart = new Chart(ctx).Doughnut(data);
+            window.problemPassChart.update();
+
     },
     render() {
         return (

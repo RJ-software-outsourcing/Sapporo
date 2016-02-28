@@ -1,11 +1,12 @@
-timeSync = new Mongo.Collection("timeSync");
+
 
 Timer = React.createClass({
   mixins: [ReactMeteorData],
   getMeteorData () {
-    return {
-      timeMessage: timeSync.findOne({timeSync: true})
+    var data = {
+      timeMessage: (timeSync.findOne({timeSync: true}))
     }
+    return data;
   },
   displayMessage () {
     if (this.data.timeMessage) {

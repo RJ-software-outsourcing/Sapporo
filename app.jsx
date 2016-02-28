@@ -2,21 +2,17 @@
 
 // App component - represents the whole app
 App = React.createClass({
-    getInitialState() {
-      return {
-          problems: []
-      };
-    },
     mixins: [ReactMeteorData],
     getMeteorData () {
-        return {
-            problems: Problems.find({}).fetch().sort(function(a, b) {
+        var data = {
+            problems: (Problems.find({}).fetch().sort(function(a, b) {
                 return (a.score) - (b.score);
-            }),
+            })),
             counter: timeSync.findOne({timeSync: true}),
             currentUser: Meteor.user(),
             userData: Meteor.user()? userDataCollection.findOne({username: Meteor.user().username}):{},
         };
+        return data;
     },
     problemPassCheck(problemId){
         if (!this.data.userData.pass) return;

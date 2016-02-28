@@ -4,8 +4,6 @@ if (Meteor.isClient) {
       if (!Meteor.status().connected) {
           if (confirm('Lost server connection. Click Yes to reload.')) {
               location.reload();
-          } else {
-              location.reload();
           }
       }
       setTimeout(function () {

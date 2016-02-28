@@ -16,7 +16,7 @@ Analyse = React.createClass({
     },
     componentDidUpdate() {
         componentHandler.upgradeDom();
-        this.drawProblemAnalyseChart(true);
+        this.drawProblemAnalyseChart(true); //Get rid of this line if we are sick of live updating
     },
     userTotalScore (user) {
         if (!user.pass) return;

@@ -1,8 +1,12 @@
-Problems = new Mongo.Collection("problems");
-userDataCollection = new Mongo.Collection("userData");
+
 
 // App component - represents the whole app
 App = React.createClass({
+    getInitialState() {
+      return {
+          problems: []
+      };
+    },
     mixins: [ReactMeteorData],
     getMeteorData () {
         return {
@@ -49,6 +53,10 @@ App = React.createClass({
     },
     componentDidUpdate(){
       componentHandler.upgradeDom();
+
+    },
+    compponentWillMount () {
+
     },
     renderDashboard () {
         React.unmountComponentAtNode(document.getElementById('main'));

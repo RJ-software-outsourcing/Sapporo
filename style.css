@@ -88,7 +88,7 @@ canvas {
 	width: 80%;
 	margin-left: 10%;
 	height: 90vh;
-	max-height: 650px;
+	max-height: 800px;
 	margin-top: 5vh;
 	padding: 1px 5px;
 	background-color: white;
@@ -113,6 +113,7 @@ canvas {
 .testConsole textarea {
 	width: 44%;
 	height: 50vh;
+    max-height: 400px;
 	background-color: black;
 	color: #66FF33;
 	padding: 1%;

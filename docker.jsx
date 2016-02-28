@@ -110,7 +110,7 @@ if (Meteor.isServer) {
             input = '';
         }
         var dockerMountPath = '/usr/src/myapp/';
-        var dockerInput = ['python', path.join(dockerMountPath, fileObj.name)].concat(input.split(" "));
+        var dockerInput = ['timeout', '3', 'python', path.join(dockerMountPath, fileObj.name)].concat(input.split(" "));
         dockerObj.run('python', dockerInput,
             [stdout, stderr], {Tty:false}, function (error, data, container) {
             var returnData = {

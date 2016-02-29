@@ -4,10 +4,9 @@
 App = React.createClass({
     mixins: [ReactMeteorData],
     getMeteorData () {
+        var problemSubscrib = Meteor.subscribe('problemsData');
         var data = {
-            problems: (Problems.find({}).fetch().sort(function(a, b) {
-                return (a.score) - (b.score);
-            })),
+            problems: problemSubscrib.ready()? Problems.find({}).fetch():[],
             counter: timeSync.findOne({timeSync: true}),
             currentUser: Meteor.user(),
             userData: Meteor.user()? userDataCollection.findOne({username: Meteor.user().username}):{},

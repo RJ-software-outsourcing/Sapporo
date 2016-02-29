@@ -65,15 +65,15 @@ ProblemPage = React.createClass({
             </div>
             <div >
                 <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '100%'}}>
-                  <textarea className="mdl-textfield__input" type="text" rows= "18" readonly value={this.state.problem.content}></textarea>
+                  <textarea className="mdl-textfield__input" type="text" rows= "18" readOnly value={this.state.problem.content}></textarea>
                   <label className="mdl-textfield__label">Summary</label>
                 </div>
                 <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
-                  <textarea className="mdl-textfield__input" type="text" rows= "10" readonly value={this.state.problem.input}></textarea>
+                  <textarea className="mdl-textfield__input" type="text" rows= "10" readOnly value={this.state.problem.input}></textarea>
                   <label className="mdl-textfield__label">Input example</label>
                 </div>
                 <div className="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style={{width: '49%'}}>
-                  <textarea className="mdl-textfield__input" type="text" rows= "10" readonly value={this.state.problem.output}></textarea>
+                  <textarea className="mdl-textfield__input" type="text" rows= "10" readOnly value={this.state.problem.output}></textarea>
                   <label className="mdl-textfield__label">Output example</label>
                 </div>
             </div>

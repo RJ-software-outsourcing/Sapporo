@@ -59,7 +59,6 @@ if (Meteor.isServer) {
     var ended = Math.ceil((end.getTime() - now.getTime())/1000);
 
     var message = 'unknown';
-    var coding = false;
 
     if (started >= 0) {
       message = 'CodeWar Starts in: ' + Math.floor(started/60) + 'min ' + (started%60) + 'sec';
@@ -79,9 +78,16 @@ if (Meteor.isServer) {
     //console.log(message);
   }
 
+  var problemPublished = false;
+
   function updateTime () {
     var schedule = codewarSchedule();
     var _time = (new Date).getUTCMinutes();
+    if (schedule.coding && !problemPublished) {
+        console.log("UpdateTime: publish Problems");
+        Meteor.call('publishProblem'); //Time to expose problems to everyone
+        problemPublished = true;
+    }
     //console.log(getStartTime());
     timeSync.update({
       timeSync: true

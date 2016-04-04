@@ -8,3 +8,5 @@ Web system for coding competition
 
 run 'meteor' inside your project folder<br>
 There you go<br>
+
+test

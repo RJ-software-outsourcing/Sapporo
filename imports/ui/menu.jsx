@@ -1,19 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { render } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
-import { Mongo } from 'meteor/mongo';
 
 import App from 'grommet/components/App';
-import Section from 'grommet/components/Section';
-import Header from 'grommet/components/Header';
-import Title from 'grommet/components/Title';
 import Box from 'grommet/components/Box';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';
 import MenuIcon from 'grommet/components/icons/base/Menu';
 
-export default class MainMenu extends Component {
+class MainMenu extends Component {
     getProblems () {
         return [
             { _id: 1, title: 'problem 1'},
@@ -33,6 +28,11 @@ export default class MainMenu extends Component {
             );
         }
     }
+    logout () {
+        Meteor.logout((err)=>{
+            if (err) console.log(err);
+        });
+    }
     render () {
         return (
             <Menu icon={<MenuIcon/>}>
@@ -41,16 +41,26 @@ export default class MainMenu extends Component {
                         Dashboard
                     </Anchor>
                     <Anchor href="#">
-                        Admin
+                        About
                     </Anchor>
-                    <Anchor href="#">
-                        Analyse
-                    </Anchor>
+                    {this.props.currentUser?
+                        <Anchor onClick={this.logout}>Log Out</Anchor>: ''
+                    }
                 </Box>
                 <Box colorIndex="light-1">
-                    {this.renderProblems()}
+                    {this.props.currentUser? this.renderProblems(): ''}
                 </Box>
             </Menu>
         );
     }
 };
+
+MainMenu.propTypes = {
+    currentUser: PropTypes.object
+};
+
+export default createContainer(() => {
+    return {
+        currentUser: Meteor.user()
+    }
+}, MainMenu);

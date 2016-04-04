@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { render } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
-import { Mongo } from 'meteor/mongo';
 
 import App from 'grommet/components/App';
 import Section from 'grommet/components/Section';
@@ -26,10 +25,7 @@ class Main extends Component {
                     </Box>
                 </Header>
                 <Section>
-                    {
-                        this.props.currentUser?
-                        <span>Logged in as {this.props.currentUser.username}</span>:<Login/>
-                    }
+                    {this.props.currentUser?<Dashboard />:<Login/>}
                 </Section>
             </App>
         );

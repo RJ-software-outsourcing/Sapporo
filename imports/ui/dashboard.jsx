@@ -1,10 +1,23 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { Meteor } from 'meteor/meteor';
+import { createContainer } from 'meteor/react-meteor-data';
+
 import Box from 'grommet/components/Box'
 
-export default class Dashboard extends Component {
+class Dashboard extends Component {
     render () {
         return (
-            <Box>Timer</Box>
+            <span>Hello {this.props.currentUser.username}</span>
         );
     }
 };
+
+Dashboard.propTypes = {
+    currentUser: PropTypes.object
+};
+
+export default createContainer(() => {
+    return {
+        currentUser: Meteor.user()
+    }
+}, Dashboard);

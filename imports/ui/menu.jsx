@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import { render } from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
@@ -7,6 +8,8 @@ import Box from 'grommet/components/Box';
 import Menu from 'grommet/components/Menu';
 import Anchor from 'grommet/components/Anchor';
 import MenuIcon from 'grommet/components/icons/base/Menu';
+
+import Admin from './admin.jsx';
 
 class MainMenu extends Component {
     getProblems () {
@@ -28,6 +31,10 @@ class MainMenu extends Component {
             );
         }
     }
+    admin () {
+        let element = document.getElementById('section');
+        render(React.createElement(Admin), element);
+    }
     logout () {
         Meteor.logout((err)=>{
             if (err) console.log(err);
@@ -37,11 +44,11 @@ class MainMenu extends Component {
         return (
             <Menu icon={<MenuIcon/>}>
                 <Box>
-                    <Anchor href="#">
+                    <Anchor>
                         Dashboard
                     </Anchor>
-                    <Anchor href="#">
-                        About
+                    <Anchor onClick={this.admin}>
+                        Admin
                     </Anchor>
                     {this.props.currentUser?
                         <Anchor onClick={this.logout}>Log Out</Anchor>: ''

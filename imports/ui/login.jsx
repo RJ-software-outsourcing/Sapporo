@@ -11,11 +11,7 @@ export default class Login extends Component {
         const username = ReactDOM.findDOMNode(this.refs.username).value.trim();
         const password = ReactDOM.findDOMNode(this.refs.password).value.trim();
         Meteor.loginWithPassword(username, password, (err) => {
-            if (err) {
-                console.log('Login Failed');
-            } else {
-                console.log('logged in');
-            }
+            if (err) alert('Login Failed');
         });
     }
     create () {
@@ -23,11 +19,7 @@ export default class Login extends Component {
             username: ReactDOM.findDOMNode(this.refs.username).value.trim(),
             password: ReactDOM.findDOMNode(this.refs.password).value.trim()
         }, (err) => {
-            if (err) {
-                console.log('Create Failed');
-            } else {
-                console.log('Create Success');
-            }
+            if (err) alert('Create Failed');
         });
     }
     render () {

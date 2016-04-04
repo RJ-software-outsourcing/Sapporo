@@ -1,15 +1,33 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 
-import { timer } from '../api/timer.js';
-
+import { timer } from '../api/db.js';
+import { timeSchedule } from '../library/timeLib.js';
 import Box from 'grommet/components/Box'
 
 
 class Timer extends Component {
+
+    display () {
+        if (this.props._timer) {
+            let schedule = timeSchedule(this.props._timer.systemTime, this.props._timer.gameTime);
+            if (schedule.start && schedule.end) {
+                return (<span>End</span>);
+            } else {
+                return (
+                    <span>
+                        {(!schedule.start && !schedule.end)? 'Will begin in: ': 'Remaining time: '}
+                        {schedule.time.min} min {schedule.time.sec} sec
+                    </span>
+                );
+            }
+        }
+    }
     render () {
         return (
-            <Box>{this.props._timer? this.props._timer._id:''}</Box>
+            <Box>
+                {this.display()}
+            </Box>
         );
     }
 };

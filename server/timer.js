@@ -1,7 +1,8 @@
 import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
-import {timer} from '../imports/api/timer.js';
+import {timer} from '../imports/api/db.js';
+import { isCoding } from '../imports/library/timeLib.js';
 
 let initGameTime = {
     start: {
@@ -15,17 +16,16 @@ let initGameTime = {
 }
 
 function updateTime () {
-    var _time = new Date;
-
+    let _time = new Date;
+    let db_time = timer.findOne({timeSync: true});
     timer.update({
         timeSync: true
     }, {
         $set: {
             systemTime: _time,
-            coding: false
+            coding: isCoding(_time, db_time.gameTime)
         }
     });
-
     Meteor.setTimeout(updateTime, 1000);
 }
 

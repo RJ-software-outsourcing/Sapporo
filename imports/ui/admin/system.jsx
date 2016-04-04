@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
-import { timer } from '../../api/timer.js';
+import { timer } from '../../api/db.js';
 
 import Box from 'grommet/components/Box';
 import Button from 'grommet/components/Button'
@@ -58,7 +58,6 @@ class System extends Component {
         });
     }
     componentDidMount () {
-        console.log(this.props._timer);
         this.setState({
             time: this.props._timer.gameTime
         });

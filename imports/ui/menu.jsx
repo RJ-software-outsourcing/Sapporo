@@ -60,7 +60,7 @@ class MainMenu extends Component {
             </Menu>
         );
     }
-};
+}
 
 MainMenu.propTypes = {
     currentUser: PropTypes.object

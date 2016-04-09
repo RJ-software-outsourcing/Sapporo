@@ -38,7 +38,7 @@ Meteor.startup(() => {
             }, {
                 $set: {gameTime: time}
             });
-            console.log('New time has been configured');
+            console.log(time);
         }
     });
 

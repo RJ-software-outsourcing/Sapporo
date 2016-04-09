@@ -7,25 +7,25 @@ import { timer } from '../../api/db.js';
 import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';
 
-let style = {
+const style = {
     width: '100%',
     textAlign : 'center',
     display: 'inline-block',
     marginTop : '10px'
 };
-let inlineDiv = {
+const inlineDiv = {
     display: 'inline-block',
     marginLeft: '10px',
     marginRight: '10px'
 };
-let numberInput = {
+const numberInput = {
     width: '100px',
     marginLeft: '10px'
 };
-let textInput = {
+const textInput = {
     marginLeft: '10px'
 };
-let initState = {
+const initState = {
     time: {
         start: {
             hr: -1,
@@ -111,8 +111,8 @@ class System extends Component {
                 </div>
                 <div style={style}>
                     <div style={inlineDiv}>
-                       <span>Project title:</span>
-                       <TextField type="text" id="projectName" value="Sapporo Project" style={textInput}/>
+                        <span>Project title:</span>
+                            <TextField type="text" id="projectName" value="Sapporo Project" style={textInput}/>
                     </div>
                 </div>
                 <div style={style}>

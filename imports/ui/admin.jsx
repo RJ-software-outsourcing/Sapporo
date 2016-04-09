@@ -4,6 +4,7 @@ import Tabs from 'material-ui/lib/tabs/tabs';
 import Tab from 'material-ui/lib/tabs/tab';
 
 import System from './admin/system.jsx';
+import ProblemConfig from './admin/problemConfig.jsx';
 
 const tabStyle = {
     backgroundColor: 'white',
@@ -17,8 +18,8 @@ export default class Admin extends Component {
                 <Tab label="System" style={tabStyle}>
                     <System />
                 </Tab>
-                <Tab label="Problem" style={tabStyle}>
-
+                <Tab label="Problems" style={tabStyle}>
+                    <ProblemConfig />
                 </Tab>
                 <Tab label="Docker" style={tabStyle}>
 

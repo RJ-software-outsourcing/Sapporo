@@ -48,30 +48,9 @@ class System extends Component {
         Meteor.call('time.update', this.state.time);
         updateLock = false;
     }
-    startH (event) {
+    updateTime (type, unit, event) {
         let time = this.state.time;
-        time.start.hr = event.target.value;
-        this.setState({
-            time: time
-        });
-    }
-    startM (event) {
-        let time = this.state.time;
-        time.start.min = event.target.value;
-        this.setState({
-            time: time
-        });
-    }
-    endH (event) {
-        let time = this.state.time;
-        time.end.hr = event.target.value;
-        this.setState({
-            time: time
-        });
-    }
-    endM (event) {
-        let time = this.state.time;
-        time.end.min = event.target.value;
+        time[type][unit] = event.target.value;
         this.setState({
             time: time
         });
@@ -93,19 +72,19 @@ class System extends Component {
                     <div style={inlineDiv}>
                         <span>Start Time:</span>
                         <TextField type="number" min="0" max="23" placeholder="HR" style={numberInput}
-                               value={this.state.time.start.hr} onChange={this.startH.bind(this)}
+                               value={this.state.time.start.hr} onChange={this.updateTime.bind(this, 'start', 'hr')}
                                id="starHr"/>
                         <TextField type="number" min="0" max="59" placeholder="MIN" style={numberInput}
-                               value={this.state.time.start.min} onChange={this.startM.bind(this)}
+                               value={this.state.time.start.min} onChange={this.updateTime.bind(this, 'start', 'min')}
                                id="startMin"/>
                     </div>
                     <div style={inlineDiv}>
                        <span>End Time:</span>
                        <TextField type="number" min="0" max="23" placeholder="HR" style={numberInput}
-                              value={this.state.time.end.hr} onChange={this.endH.bind(this)}
+                              value={this.state.time.end.hr} onChange={this.updateTime.bind(this, 'end', 'hr')}
                               id="endHr"/>
                        <TextField type="number" min="0" max="59" placeholder="MIN" style={numberInput}
-                              value={this.state.time.end.min} onChange={this.endM.bind(this)}
+                              value={this.state.time.end.min} onChange={this.updateTime.bind(this, 'end', 'min')}
                               id="endMin"/>
                     </div>
                 </div>

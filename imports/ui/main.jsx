@@ -2,30 +2,62 @@ import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { render, unmountComponentAtNode } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import App from 'grommet/components/App';
-import Section from 'grommet/components/Section';
-import Header from 'grommet/components/Header';
-import Box from 'grommet/components/Box';
-import Configuration from 'grommet/components/icons/base/Configuration';
+import AppBar from 'material-ui/lib/app-bar';
+import LeftNav from 'material-ui/lib/left-nav';
+import MenuItem from 'material-ui/lib/menus/menu-item';
+import Divider from 'material-ui/lib/divider';
+import DashboardIcon from 'material-ui/lib/svg-icons/action/dashboard';
+import AdminIcon from 'material-ui/lib/svg-icons/action/settings';
+import AboutIcon from 'material-ui/lib/svg-icons/action/code';
+import LogoutIcon from 'material-ui/lib/svg-icons/action/exit-to-app';
 
-import Menu from './menu.jsx';
 import Timer from './Timer.jsx';
 import Login from './login.jsx';
 import Dashboard from './dashboard.jsx';
 import Admin from './admin.jsx';
 
+injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
+
 class Main extends Component {
-    renderConfig () {
-        unmountComponentAtNode(document.getElementById('section'));
-        render(React.createElement(Admin), document.getElementById('section'));
+    constructor(props) {
+        super(props);
+        this.state = {
+            open : false,
+            sectionState: 'login'
+        };
+    }
+    navOpen () {
+        this.setState({open:true});
+    }
+    navClose () {
+        this.setState({open:false});
+    }
+    logout () {
+        Meteor.logout((err)=>{
+            this.navClose();
+            if (err) {
+                console.log(err);
+            }
+        });
+    }
+    adminPage () {
+        this.setState({sectionState: 'admin'});
+        this.navClose();
     }
     renderSection () {
-        unmountComponentAtNode(document.getElementById('section'));
+        const sectionDOM = document.getElementById('section');
         if (this.props.currentUser) {
-            render(React.createElement(Dashboard), document.getElementById('section'));
+            switch (this.state.sectionState) {
+            case 'admin':
+                render(React.createElement(Admin), sectionDOM);
+                break;
+            default:
+                render(React.createElement(Dashboard), sectionDOM);
+            }
         } else {
-            render(React.createElement(Login), document.getElementById('section'));
+            render(React.createElement(Login), sectionDOM);
         }
     }
     componentDidMount () {
@@ -36,20 +68,24 @@ class Main extends Component {
     }
     render () {
         return (
-            <App>
-                <Header direction="row" large={true} justify="between"
-                        pad={{horizontal: 'medium'}} colorIndex="neutral-1">
-                    <Menu/>
-                    <Box direction="row" pad={{between: 'medium'}}>
-                        <Timer />
-                        <Box onClick={this.renderConfig}><Configuration /></Box>
-                    </Box>
-                </Header>
-                <section id="section"></section>
-            </App>
+            <div>
+                <AppBar title="Sapporo" onClick={this.navOpen.bind(this)}>
+                </AppBar>
+                <LeftNav  docked={false} open={this.state.open}
+                          onRequestChange={this.navClose.bind(this)}>
+                    <MenuItem leftIcon={<DashboardIcon />}>Dashboard</MenuItem>
+                    <MenuItem leftIcon={<AdminIcon />} onClick={this.adminPage.bind(this)}>Admin Config</MenuItem>
+                    <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
+                    <Divider />
+                    <MenuItem leftIcon={<LogoutIcon />} onClick={this.logout.bind(this)}>Log Out</MenuItem>
+                    <Divider />
+                    <MenuItem>problem</MenuItem>
+                </LeftNav>
+                <div id="section"></div>
+            </div>
         );
     }
-};
+}
 
 
 Main.propTypes = {
@@ -59,5 +95,5 @@ Main.propTypes = {
 export default createContainer(() => {
     return {
         currentUser: Meteor.user()
-    }
+    };
 }, Main);

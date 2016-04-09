@@ -1,16 +1,19 @@
 import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
+import Timer from './Timer.jsx';
 
-import Box from 'grommet/components/Box'
 
 class Dashboard extends Component {
     render () {
         return (
-            <span>Hello {this.props.currentUser.username}</span>
+            <div>
+                <span>Hello {this.props.currentUser.username}</span>
+                <Timer />
+            </div>
         );
     }
-};
+}
 
 Dashboard.propTypes = {
     currentUser: PropTypes.object
@@ -19,5 +22,5 @@ Dashboard.propTypes = {
 export default createContainer(() => {
     return {
         currentUser: Meteor.user()
-    }
+    };
 }, Dashboard);

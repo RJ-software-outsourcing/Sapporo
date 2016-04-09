@@ -1,26 +1,29 @@
 import React, { Component } from 'react';
 
-import Tabs from 'grommet/components/Tabs'
-import Tab from 'grommet/components/Tab'
+import Tabs from 'material-ui/lib/tabs/tabs';
+import Tab from 'material-ui/lib/tabs/tab';
 
 import System from './admin/system.jsx';
+
+const tabStyle = {
+    backgroundColor: 'white',
+    color: 'black'
+};
 
 export default class Admin extends Component {
     render () {
         return (
-            <Tabs>
-                <Tab title="System">
+            <Tabs primary={false}>
+                <Tab label="System" style={tabStyle}>
                     <System />
                 </Tab>
-                <Tab title="Problems">
-                    <h3>Second Tab</h3>
-                    <p>Contents of the second tab</p>
+                <Tab label="Problem" style={tabStyle}>
+
                 </Tab>
-                <Tab title="Docker">
-                    <h3>Third Tab</h3>
-                    <p>Contents of the third tab</p>
+                <Tab label="Docker" style={tabStyle}>
+
                 </Tab>
             </Tabs>
         );
     }
-};
+}

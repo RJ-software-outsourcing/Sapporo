@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
+import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { timer } from '../api/db.js';
 import { timeSchedule } from '../library/timeLib.js';
-import Box from 'grommet/components/Box'
 
 
 class Timer extends Component {
@@ -25,12 +25,12 @@ class Timer extends Component {
     }
     render () {
         return (
-            <Box>
+            <div>
                 {this.display()}
-            </Box>
+            </div>
         );
     }
-};
+}
 
 Timer.propTypes = {
     _timer: PropTypes.object
@@ -40,5 +40,5 @@ export default createContainer(() => {
     Meteor.subscribe('timer');
     return {
         _timer: timer.findOne({timeSync: true})
-    }
+    };
 }, Timer);

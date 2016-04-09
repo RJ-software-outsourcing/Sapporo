@@ -2,7 +2,8 @@
   "name": "sapporo_grommet",
   "private": true,
   "scripts": {
-    "start": "meteor run"
+    "start": "meteor run",
+    "build:css": "node-sass --include-path node_modules main.scss bundle.css"
   },
   "dependencies": {
     "meteor-node-stubs": "~0.2.0",

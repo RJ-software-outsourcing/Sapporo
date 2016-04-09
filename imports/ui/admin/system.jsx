@@ -1,13 +1,30 @@
 import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { timer } from '../../api/db.js';
 
-import Box from 'grommet/components/Box';
-import Button from 'grommet/components/Button'
+import TextField from 'material-ui/lib/text-field';
+import RaisedButton from 'material-ui/lib/raised-button';
 
+let style = {
+    width: '100%',
+    textAlign : 'center',
+    display: 'inline-block',
+    marginTop : '10px'
+};
+let inlineDiv = {
+    display: 'inline-block',
+    marginLeft: '10px',
+    marginRight: '10px'
+};
+let numberInput = {
+    width: '100px',
+    marginLeft: '10px'
+};
+let textInput = {
+    marginLeft: '10px'
+};
 let initState = {
     time: {
         start: {
@@ -19,7 +36,8 @@ let initState = {
             min: -1
         }
     }
-}
+};
+let updateLock = false;
 
 class System extends Component {
     constructor(props) {
@@ -28,6 +46,7 @@ class System extends Component {
     }
     submit () {
         Meteor.call('time.update', this.state.time);
+        updateLock = false;
     }
     startH (event) {
         let time = this.state.time;
@@ -57,31 +76,52 @@ class System extends Component {
             time: time
         });
     }
-    componentDidMount () {
+    updateSystemData () {
+        if (updateLock) return;
         this.setState({
             time: this.props._timer.gameTime
         });
+        updateLock = true;
+    }
+    componentDidUpdate () {
+        if (!updateLock) this.updateSystemData();
     }
     render () {
         return (
-            <Box direction="column" align="center" pad={{between:"large"}}>
-                <Box direction="row" pad={{between:"small"}} align="center">
-                    <span>Start Time:</span>
-                    <input type="number" min="0" max="23" placeholder="HR"
-                           onChange={this.startH.bind(this)} value={this.state.time.start.hr}/>
-                    <input type="number" min="0" max="59" placeholder="MIN"
-                           onChange={this.startM.bind(this)} value={this.state.time.start.min}/>
-                    <span>End Time:</span>
-                    <input type="number" min="0" max="23" placeholder="HR"
-                           onChange={this.endH.bind(this)} value={this.state.time.end.hr}/>
-                    <input type="number" min="0" max="59" placeholder="MIN"
-                           onChange={this.endM.bind(this)} value={this.state.time.end.min}/>
-                </Box>
-                <Button label="Submit" onClick={this.submit.bind(this)}/>
-            </Box>
+            <div>
+                <div style={style}>
+                    <div style={inlineDiv}>
+                        <span>Start Time:</span>
+                        <TextField type="number" min="0" max="23" placeholder="HR" style={numberInput}
+                               value={this.state.time.start.hr} onChange={this.startH.bind(this)}
+                               id="starHr"/>
+                        <TextField type="number" min="0" max="59" placeholder="MIN" style={numberInput}
+                               value={this.state.time.start.min} onChange={this.startM.bind(this)}
+                               id="startMin"/>
+                    </div>
+                    <div style={inlineDiv}>
+                       <span>End Time:</span>
+                       <TextField type="number" min="0" max="23" placeholder="HR" style={numberInput}
+                              value={this.state.time.end.hr} onChange={this.endH.bind(this)}
+                              id="endHr"/>
+                       <TextField type="number" min="0" max="59" placeholder="MIN" style={numberInput}
+                              value={this.state.time.end.min} onChange={this.endM.bind(this)}
+                              id="endMin"/>
+                    </div>
+                </div>
+                <div style={style}>
+                    <div style={inlineDiv}>
+                       <span>Project title:</span>
+                       <TextField type="text" id="projectName" value="Sapporo Project" style={textInput}/>
+                    </div>
+                </div>
+                <div style={style}>
+                    <RaisedButton label="Submit"  primary={true} onClick={this.submit.bind(this)}/>
+                </div>
+            </div>
         );
     }
-};
+}
 
 System.propTypes = {
     _timer: PropTypes.object
@@ -91,5 +131,5 @@ export default createContainer(() => {
     Meteor.subscribe('timer');
     return {
         _timer: timer.findOne({timeSync: true})
-    }
+    };
 }, System);

@@ -13,7 +13,7 @@ let initGameTime = {
         hr: 0,
         min: 0
     }
-}
+};
 
 function updateTime () {
     let _time = new Date;

@@ -1,36 +1,62 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 
-import Box from 'grommet/components/Box'
-import Button from 'grommet/components/Button'
+import TextField from 'material-ui/lib/text-field';
+import RaisedButton from 'material-ui/lib/raised-button';
+
+const loginStyle = {
+    width: '60%',
+    marginLeft: '20%',
+    textAlign: 'center'
+};
+const textFieldStyle = {
+    width: '100%'
+};
+const loginButton = {
+    margin: '10px'
+};
+
 
 export default class Login extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            username: '',
+            password: ''
+        };
+    }
+    updateUsername(event) {
+        this.setState({username: event.target.value});
+    }
+    updatePassword(event) {
+        this.setState({password: event.target.value});
+    }
     login () {
-        const username = ReactDOM.findDOMNode(this.refs.username).value.trim();
-        const password = ReactDOM.findDOMNode(this.refs.password).value.trim();
-        Meteor.loginWithPassword(username, password, (err) => {
+        Meteor.loginWithPassword(this.state.username, this.state.password, (err) => {
             if (err) alert('Login Failed');
         });
     }
     create () {
         Accounts.createUser({
-            username: ReactDOM.findDOMNode(this.refs.username).value.trim(),
-            password: ReactDOM.findDOMNode(this.refs.password).value.trim()
+            username: this.state.username,
+            password: this.state.password
         }, (err) => {
             if (err) alert('Create Failed');
         });
     }
     render () {
         return (
-            <Box align="center" direction="column"
-                 justify="center" pad={{between: 'small'}}>
-                <input type="text" placeholder="User Name" ref="username"/>
-                <input type="password" placeholder="Password" ref="password"/>
-                <Button label="Login" onClick={this.login.bind(this)}/>
-                <Button label="Create" accent={true} onClick={this.create.bind(this)}/>
-            </Box>
+            <div style={loginStyle}>
+                <div>
+                    <TextField  style={textFieldStyle} floatingLabelText="User Name" onChange={this.updateUsername.bind(this)}/>
+                    <TextField  style={textFieldStyle} type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)}/>
+                </div>
+                <div>
+                    <RaisedButton style={loginButton} label="Login"  primary={true} onClick={this.login.bind(this)}/>
+                    <RaisedButton style={loginButton} label="Create" secondary={true} onClick={this.create.bind(this)}/>
+                </div>
+            </div>
         );
     }
-};
+}

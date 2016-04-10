@@ -35,17 +35,17 @@ const timeSchedule = function (now, timeSetting) {
             min: 0,
             sec: 0
         }
-    }
+    };
     if (hadStarted >= 0) {
         returnObj.time = {
             min: Math.floor(hadStarted/60),
             sec: hadStarted % 60
-        }
+        };
     } else if (hadStarted < 0 && hadEnded >= 0) {
         returnObj.time = {
             min: Math.floor(hadEnded/60),
             sec: hadEnded % 60
-        }
+        };
         returnObj.start = true;
         returnObj.isCoding = true;
     } else {
@@ -64,4 +64,4 @@ const isCoding = function (now, timeSetting) {
     return (hadStarted < 0 && hadEnded >= 0)? true:false;
 };
 
-export {timeSchedule, isCoding}
+export {timeSchedule, isCoding};

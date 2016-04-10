@@ -2,8 +2,11 @@ import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
 import {docker} from '../imports/api/db.js';
+import { commandForTest } from '../imports/library/docker.js';
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
+import stream from 'stream';
+import {createTestingFile} from './fileAccess.js';
 
 Meteor.startup(() => {
     Meteor.methods({
@@ -15,7 +18,6 @@ Meteor.startup(() => {
             }, {
                 $set: {languages: temp.languages}
             });
-            console.log(data);
         },
         'docker.remove'(key) {
             let temp = docker.findOne({docker: true});
@@ -58,8 +60,7 @@ Meteor.startup(() => {
             let future = new Future();
             let dockerData = docker.findOne({docker: true});
             if (dockerData.languages.length === 0) {
-                future.throw('No Programming Languages has been configured');
-                return;
+                throw new Meteor.Error(500, 'No Programming Language Configuration');
             }
             let testDocker = new Dockerode();
             testDocker.listImages({}, (err, data) => {
@@ -87,9 +88,50 @@ Meteor.startup(() => {
                 future.return(result);
             });
             return future.wait();
+        },
+        'docker.testImage'(){
+            let dockerData = docker.findOne({docker: true});
+            let testDocker = new Dockerode();
+            let result = [];
+            for (var key in dockerData.languages) {
+                result.push({
+                    title  : dockerData.languages[key].title,
+                    output : dockerTest(testDocker, dockerData.languages[key])
+                });
+            }
+            return result;
         }
     });
 });
+
+const dockerTest = function (dockerObj, lang) {
+    let localTestFolder = createTestingFile(lang);
+    let command = commandForTest(lang);
+    let result = dockerRun(dockerObj, lang.image, command, localTestFolder, lang.mountPath);
+    return result;
+};
+
+const dockerRun = function (dockerObj, image, command, localFolder, dockerFolder) {
+    let future = new Future();
+    let stdout = stream.Writable();
+    let stderr = stream.Writable();
+    let output = '';
+    let err    = '';
+    stdout._write = function (chunk, encoding, done) {
+        output = output + chunk.toString();
+        done();
+    };
+    stderr._write = function (chunk, encoding, done) {
+        err = err + chunk.toString();
+        done();
+    };
+    dockerObj.run(image, command, [stdout, stderr], {Tty:false}, function (error, data) {
+        future.return(output);
+    }).on('container', function (container) {
+        container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];
+    });
+    return future.wait();
+};
 
 /*
 testDocker.run('python', ['python','--version'], process.stdout, function (err, data) {

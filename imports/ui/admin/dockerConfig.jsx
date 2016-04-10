@@ -13,6 +13,7 @@ import FlatButton from 'material-ui/lib/flat-button';
 import LinearProgress from 'material-ui/lib/linear-progress';
 
 import { docker } from '../../api/db.js';
+import { commandForTest } from '../../library/docker.js';
 
 const langField = {
     display: 'inline-block',
@@ -76,23 +77,34 @@ class DockerConfig extends Component {
             add: temp
         });
     }
+    showCommandLine (lang) {
+        let strArray = commandForTest(lang);
+        return strArray.join(' ');
+    }
     renderLanguages () {
         if (!this.state.docker.languages) {
             return;
         }
         return this.state.docker.languages.map((language, key) => (
-            <div key={key} style={{width: '100%'}}>
+            <div key={key} style={{width: '100%', marginTop: '30px'}}>
                 <Divider />
                 <div>
                     <TextField type="text" value={language.title} floatingLabelText="Programming Language" onChange={this.updateLang.bind(this, key, 'title')}/>
                     <TextField type="text" value={language.image} floatingLabelText="Docker Image (repo:tag)" onChange={this.updateLang.bind(this, key, 'image')} />
-                    <RaisedButton label="Remove" secondary={true} style={{margin: '20px 20px 0px', float: 'right'}} onTouchTap={this.removeLang.bind(this, key)}/>
+                    <RaisedButton label="Remove" secondary={true} style={{margin: '20px 0px 0px', float: 'right'}} onTouchTap={this.removeLang.bind(this, key)}/>
                 </div>
                 <div style={{width: '100%'}}>
                     <TextField type="text" style={langField} value={language.executable} floatingLabelText="Executable" onChange={this.updateLang.bind(this, key, 'executable')} />
                     <TextField type="text" style={langField} value={language.preArg} floatingLabelText="Args Before Input File (Optional)" onChange={this.updateLang.bind(this, key, 'preArg')} />
                     <TextField type="text" style={langField} value={language.mountPath} floatingLabelText="Mounted Path on Docker" onChange={this.updateLang.bind(this, key, 'mountPath')} />
                     <TextField type="text" style={langField} value={language.postArg} floatingLabelText="Args After Input File (Optional)" onChange={this.updateLang.bind(this, key, 'postArg')} />
+                </div>
+                <div>
+                    <TextField type="text" style={{width:'100%'}} value={language.helloworld} floatingLabelText="Testing Script" hintText="Write script which prints 'helloworld' for testing"
+                               onChange={this.updateLang.bind(this, key, 'helloworld')} />
+                </div>
+                <div>
+                    <span>{this.showCommandLine(language)}</span>
                 </div>
             </div>
         ));
@@ -115,14 +127,29 @@ class DockerConfig extends Component {
         updateLock = false;
     }
     startTesting () {
-        this.setState({
-            runTest: true
-        });
+        this.setState({runTest: true});
         Meteor.call('docker.checkImage', (err, result) => {
             if (err) {
                 alert(err);
             } else {
+                for (var key in result) {
+                    if (!result[key].find) {
+                        alert(result[key].image + ' not found, abort.');
+                        this.setState({runTest: false});
+                        return;
+                    }
+                }
                 console.log(result);
+                alert('All images found! Ready to run them');
+                Meteor.call('docker.testImage', (err, result) => {
+                    if (err) {
+                        alert(err);
+                    } else {
+                        for (var key in result) {
+                            alert(result[key].title + ' : ' + result[key].output);
+                        }
+                    }
+                });
             }
         });
     }

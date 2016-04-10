@@ -10,6 +10,7 @@ import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
 import Divider from 'material-ui/lib/divider';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
+import LinearProgress from 'material-ui/lib/linear-progress';
 
 import { docker } from '../../api/db.js';
 
@@ -19,7 +20,7 @@ const langField = {
 };
 const defaultDocker = {
     ip: '',
-    port: 0,
+    port: '',
     languages: []
 };
 let updateLock = false;
@@ -43,6 +44,12 @@ class DockerConfig extends Component {
         Meteor.call('docker.remove', key, () => {
             this.setState({docker:defaultDocker});
             updateLock = false;
+        });
+    }
+    updateAll () {
+        updateLock = false;
+        Meteor.call('docker.update', this.state.docker, (err)=>{
+            (err)? alert('Update Failed'):alert('Update Success');
         });
     }
     componentDidUpdate () {
@@ -78,7 +85,7 @@ class DockerConfig extends Component {
                 <Divider />
                 <div>
                     <TextField type="text" value={language.title} floatingLabelText="Programming Language" onChange={this.updateLang.bind(this, key, 'title')}/>
-                    <TextField type="text" value={language.image} floatingLabelText="Docker Image" onChange={this.updateLang.bind(this, key, 'image')} />
+                    <TextField type="text" value={language.image} floatingLabelText="Docker Image (repo:tag)" onChange={this.updateLang.bind(this, key, 'image')} />
                     <RaisedButton label="Remove" secondary={true} style={{margin: '20px 20px 0px', float: 'right'}} onTouchTap={this.removeLang.bind(this, key)}/>
                 </div>
                 <div style={{width: '100%'}}>
@@ -103,22 +110,42 @@ class DockerConfig extends Component {
     }
     closeAddDialog () {
         this.setState({
-            addDialogOpen: false,
+            addDialogOpen: false
         });
         updateLock = false;
+    }
+    startTesting () {
+        this.setState({
+            runTest: true
+        });
+        Meteor.call('docker.checkImage', (err, result) => {
+            if (err) {
+                alert(err);
+            } else {
+                console.log(result);
+            }
+        });
+    }
+    abortTest () {
+        this.setState({
+            runTest: false
+        });
     }
     render () {
         const actions = [
             <FlatButton label="Cancel" secondary={true} onTouchTap={this.closeAddDialog.bind(this)}/>,
             <FlatButton label="Submit" primary={true}   onTouchTap={this.addNewLang.bind(this)}/>
         ];
-
+        const testActions = [
+            <FlatButton label="Abort" secondary={true} onTouchTap={this.abortTest.bind(this)}/>
+        ];
         return (
-            <div>
+            <div style={{width:'90%', marginLeft:'5%'}}>
                 <div>
                     <TextField type="text" id="IP address" value={this.state.docker.ip} floatingLabelText="IP address"/>
                     <TextField type="text" id="port" value={this.state.docker.port} floatingLabelText="Port number"/>
-                    <RaisedButton label="Update" primary={true} />
+                    <RaisedButton label="Update" primary={true} onTouchTap={this.updateAll.bind(this)}/>
+                    <RaisedButton label="Test" secondary={true} onTouchTap={this.startTesting.bind(this)}/>
                 </div>
                 <div>
                     <Toolbar style={{marginTop:'30px'}}>
@@ -134,7 +161,7 @@ class DockerConfig extends Component {
                 </div>
                 {this.state.add?
                     <Dialog title="Add New Language Support" actions={actions} modal={false}
-                            open={this.state.addDialogOpen} onRequestClose={this.closeAddDialog}>
+                            open={this.state.addDialogOpen} onRequestClose={this.closeAddDialog.bind(this)}>
                         <div>
                             <TextField type="text" value={this.state.add.title} floatingLabelText="Programming Language" onChange={this.updateAdd.bind(this, 'title')}/>
                             <TextField type="text" value={this.state.add.image} floatingLabelText="Docker Image"         onChange={this.updateAdd.bind(this, 'image')}/>
@@ -143,7 +170,17 @@ class DockerConfig extends Component {
                     </Dialog>
                 :''
                 }
+                {this.state.runTest?
+                    <Dialog title="Running Docker testing...." actions={testActions} modal={false}
+                            open={this.state.runTest} onRequestClose={this.abortTest.bind(this)}>
+                        <LinearProgress mode="indeterminate"/>
+                        <div>
 
+                        </div>
+
+                    </Dialog>
+                :''
+                }
             </div>
         );
     }

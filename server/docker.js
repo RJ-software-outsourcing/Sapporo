@@ -2,22 +2,8 @@ import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
 import {docker} from '../imports/api/db.js';
-
-let dockerLock = true;
-let dockerInstance = {};
-
-function validateDockerInstance () {
-    //Hahaha
-}
-
-function dockerCheckingRoutine () {
-    //check if db has been updated (always true on system start)
-    //check docker instance based on new setting
-    //If fail, dockerLock = false
-    //We may check on current docker as well
-
-    Meteor.setTimeout(dockerCheckingRoutine, 30000); //Check every 30 seconds
-}
+import Dockerode from 'dockerode';
+import Future from 'fibers/future';
 
 Meteor.startup(() => {
     Meteor.methods({
@@ -27,9 +13,7 @@ Meteor.startup(() => {
             docker.update({
                 _id: temp._id
             }, {
-                $set: {
-                    languages: temp.languages
-                }
+                $set: {languages: temp.languages}
             });
             console.log(data);
         },
@@ -40,6 +24,13 @@ Meteor.startup(() => {
                 _id: temp._id
             }, {
                 $set: temp
+            });
+        },
+        'docker.update'(data) {
+            docker.update({
+                _id: data._id
+            }, {
+                $set: data
             });
         }
     });
@@ -52,7 +43,7 @@ Meteor.startup(() => {
             port: 1234,
             languages: [{
                 title: 'Python 3',
-                image: 'python',
+                image: 'python:latest',
                 mountPath: '/usr/src/myapp/',
                 executable: 'python',
                 preArg: '',
@@ -60,5 +51,48 @@ Meteor.startup(() => {
             }]
         });
     }
-    //dockerCheckingRoutine ();
+
+    //Checking Docker
+    Meteor.methods({
+        'docker.checkImage'() {
+            let future = new Future();
+            let dockerData = docker.findOne({docker: true});
+            if (dockerData.languages.length === 0) {
+                future.throw('No Programming Languages has been configured');
+                return;
+            }
+            let testDocker = new Dockerode();
+            testDocker.listImages({}, (err, data) => {
+                if (err) {
+                    future.throw('cannot connect to Docker');
+                    return;
+                }
+                let images = data.map((image)=>{
+                    return image.RepoTags[0];
+                });
+                let result = dockerData.languages.map((lang)=>{
+                    for (var key in images) {
+                        if (lang.image === images[key]) {
+                            return {
+                                image: lang.image,
+                                find: true
+                            };
+                        }
+                    }
+                    return {
+                        image: lang.image,
+                        find: false
+                    };
+                });
+                future.return(result);
+            });
+            return future.wait();
+        }
+    });
 });
+
+/*
+testDocker.run('python', ['python','--version'], process.stdout, function (err, data) {
+    console.log(data);
+});
+*/

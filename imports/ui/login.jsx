@@ -53,8 +53,8 @@ export default class Login extends Component {
                     <TextField  style={textFieldStyle} type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)}/>
                 </div>
                 <div>
-                    <RaisedButton style={loginButton} label="Login"  primary={true} onClick={this.login.bind(this)}/>
-                    <RaisedButton style={loginButton} label="Create" secondary={true} onClick={this.create.bind(this)}/>
+                    <RaisedButton style={loginButton} label="Login"  primary={true} onTouchTap={this.login.bind(this)}/>
+                    <RaisedButton style={loginButton} label="Create" secondary={true} onTouchTap={this.create.bind(this)}/>
                 </div>
             </div>
         );

@@ -55,7 +55,7 @@ class ProblemConfig extends Component {
     renderProblems () {
         return this.props._problem.map((problem, key) => (
             <ListItem key={key} primaryText={problem.title} secondaryText={problem.score}
-                      leftIcon={<ProblemIcon />} onClick={this.clickProblem.bind(this, problem)} style={{borderBottom: '1px solid #DDD'}}/>
+                      leftIcon={<ProblemIcon />} onTouchTap={this.clickProblem.bind(this, problem)} style={{borderBottom: '1px solid #DDD'}}/>
         ));
     }
     clickProblem (problem) {
@@ -98,9 +98,9 @@ class ProblemConfig extends Component {
                     <div>
                         <TextField type="number" min="0" placeholder="Score" style={scoreStyle} value={selected.score} onChange={this.updateSelected.bind(this, 'score')}/>
                         <TextField type="text" placeholder="Title" style={titleStyle} value={selected.title} onChange={this.updateSelected.bind(this, 'title')}/>
-                        <RaisedButton label="Update" primary={true}   onClick={this.updateProblem.bind(this, selected)}/>
-                        <RaisedButton label="Cancel" onClick={this.exitEditor.bind(this)}/>
-                        <RaisedButton label="Delete" secondary={true} onClick={this.deleteProblem.bind(this, selected)}/>
+                        <RaisedButton label="Update" primary={true}   onTouchTap={this.updateProblem.bind(this, selected)}/>
+                        <RaisedButton label="Cancel" onTouchTap={this.exitEditor.bind(this)}/>
+                        <RaisedButton label="Delete" secondary={true} onTouchTap={this.deleteProblem.bind(this, selected)}/>
                     </div>
                     <div>
                         <TextField type="text" floatingLabelText="Problem Description" multiLine={true} value={selected.description}
@@ -130,7 +130,7 @@ class ProblemConfig extends Component {
                                value={this.state.addScore} onChange={this.updateAddScore.bind(this)}/>
                     <TextField type="text" id="problemName" placeholder="Title" style={titleStyle}
                                value={this.state.addTitle} onChange={this.updateAddTitle.bind(this)}/>
-                    <RaisedButton label="Add" primary={true} onClick={this.addProblem.bind(this)}/>
+                    <RaisedButton label="Add" primary={true} onTouchTap={this.addProblem.bind(this)}/>
                 </div>
                 <List style={listStyle}>
                     {this.renderProblems()}

@@ -69,15 +69,15 @@ class Main extends Component {
     render () {
         return (
             <div>
-                <AppBar title="Sapporo" onClick={this.navOpen.bind(this)}>
+                <AppBar title="Sapporo" onTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />}>Dashboard</MenuItem>
-                    <MenuItem leftIcon={<AdminIcon />} onClick={this.adminPage.bind(this)}>Admin Config</MenuItem>
+                    <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.adminPage.bind(this)}>Admin Config</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
                     <Divider />
-                    <MenuItem leftIcon={<LogoutIcon />} onClick={this.logout.bind(this)}>Log Out</MenuItem>
+                    <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>
                     <Divider />
                     <MenuItem>problem</MenuItem>
                 </LeftNav>

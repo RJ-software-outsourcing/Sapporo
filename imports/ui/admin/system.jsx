@@ -22,9 +22,6 @@ const numberInput = {
     width: '100px',
     marginLeft: '10px'
 };
-const textInput = {
-    marginLeft: '10px'
-};
 const initState = {
     time: {
         start: {
@@ -90,12 +87,11 @@ class System extends Component {
                 </div>
                 <div style={style}>
                     <div style={inlineDiv}>
-                        <span>Project title:</span>
-                            <TextField type="text" id="projectName" value="Sapporo Project" style={textInput}/>
+                            <TextField type="text" id="projectName" value="Sapporo Project" floatingLabelText="Project Name"/>
                     </div>
                 </div>
                 <div style={style}>
-                    <RaisedButton label="Submit"  primary={true} onClick={this.submit.bind(this)}/>
+                    <RaisedButton label="Submit"  primary={true} onTouchTap={this.submit.bind(this)}/>
                 </div>
             </div>
         );

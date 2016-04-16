@@ -6,7 +6,7 @@ import { commandForTest } from '../imports/library/docker.js';
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
 import stream from 'stream';
-import {createTestingFile} from './fileAccess.js';
+import {createTestingFile, createUserFile} from './fileAccess.js';
 
 Meteor.startup(() => {
     Meteor.methods({
@@ -62,7 +62,7 @@ Meteor.startup(() => {
             if (dockerData.languages.length === 0) {
                 throw new Meteor.Error(500, 'No Programming Language Configuration');
             }
-            let testDocker = new Dockerode();
+            let testDocker = getDockerInstance();
             testDocker.listImages({}, (err, data) => {
                 if (err) {
                     future.throw('cannot connect to Docker');
@@ -91,7 +91,7 @@ Meteor.startup(() => {
         },
         'docker.testImage'(){
             let dockerData = docker.findOne({docker: true});
-            let testDocker = new Dockerode();
+            let testDocker = getDockerInstance();
             let result = [];
             for (var key in dockerData.languages) {
                 result.push({
@@ -100,14 +100,40 @@ Meteor.startup(() => {
                 });
             }
             return result;
+        },
+        'docker.submitCode'(data, isTest){
+            console.log(data);
+            let dockerData = docker.findOne({docker: true});
+            let _docker = getDockerInstance(dockerData);
+            let langObj = null;
+            for (var key in dockerData.languages) {
+                if (dockerData.languages[key].title === data.language) {
+                    langObj = dockerData.languages[key];
+                }
+            }
+            if (!langObj) {
+                throw new Meteor.Error(500, 'No Programming Language Found');
+            }
+            let output = userSubmit(_docker, data, langObj);
+            return output;
         }
     });
 });
+
+const getDockerInstance = function(dockerData) {
+    return new Dockerode();
+};
 
 const dockerTest = function (dockerObj, lang) {
     let localTestFolder = createTestingFile(lang);
     let command = commandForTest(lang);
     let result = dockerRun(dockerObj, lang.image, command, localTestFolder, lang.mountPath);
+    return result;
+};
+const userSubmit = function (_docker, data, langObj) {
+    let localTestFolder = createUserFile(data);
+    let command = commandForTest(langObj);
+    let result = dockerRun(_docker, langObj.image, command, localTestFolder, langObj.mountPath);
     return result;
 };
 

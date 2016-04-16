@@ -25,12 +25,12 @@ const numberInput = {
 const initState = {
     time: {
         start: {
-            hr: -1,
-            min: -1
+            hr: null,
+            min: null
         },
         end: {
-            hr: -1,
-            min: -1
+            hr: null,
+            min: null
         }
     }
 };
@@ -40,6 +40,7 @@ class System extends Component {
     constructor(props) {
         super(props);
         this.state = initState;
+        updateLock = false;
     }
     submit () {
         Meteor.call('time.update', this.state.time);
@@ -67,6 +68,11 @@ class System extends Component {
             <div>
                 <div style={style}>
                     <div style={inlineDiv}>
+                            <TextField type="text" id="projectName" value="Sapporo Project" floatingLabelText="Project Name"/>
+                    </div>
+                </div>
+                <div style={style}>
+                    <div style={inlineDiv}>
                         <span>Start Time:</span>
                         <TextField type="number" min="0" max="23" placeholder="HR" style={numberInput}
                                value={this.state.time.start.hr} onChange={this.updateTime.bind(this, 'start', 'hr')}
@@ -85,11 +91,7 @@ class System extends Component {
                               id="endMin"/>
                     </div>
                 </div>
-                <div style={style}>
-                    <div style={inlineDiv}>
-                            <TextField type="text" id="projectName" value="Sapporo Project" floatingLabelText="Project Name"/>
-                    </div>
-                </div>
+
                 <div style={style}>
                     <RaisedButton label="Submit"  primary={true} onTouchTap={this.submit.bind(this)}/>
                 </div>

@@ -6,6 +6,7 @@ import Paper from 'material-ui/lib/paper';
 import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
+import RaisedButton from 'material-ui/lib/raised-button';
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -13,7 +14,8 @@ import AceEditor from 'react-ace';
 import * as langType from '../library/lang_import.js';
 import * as themeType from '../library/theme_import.js';
 import 'brace/theme/tomorrow_night_blue';
-//console.log(lang);
+
+import { docker } from '../api/db.js';
 
 const split = {
     width: '50%',
@@ -27,15 +29,8 @@ let updateLock = false;
 class ProblemEditor extends Component {
     constructor(props) {
         super(props);
-        var initLang = '';
-        for (var key in langType) {
-            if (key !== '__esModule') {
-                initLang = key;
-                break;
-            }
-        }
         this.state = {
-            language: initLang,
+            langType: null,
             theme: 'chaos',
             code: ''
         };
@@ -46,23 +41,22 @@ class ProblemEditor extends Component {
             code: code
         };
         localStorage.setItem(tmpObj._id, JSON.stringify(tmpObj));
-        console.log(localStorage.getItem(tmpObj._id));
         updateLock = false;
     }
     updateLang(event, index, value) {
-        this.setState({
-            language: value
-        });
-    }
-    renderLangOptions () {
-        let langList = [];
-        for (var key in langType) {
-            if (key !== '__esModule') {
-                langList.push(key);
+        for (var key in this.props._docker.languages) {
+            if (this.props._docker.languages[key].title === value) {
+                this.setState({
+                    language: value,
+                    langType: this.props._docker.languages[key].langType
+                });
             }
         }
-        return langList.map((lang, key) => (
-            <MenuItem key={key} value={lang} primaryText={lang}></MenuItem>
+    }
+    renderLangOptions () {
+        if (!this.props._docker) return;
+        return this.props._docker.languages.map((lang, key) => (
+            <MenuItem key={key} value={lang.title} primaryText={lang.title}></MenuItem>
         ));
     }
     updateTheme(event, index, value) {
@@ -92,6 +86,15 @@ class ProblemEditor extends Component {
             }
             updateLock = true;
         }
+        if (this.state.langType === null && this.props._docker) {
+            let _docker = this.props._docker;
+            if (_docker.languages && _docker.languages.length > 0) {
+                this.setState({
+                    langType: this.props._docker.languages[0].langType,
+                    language: this.props._docker.languages[0].title
+                });
+            }
+        }
     }
     componentDidMount () {
         this.updatePageData();
@@ -101,9 +104,24 @@ class ProblemEditor extends Component {
     }
     componentWillUpdate (nextProp) {
         if (nextProp.data._id !== this.props.data._id) {
-            console.log('new props');
             updateLock = false;
         }
+    }
+    submitCode (isTest) {
+        let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+        let obj = {
+            problemID: this.props.data._id,
+            language: this.state.language,
+            code: tmpObj.code,
+            user: this.props.currentUser
+        };
+        Meteor.call('docker.submitCode', obj, isTest, function (err, result) {
+            if (!err) {
+                console.log(result);
+            } else {
+                alert(err);
+            }
+        });
     }
     render () {
         const  editorOption = {
@@ -131,17 +149,27 @@ class ProblemEditor extends Component {
                     </Paper>
                     <div style={{width: '49.5%', float:'right'}}>
                         <div>
-                            <SelectField value={this.state.language} onChange={this.updateLang.bind(this)}
-                                         floatingLabelText="Choose A Language" style={{}}>
-                                         {this.renderLangOptions()}
-                            </SelectField>
-                            <SelectField value={this.state.theme} onChange={this.updateTheme.bind(this)}
-                                         floatingLabelText="Theme" style={{}}>
-                                         {this.renderThemeOptions()}
-                            </SelectField>
+                            <div style={{width:'50%', display:'inline-block'}}>
+                                <SelectField value={this.state.language} onChange={this.updateLang.bind(this)}
+                                             floatingLabelText="Language" style={{width:'50%'}}>
+                                             {this.renderLangOptions()}
+                                </SelectField>
+                                <SelectField value={this.state.theme} onChange={this.updateTheme.bind(this)}
+                                             floatingLabelText="Theme" style={{width:'50%'}}>
+                                             {this.renderThemeOptions()}
+                                </SelectField>
+                            </div>
+                            <div style={{display:'inline-block', float:'right'}}>
+                                <RaisedButton label="Test"    primary={true} onTouchTap={this.submitCode.bind(this, false)}/>
+                                <RaisedButton label="Submit"  sencondary={true} onTouchTap={this.submitCode.bind(this, true)}/>
+                            </div>
                         </div>
-                        <AceEditor mode={this.state.language} theme={this.state.theme} onChange={this.updateCode.bind(this)} value={this.state.code} width='100%'
-                              name="UNIQUE_ID_OF_DIV" editorProps={editorOption} enableBasicAutocompletion={false} enableLiveAutocompletion={false}/>
+                        {this.state.langType?
+                            <AceEditor mode={this.state.langType} theme={this.state.theme} onChange={this.updateCode.bind(this)} value={this.state.code} width='100%'
+                                  name="UNIQUE_ID_OF_DIV" editorProps={editorOption} enableBasicAutocompletion={false} enableLiveAutocompletion={false}/>
+                              :''
+                        }
+
                     </div>
                 </div>
                 <span>{this.props.data._id}</span>
@@ -152,12 +180,14 @@ class ProblemEditor extends Component {
 
 
 ProblemEditor.propTypes = {
-
+    _docker: PropTypes.object,
+    currentUser: PropTypes.object,
 };
 
 export default createContainer(() => {
-    //Meteor.subscribe('docker');
+    Meteor.subscribe('docker');
     return {
-
+        _docker: docker.findOne({docker: true}),
+        currentUser: Meteor.user()
     };
 }, ProblemEditor);

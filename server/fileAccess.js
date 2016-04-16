@@ -26,4 +26,17 @@ const createTestingFile = function (lang) {
     return testPath;
 };
 
-export {createTestingFile};
+const createUserFile = function (data) {
+    let userPath = path.join(submittedPath, data.user._id);
+    let userFile = path.join(userPath, testFileName);
+    if (!fs.existsSync(userPath)) {
+        fs.mkdirSync(userPath);
+    }
+    if (fs.existsSync(userFile)) {
+        fs.unlinkSync(userFile);
+    }
+    fs.writeFileSync(userFile, data.code);
+    return userPath;
+};
+
+export {createTestingFile, createUserFile};

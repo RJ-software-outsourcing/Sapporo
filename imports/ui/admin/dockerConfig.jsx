@@ -29,6 +29,7 @@ const defaultDocker = {
     languages: []
 };
 let updateLock = false;
+
 class DockerConfig extends Component {
     constructor(props) {
         super(props);
@@ -36,6 +37,7 @@ class DockerConfig extends Component {
             addDialogOpen: false,
             docker: defaultDocker
         };
+        updateLock = false;
     }
     addNewLang () {
         Meteor.call('docker.add', this.state.add, () => {
@@ -109,7 +111,6 @@ class DockerConfig extends Component {
         }
         return this.state.docker.languages.map((language, key) => (
             <div key={key} style={{width: '100%', marginTop: '30px'}}>
-                <Divider />
                 <div>
                     <TextField type="text" value={language.title} floatingLabelText="Programming Language" onChange={this.updateLang.bind(this, key, 'title')}/>
                     <TextField type="text" value={language.image} floatingLabelText="Docker Image (repo:tag)" onChange={this.updateLang.bind(this, key, 'image')} />

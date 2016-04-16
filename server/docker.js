@@ -1,8 +1,8 @@
 import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
-import {docker} from '../imports/api/db.js';
-import { commandForTest } from '../imports/library/docker.js';
+import {docker, problem} from '../imports/api/db.js';
+import { commandForImage, commandForTest, resultCompare} from '../imports/library/docker.js';
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
 import stream from 'stream';
@@ -104,6 +104,7 @@ Meteor.startup(() => {
         'docker.submitCode'(data, isTest){
             console.log(data);
             let dockerData = docker.findOne({docker: true});
+            let problemData = problem.findOne({_id:data.problemID});
             let _docker = getDockerInstance(dockerData);
             let langObj = null;
             for (var key in dockerData.languages) {
@@ -114,7 +115,16 @@ Meteor.startup(() => {
             if (!langObj) {
                 throw new Meteor.Error(500, 'No Programming Language Found');
             }
-            let output = userSubmit(_docker, data, langObj);
+            let output = {
+                pass: false,
+                stdout: null
+            };
+            if (isTest) {
+                let testInput = problemData.testInput;
+                console.log(problemData.testOutput);
+                output.stdout = userSubmit(_docker, data, langObj, testInput);
+                output.pass   = resultCompare(output.stdout, problemData.testOutput);
+            }
             return output;
         }
     });
@@ -130,9 +140,10 @@ const dockerTest = function (dockerObj, lang) {
     let result = dockerRun(dockerObj, lang.image, command, localTestFolder, lang.mountPath);
     return result;
 };
-const userSubmit = function (_docker, data, langObj) {
+const userSubmit = function (_docker, data, langObj, testInput) {
     let localTestFolder = createUserFile(data);
-    let command = commandForTest(langObj);
+    let command = commandForImage(langObj, testInput);
+    console.log(command);
     let result = dockerRun(_docker, langObj.image, command, localTestFolder, langObj.mountPath);
     return result;
 };
@@ -151,7 +162,7 @@ const dockerRun = function (dockerObj, image, command, localFolder, dockerFolder
         err = err + chunk.toString();
         done();
     };
-    dockerObj.run(image, command, [stdout, stderr], {Tty:false}, function (error, data) {
+    dockerObj.run(image, command, [stdout, stderr], {Tty:false}, function (error) {
         if (err !== '') {
             future.return(err);
         } else if (error) {

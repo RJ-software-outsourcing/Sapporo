@@ -7,6 +7,9 @@ import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import RaisedButton from 'material-ui/lib/raised-button';
+import FlatButton from 'material-ui/lib/flat-button';
+import Dialog from 'material-ui/lib/dialog';
+import LinearProgress from 'material-ui/lib/linear-progress';
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -31,8 +34,9 @@ class ProblemEditor extends Component {
         super(props);
         this.state = {
             langType: null,
-            theme: 'chaos',
-            code: ''
+            theme: 'vibrant_ink',
+            code: '',
+            runCode: false
         };
     }
     updateCode(code) {
@@ -108,6 +112,7 @@ class ProblemEditor extends Component {
         }
     }
     submitCode (isTest) {
+        this.setState({runCode: true});
         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
         let obj = {
             problemID: this.props.data._id,
@@ -115,18 +120,29 @@ class ProblemEditor extends Component {
             code: tmpObj.code,
             user: this.props.currentUser
         };
-        Meteor.call('docker.submitCode', obj, isTest, function (err, result) {
+        Meteor.call('docker.submitCode', obj, isTest, (err, result) => {
             if (!err) {
-                console.log(result);
+                if (result.pass) {
+                    alert('Success :D');
+                } else {
+                    alert('failed');
+                }
+                this.closeDialog();
             } else {
                 alert(err);
             }
         });
     }
+    closeDialog() {
+        this.setState({runCode: false});
+    }
     render () {
         const  editorOption = {
             $blockScrolling: true
         };
+        const actions = [
+            <FlatButton label="Exit" secondary={true} onTouchTap={this.closeDialog.bind(this)}/>
+        ];
         return (
             <div>
                 <div style={{display:'inline-block', width: '100%', padding:'10px 0'}} >
@@ -160,8 +176,8 @@ class ProblemEditor extends Component {
                                 </SelectField>
                             </div>
                             <div style={{display:'inline-block', float:'right'}}>
-                                <RaisedButton label="Test"    primary={true} onTouchTap={this.submitCode.bind(this, false)}/>
-                                <RaisedButton label="Submit"  sencondary={true} onTouchTap={this.submitCode.bind(this, true)}/>
+                                <RaisedButton label="Test"    primary={true} onTouchTap={this.submitCode.bind(this, true)}/>
+                                <RaisedButton label="Submit"  secondary={true} onTouchTap={this.submitCode.bind(this, false)}/>
                             </div>
                         </div>
                         {this.state.langType?
@@ -173,6 +189,10 @@ class ProblemEditor extends Component {
                     </div>
                 </div>
                 <span>{this.props.data._id}</span>
+                <Dialog title="Verifying..." actions={actions} modal={false}
+                        open={this.state.runCode}>
+                    <LinearProgress mode="indeterminate"/>
+                </Dialog>
             </div>
         );
     }

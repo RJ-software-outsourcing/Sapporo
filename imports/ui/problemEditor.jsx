@@ -23,6 +23,7 @@ const textDiv = {
     width: '96%',
     padding: '0px 2%'
 };
+let updateLock = false;
 class ProblemEditor extends Component {
     constructor(props) {
         super(props);
@@ -35,11 +36,18 @@ class ProblemEditor extends Component {
         }
         this.state = {
             language: initLang,
-            theme: 'chaos'
+            theme: 'chaos',
+            code: ''
         };
     }
     updateCode(code) {
-        //console.log(code);
+        let tmpObj = {
+            _id: this.props.data._id,
+            code: code
+        };
+        localStorage.setItem(tmpObj._id, JSON.stringify(tmpObj));
+        console.log(localStorage.getItem(tmpObj._id));
+        updateLock = false;
     }
     updateLang(event, index, value) {
         this.setState({
@@ -72,6 +80,30 @@ class ProblemEditor extends Component {
         return themeList.map((theme, key) => (
             <MenuItem key={key} value={theme} primaryText={theme}></MenuItem>
         ));
+    }
+    updatePageData () {
+        if (!updateLock) {
+            let tmpObj = localStorage.getItem(this.props.data._id);
+            if (tmpObj || tmpObj !== '') {
+                tmpObj = JSON.parse(tmpObj);
+                this.setState ({
+                    code: tmpObj.code
+                });
+            }
+            updateLock = true;
+        }
+    }
+    componentDidMount () {
+        this.updatePageData();
+    }
+    componentDidUpdate () {
+        this.updatePageData();
+    }
+    componentWillUpdate (nextProp) {
+        if (nextProp.data._id !== this.props.data._id) {
+            console.log('new props');
+            updateLock = false;
+        }
     }
     render () {
         const  editorOption = {
@@ -108,7 +140,7 @@ class ProblemEditor extends Component {
                                          {this.renderThemeOptions()}
                             </SelectField>
                         </div>
-                        <AceEditor mode={this.state.language} theme={this.state.theme} onChange={this.updateCode.bind(this)} width='100%'
+                        <AceEditor mode={this.state.language} theme={this.state.theme} onChange={this.updateCode.bind(this)} value={this.state.code} width='100%'
                               name="UNIQUE_ID_OF_DIV" editorProps={editorOption} enableBasicAutocompletion={false} enableLiveAutocompletion={false}/>
                     </div>
                 </div>

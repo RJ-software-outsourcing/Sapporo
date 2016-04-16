@@ -4,19 +4,16 @@ import { createContainer } from 'meteor/react-meteor-data';
 
 import Paper from 'material-ui/lib/paper';
 import TextField from 'material-ui/lib/text-field';
-import DropDownMenu from 'material-ui/lib/DropDownMenu';
+import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import brace from 'brace';
 import AceEditor from 'react-ace';
 
-import 'brace/mode/java';
-import 'brace/mode/javascript';
-import 'brace/mode/c_cpp';
-import 'brace/mode/python';
+import * as langType from '../library/lang_import.js';
+import * as themeType from '../library/theme_import.js';
 import 'brace/theme/tomorrow_night_blue';
-
-import { docker } from '../api/db.js';
+//console.log(lang);
 
 const split = {
     width: '50%',
@@ -29,15 +26,52 @@ const textDiv = {
 class ProblemEditor extends Component {
     constructor(props) {
         super(props);
+        var initLang = '';
+        for (var key in langType) {
+            if (key !== '__esModule') {
+                initLang = key;
+                break;
+            }
+        }
         this.state = {
-            language: 'c_cpp'
+            language: initLang,
+            theme: 'chaos'
         };
     }
     updateCode(code) {
         //console.log(code);
     }
+    updateLang(event, index, value) {
+        this.setState({
+            language: value
+        });
+    }
     renderLangOptions () {
-
+        let langList = [];
+        for (var key in langType) {
+            if (key !== '__esModule') {
+                langList.push(key);
+            }
+        }
+        return langList.map((lang, key) => (
+            <MenuItem key={key} value={lang} primaryText={lang}></MenuItem>
+        ));
+    }
+    updateTheme(event, index, value) {
+        this.setState({
+            theme: value
+        });
+    }
+    renderThemeOptions () {
+        let themeList = [];
+        for (var key in themeType) {
+            if (key !== '__esModule') {
+                themeList.push(key);
+            }
+        }
+        return themeList.map((theme, key) => (
+            <MenuItem key={key} value={theme} primaryText={theme}></MenuItem>
+        ));
     }
     render () {
         const  editorOption = {
@@ -65,11 +99,16 @@ class ProblemEditor extends Component {
                     </Paper>
                     <div style={{width: '49.5%', float:'right'}}>
                         <div>
-                            <DropDownMenu value={this.state.language}>
-                                {this.renderLangOptions()}
-                            </DropDownMenu>
+                            <SelectField value={this.state.language} onChange={this.updateLang.bind(this)}
+                                         floatingLabelText="Choose A Language" style={{}}>
+                                         {this.renderLangOptions()}
+                            </SelectField>
+                            <SelectField value={this.state.theme} onChange={this.updateTheme.bind(this)}
+                                         floatingLabelText="Theme" style={{}}>
+                                         {this.renderThemeOptions()}
+                            </SelectField>
                         </div>
-                        <AceEditor mode={this.state.language} theme="tomorrow_night_blue" onChange={this.updateCode.bind(this)} width='100%'
+                        <AceEditor mode={this.state.language} theme={this.state.theme} onChange={this.updateCode.bind(this)} width='100%'
                               name="UNIQUE_ID_OF_DIV" editorProps={editorOption} enableBasicAutocompletion={false} enableLiveAutocompletion={false}/>
                     </div>
                 </div>
@@ -81,12 +120,12 @@ class ProblemEditor extends Component {
 
 
 ProblemEditor.propTypes = {
-    _docker: PropTypes.object
+
 };
 
 export default createContainer(() => {
-    Meteor.subscribe('docker');
+    //Meteor.subscribe('docker');
     return {
-        _docker: docker.findOne({docker: true})
+
     };
 }, ProblemEditor);

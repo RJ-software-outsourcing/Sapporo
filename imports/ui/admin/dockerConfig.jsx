@@ -11,9 +11,13 @@ import Divider from 'material-ui/lib/divider';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import LinearProgress from 'material-ui/lib/linear-progress';
+import SelectField from 'material-ui/lib/select-field';
+import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import { docker } from '../../api/db.js';
 import { commandForTest } from '../../library/docker.js';
+import brace from 'brace';
+import * as langType from '../../library/lang_import.js';
 
 const langField = {
     display: 'inline-block',
@@ -70,6 +74,13 @@ class DockerConfig extends Component {
             docker: temp
         });
     }
+    updateType (key, event, index, value) {
+        let temp = this.state.docker;
+        temp.languages[key]['langType'] = value;
+        this.setState({
+            docker: temp
+        });
+    }
     updateAdd (attr, event) {
         let temp = this.state.add;
         temp[attr] = event.target.value;
@@ -81,6 +92,17 @@ class DockerConfig extends Component {
         let strArray = commandForTest(lang);
         return strArray.join(' ');
     }
+    renderLangOptions () {
+        let langList = [];
+        for (var key in langType) {
+            if (key !== '__esModule') {
+                langList.push(key);
+            }
+        }
+        return langList.map((lang, key) => (
+            <MenuItem key={key} value={lang} primaryText={lang}></MenuItem>
+        ));
+    }
     renderLanguages () {
         if (!this.state.docker.languages) {
             return;
@@ -91,6 +113,8 @@ class DockerConfig extends Component {
                 <div>
                     <TextField type="text" value={language.title} floatingLabelText="Programming Language" onChange={this.updateLang.bind(this, key, 'title')}/>
                     <TextField type="text" value={language.image} floatingLabelText="Docker Image (repo:tag)" onChange={this.updateLang.bind(this, key, 'image')} />
+                    <SelectField value={language.langType}  onChange={this.updateType.bind(this, key)}
+                                 floatingLabelText="Language Family" style={{top:'-8px'}}>{this.renderLangOptions()}</SelectField>
                     <RaisedButton label="Remove" secondary={true} style={{margin: '20px 0px 0px', float: 'right'}} onTouchTap={this.removeLang.bind(this, key)}/>
                 </div>
                 <div style={{width: '100%'}}>
@@ -100,12 +124,13 @@ class DockerConfig extends Component {
                     <TextField type="text" style={langField} value={language.postArg} floatingLabelText="Args After Input File (Optional)" onChange={this.updateLang.bind(this, key, 'postArg')} />
                 </div>
                 <div>
-                    <TextField type="text" style={{width:'100%'}} value={language.helloworld} floatingLabelText="Testing Script" hintText="Write script which prints 'helloworld' for testing"
-                               onChange={this.updateLang.bind(this, key, 'helloworld')} />
+                    <span style={{float:'right'}}>{this.showCommandLine(language)}</span>
                 </div>
                 <div>
-                    <span>{this.showCommandLine(language)}</span>
+                    <TextField type="text" style={{width:'100%'}} value={language.helloworld} floatingLabelText="Testing Script" hintText="Write script which prints 'helloworld' for testing"
+                               onChange={this.updateLang.bind(this, key, 'helloworld')} rows={2} rowsMax={2} multiLine={true}/>
                 </div>
+
             </div>
         ));
     }
@@ -139,7 +164,6 @@ class DockerConfig extends Component {
                         return;
                     }
                 }
-                console.log(result);
                 alert('All images found! Ready to run them');
                 Meteor.call('docker.testImage', (err, result) => {
                     if (err) {
@@ -167,7 +191,7 @@ class DockerConfig extends Component {
             <FlatButton label="Abort" secondary={true} onTouchTap={this.abortTest.bind(this)}/>
         ];
         return (
-            <div style={{width:'90%', marginLeft:'5%'}}>
+            <div style={{}}>
                 <div>
                     <TextField type="text" id="IP address" value={this.state.docker.ip} floatingLabelText="IP address"/>
                     <TextField type="text" id="port" value={this.state.docker.port} floatingLabelText="Port number"/>

@@ -126,7 +126,15 @@ const dockerRun = function (dockerObj, image, command, localFolder, dockerFolder
         done();
     };
     dockerObj.run(image, command, [stdout, stderr], {Tty:false}, function (error, data) {
-        future.return(output);
+        if (err !== '') {
+            future.return(err);
+        } else if (error) {
+            future.return(error);
+        } else if (output) {
+            future.return(output);
+        } else {
+            future.return('Weird');
+        }
     }).on('container', function (container) {
         container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];
     });

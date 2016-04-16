@@ -1,8 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { render, unmountComponentAtNode } from 'react-dom';
+import { render} from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+
+import { problem } from '../api/db.js';
 
 import AppBar from 'material-ui/lib/app-bar';
 import LeftNav from 'material-ui/lib/left-nav';
@@ -17,6 +19,7 @@ import Timer from './Timer.jsx';
 import Login from './login.jsx';
 import Dashboard from './dashboard.jsx';
 import Admin from './admin.jsx';
+import ProblemEditor from './problemEditor.jsx';
 
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
 
@@ -53,12 +56,33 @@ class Main extends Component {
             case 'admin':
                 render(React.createElement(Admin), sectionDOM);
                 break;
+            case 'dashboard':
+                render(React.createElement(Dashboard), sectionDOM);
+                break;
+            case 'problemEditor':
+                render(<ProblemEditor data={this.state.problem}/>, sectionDOM);
+                break;
             default:
                 render(React.createElement(Dashboard), sectionDOM);
             }
         } else {
             render(React.createElement(Login), sectionDOM);
         }
+    }
+    dashboard () {
+        this.setState({sectionState: 'dashboard'});
+        this.navClose();
+    }
+    renderProblemEditor (problem) {
+        this.setState({sectionState: 'problemEditor', problem: problem});
+        this.navClose();
+    }
+    renderProblems () {
+        return this.props._problem.map((problem, key) => (
+            <MenuItem key={key} leftIcon={<AboutIcon />} onTouchTap={this.renderProblemEditor.bind(this, problem)}>
+                {problem.title}
+            </MenuItem>
+        ));
     }
     componentDidMount () {
         this.renderSection();
@@ -73,13 +97,14 @@ class Main extends Component {
                 </AppBar>
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
-                    <MenuItem leftIcon={<DashboardIcon />}>Dashboard</MenuItem>
+                    <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.dashboard.bind(this)}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.adminPage.bind(this)}>Admin Config</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>
                     <Divider />
                     <MenuItem>problem</MenuItem>
+                    {this.renderProblems()}
                 </LeftNav>
                 <div id="section"></div>
             </div>
@@ -89,11 +114,14 @@ class Main extends Component {
 
 
 Main.propTypes = {
-    currentUser: PropTypes.object
+    currentUser: PropTypes.object,
+    _problem: PropTypes.array.isRequired
 };
 
 export default createContainer(() => {
+    Meteor.subscribe('problem');
     return {
-        currentUser: Meteor.user()
+        currentUser: Meteor.user(),
+        _problem: problem.find({}).fetch()
     };
 }, Main);

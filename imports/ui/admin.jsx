@@ -6,6 +6,8 @@ import Tab from 'material-ui/lib/tabs/tab';
 import System from './admin/system.jsx';
 import ProblemConfig from './admin/problemConfig.jsx';
 import DockerConfig from './admin/dockerConfig.jsx';
+import Rank from './admin/rank.jsx';
+
 
 const tabStyle = {
     backgroundColor: 'white',
@@ -24,6 +26,9 @@ export default class Admin extends Component {
                 </Tab>
                 <Tab label="Docker" style={tabStyle}>
                     <DockerConfig />
+                </Tab>
+                <Tab label="Ranking" style={tabStyle}>
+                    <Rank />
                 </Tab>
             </Tabs>
         );

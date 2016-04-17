@@ -98,7 +98,7 @@ class Main extends Component {
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.dashboard.bind(this)}>Dashboard</MenuItem>
-                    <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.adminPage.bind(this)}>Admin Config</MenuItem>
+                    <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.adminPage.bind(this)}>Administrator</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>

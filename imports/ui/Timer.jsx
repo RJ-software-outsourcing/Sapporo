@@ -14,7 +14,7 @@ class Timer extends Component {
             if (schedule.start && schedule.end) {
                 return 'End';
             } else {
-                return (!schedule.start && !schedule.end)? 'Begins In: ': '' + schedule.time.min + ' min ' + schedule.time.sec + ' sec';
+                return ((!schedule.start && !schedule.end)? 'Begins In: ': '') + schedule.time.min + ' min ' + schedule.time.sec + ' sec';
             }
         }
     }

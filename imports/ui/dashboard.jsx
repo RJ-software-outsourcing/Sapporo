@@ -5,6 +5,14 @@ import Timer from './Timer.jsx';
 
 import GridList from 'material-ui/lib/grid-list/grid-list';
 import GridTile from 'material-ui/lib/grid-list/grid-tile';
+import AccountIcon from 'material-ui/lib/svg-icons/action/account-circle';
+import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
+import ClockIcon from 'material-ui/lib/svg-icons/device/access-time';
+import TotalIcon from 'material-ui/lib/svg-icons/toggle/star-half';
+import PassIcon from 'material-ui/lib/svg-icons/navigation/check';
+import OnlineIcon from 'material-ui/lib/svg-icons/action/question-answer';
+import AboutIcon from 'material-ui/lib/svg-icons/action/code';
+import IconButton from 'material-ui/lib/icon-button';
 
 import { problem, userData } from '../api/db.js';
 import { getTotalScore, getUserTotalScore, getCurrentUserData, getUserPassedProblem } from '../library/score_lib.js';
@@ -13,7 +21,7 @@ const styles = {
     gridList: {
         width: '100%',
         overflowY: 'auto',
-        marginTop:'10px'
+        marginTop:'5px'
     }
 };
 const cellHeight = function () {
@@ -85,52 +93,60 @@ class Dashboard extends Component {
     }
     render () {
         const tilesData = [{
-            title: 'Hi ' + Meteor.user().username,
+            title: Meteor.user().username,
             featured: true,
             cols: 2,
             image: '/images/1.jpg',
-            backgroundColor: 'rgba(0,0,80,0.5)',
+            backgroundColor: 'rgba(0,40,80,0.3)',
+            icon: <IconButton><AccountIcon color="white" /></IconButton>
         }, {
             title: 'Live Feed Messages',
             cols: 2,
             image: '/images/6.jpg',
-            backgroundColor: 'rgba(0,80,0,0.5)'
+            backgroundColor: 'rgba(0,165,200,1)',
+            icon: <IconButton><MessageIcon color="white" /></IconButton>
         }, {
             title: 'Time',
             cols: 2,
-            image: '/images/3.jpg',
-            backgroundColor: 'rgba(80,0,0,0.5)',
-            content: getTimerTile(<Timer/>)
+            image: '/images/6.jpg',
+            backgroundColor: 'rgba(0,40,80, 0.6)',
+            content: getTimerTile(<Timer/>),
+            icon: <IconButton><ClockIcon color="white" /></IconButton>
         }, {
             title: 'Total Score',
             featured: true,
             cols: 1.5,
             image: '/images/4.jpg',
-            backgroundColor: 'rgba(40,0,40,0.5)',
-            content: this.getScoreTile()
+            backgroundColor: 'rgba(255,80,80,1)',
+            content: this.getScoreTile(),
+            icon: <IconButton><TotalIcon color="white" /></IconButton>
         }, {
             title: 'Passed Problems',
             cols: 1.5,
-            image: '/images/5.jpg',
-            backgroundColor: 'rgba(0,50,50,0.5)',
-            content: this.getPassProblemTile()
+            image: '/images/3.jpg',
+            backgroundColor: 'rgba(80,40,0,0.6)',
+            content: this.getPassProblemTile(),
+            icon: <IconButton><PassIcon color="white" /></IconButton>
         }, {
             title: 'Online Help',
             featured: true,
             cols: 1.5,
             image: '/images/3.jpg',
-            backgroundColor: 'rgba(80,80,0,0.5)'
+            backgroundColor: 'rgba(0,165,165,1)',
+            icon: <IconButton><OnlineIcon color="white" /></IconButton>
         }, {
             title: 'About Us',
             cols: 1.5,
             image: '/images/5.jpg',
-            backgroundColor: 'rgba(80,80,160,0.5)'
+            backgroundColor: 'rgba(0,80,160,0.5)',
+            icon: <IconButton><AboutIcon color="white" /></IconButton>
         }];
         return (
             <div>
                 <GridList cols={6} cellHeight={cellHeight()} padding={5} style={styles.gridList}>
                           {tilesData.map((tile, key) => (
                     <GridTile key={key} title={tile.title}
+                              actionIcon={tile.icon}
                               actionPosition="left" titlePosition="bottom"
                               titleBackground="rgba(0, 0, 0, 0.6)" children={this.getContent(tile)}
                               cols={tile.cols} rows={1} style={this.tileStyle(tile)}>

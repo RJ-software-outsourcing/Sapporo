@@ -8,7 +8,9 @@ class Dashboard extends Component {
     render () {
         return (
             <div>
-                <span>Hello {this.props.currentUser.username}</span>
+                <span>Hello {this.props.currentUser?
+                                this.props.currentUser.username: ''
+                            }</span>
                 <Timer />
             </div>
         );

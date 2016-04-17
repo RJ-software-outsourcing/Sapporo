@@ -7,6 +7,7 @@ import Dockerode from 'dockerode';
 import Future from 'fibers/future';
 import stream from 'stream';
 import {createTestingFile, createUserFile} from './fileAccess.js';
+import {updateProblem} from './userData.js';
 
 Meteor.startup(() => {
     Meteor.methods({
@@ -134,6 +135,7 @@ Meteor.startup(() => {
                 }
                 output.stdout = null;
                 output.pass = success;
+                updateProblem(data.user._id, data.problemID, success, data.code);
             }
             return output;
         }

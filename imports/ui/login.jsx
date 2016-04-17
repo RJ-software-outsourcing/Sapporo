@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 
+import { userData } from '../api/db.js';
+
 import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';
 
@@ -32,9 +34,18 @@ export default class Login extends Component {
     updatePassword(event) {
         this.setState({password: event.target.value});
     }
+    checkUser () {
+        Meteor.call('user.check', Meteor.user()._id, function (err) {
+            if (err) alert('User Check failed');
+        });
+    }
     login () {
         Meteor.loginWithPassword(this.state.username, this.state.password, (err) => {
-            if (err) alert('Login Failed');
+            if (err) {
+                alert(err);
+            } else {
+                this.checkUser();
+            }
         });
     }
     create () {
@@ -42,7 +53,11 @@ export default class Login extends Component {
             username: this.state.username,
             password: this.state.password
         }, (err) => {
-            if (err) alert('Create Failed');
+            if (err) {
+                alert(err);
+            } else {
+                this.checkUser();
+            }
         });
     }
     render () {

@@ -12,22 +12,15 @@ class Timer extends Component {
         if (this.props._timer) {
             let schedule = timeSchedule(this.props._timer.systemTime, this.props._timer.gameTime);
             if (schedule.start && schedule.end) {
-                return (<span>End</span>);
+                return 'End';
             } else {
-                return (
-                        <span>
-                            {(!schedule.start && !schedule.end)? 'Starts in: ': ''}
-                            {schedule.time.min} min {schedule.time.sec} sec
-                        </span>
-                );
+                return (!schedule.start && !schedule.end)? 'Begins In: ': '' + schedule.time.min + ' min ' + schedule.time.sec + ' sec';
             }
         }
     }
     render () {
         return (
-            <div style={{verticalAlign:'middle'}}>
-                {this.display()}
-            </div>
+            <span>{this.display()}</span>
         );
     }
 }

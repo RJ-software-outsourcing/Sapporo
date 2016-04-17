@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { render} from 'react-dom';
+import { render, unmountComponentAtNode } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
@@ -54,16 +54,16 @@ class Main extends Component {
         if (this.props.currentUser) {
             switch (this.state.sectionState) {
             case 'admin':
-                render(React.createElement(Admin), sectionDOM);
+                render(<Admin />, sectionDOM);
                 break;
             case 'dashboard':
-                render(React.createElement(Dashboard), sectionDOM);
+                render(<Dashboard />, sectionDOM);
                 break;
             case 'problemEditor':
                 render(<ProblemEditor data={this.state.problem}/>, sectionDOM);
                 break;
             default:
-                render(React.createElement(Dashboard), sectionDOM);
+                render(<Dashboard />, sectionDOM);
             }
         } else {
             render(React.createElement(Login), sectionDOM);
@@ -93,7 +93,7 @@ class Main extends Component {
     render () {
         return (
             <div>
-                <AppBar title="Sapporo" onTouchTap={this.navOpen.bind(this)}>
+                <AppBar title="Sapporo" onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>

@@ -28,7 +28,7 @@ const defaultDocker = {
     port: '',
     languages: []
 };
-let updateLock = false;
+let updateDockerLock = false;
 
 class DockerConfig extends Component {
     constructor(props) {
@@ -37,7 +37,7 @@ class DockerConfig extends Component {
             addDialogOpen: false,
             docker: defaultDocker
         };
-        updateLock = false;
+        updateDockerLock = false;
     }
     addNewLang () {
         Meteor.call('docker.add', this.state.add, () => {
@@ -50,24 +50,28 @@ class DockerConfig extends Component {
     removeLang (key) {
         Meteor.call('docker.remove', key, () => {
             this.setState({docker:defaultDocker});
-            updateLock = false;
+            updateDockerLock = false;
         });
     }
     updateAll () {
-        updateLock = false;
+        updateDockerLock = false;
         Meteor.call('docker.update', this.state.docker, (err)=>{
             (err)? alert('Update Failed'):alert('Update Success');
         });
     }
+    componentDidMount () {
+        updateDockerLock = false;
+    }
     componentDidUpdate () {
-        if (!updateLock) this.updateDocker();
+        if (!updateDockerLock) this.updateDocker();
     }
     updateDocker () {
-        if (updateLock) return;
-        this.setState({
-            docker: this.props._docker
-        });
-        updateLock = true;
+        if (this.props._docker) {
+            this.setState({
+                docker: this.props._docker
+            });
+            updateDockerLock = true;
+        }
     }
     updateLang (key, attr, event) {
         let temp = this.state.docker;
@@ -150,7 +154,7 @@ class DockerConfig extends Component {
         this.setState({
             addDialogOpen: false
         });
-        updateLock = false;
+        updateDockerLock = false;
     }
     startTesting () {
         this.setState({runTest: true});

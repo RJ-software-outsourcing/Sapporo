@@ -66,7 +66,8 @@ class ProblemConfig extends Component {
     addProblem () {
         Meteor.call('problem.add', {
             title: this.state.addTitle,
-            score: this.state.addScore
+            score: this.state.addScore,
+            verfication: []
         });
         this.setState(initState);
     }
@@ -88,6 +89,44 @@ class ProblemConfig extends Component {
             selectProblem : temp
         });
     }
+    addVerificationCase () {
+        let selected = this.state.selectProblem;
+        selected.verfication.push({
+            input: null,
+            output: null
+        });
+        this.setState({
+            selectProblem: selected
+        });
+    }
+    updateVerificationCase (key, field, event) {
+        let selected = this.state.selectProblem;
+        selected.verfication[key][field] = event.target.value;
+        this.setState({
+            selectProblem : selected
+        });
+    }
+    deleteVerificationCase (key) {
+        let selected = this.state.selectProblem;
+        selected.verfication.splice(key, 1);
+        this.setState({
+            selectProblem: selected
+        });
+    }
+    renderVerification () {
+        if (!this.state.selectProblem.verfication) {
+            return;
+        }
+        return this.state.selectProblem.verfication.map((item, key) => (
+            <div style={{width: '100%'}} key={key}>
+                <TextField type="text" placeholder="Input"  value={item.input}  name={key+'input'}
+                           onChange={this.updateVerificationCase.bind(this, key, 'input')}/>
+                       <TextField type="text" placeholder="Output" value={item.output} name={key+'output'}
+                           onChange={this.updateVerificationCase.bind(this, key, 'output')}/>
+                <RaisedButton label="Delete" secondary={true} onTouchTap={this.deleteVerificationCase.bind(this, key)}/>
+            </div>
+        ));
+    }
     renderEditor () {
         let selected = this.state.selectProblem;
         return (
@@ -96,27 +135,33 @@ class ProblemConfig extends Component {
                 <div style={{position: 'fixed', top:'5vh', left:'5%', width: '85%', height: '85vh', padding:'2.5vh 2.5%',
                      backgroundColor:'white', zIndex:'2500', overflow:'scroll'}}>
                     <div>
-                        <TextField type="number" min="0" placeholder="Score" style={scoreStyle} value={selected.score} onChange={this.updateSelected.bind(this, 'score')}/>
-                        <TextField type="text" placeholder="Title" style={titleStyle} value={selected.title} onChange={this.updateSelected.bind(this, 'title')}/>
+                        <TextField type="number" min="0" placeholder="Score" name="number"
+                                   style={scoreStyle} value={selected.score} onChange={this.updateSelected.bind(this, 'score')}/>
+                        <TextField type="text" placeholder="Title" style={titleStyle} name="title"
+                                   value={selected.title} onChange={this.updateSelected.bind(this, 'title')}/>
                         <RaisedButton label="Update" primary={true}   onTouchTap={this.updateProblem.bind(this, selected)}/>
                         <RaisedButton label="Cancel" onTouchTap={this.exitEditor.bind(this)}/>
                         <RaisedButton label="Delete" secondary={true} onTouchTap={this.deleteProblem.bind(this, selected)}/>
                     </div>
                     <div>
-                        <TextField type="text" floatingLabelText="Problem Description" multiLine={true} value={selected.description}
+                        <TextField type="text" floatingLabelText="Problem Description" multiLine={true} value={selected.description} name="description"
                                    rows={2} rowsMax={4} underlineShow={false} style={{width: '100%'}} onChange={this.updateSelected.bind(this, 'description')}/>
                     </div>
                     <div style={{marginTop: '30px', borderTop: '1px solid #DDD'}}>
-                        <TextField type="text" floatingLabelText="Input Example" multiLine={true}  value={selected.exampleInput}
+                        <TextField type="text" floatingLabelText="Input Example" multiLine={true}  value={selected.exampleInput} name="exampleInput"
                                    rows={2} rowsMax={2} underlineShow={false} style={inlineTestfield} onChange={this.updateSelected.bind(this, 'exampleInput')}/>
-                               <TextField type="text" floatingLabelText="Output Example" multiLine={true} value={selected.exampleOutput}
+                        <TextField type="text" floatingLabelText="Output Example" multiLine={true} value={selected.exampleOutput} name="exampleOutput"
                                    rows={2} rowsMax={2} underlineShow={false} style={inlineTestfield} onChange={this.updateSelected.bind(this, 'exampleOutput')}/>
                     </div>
                     <div style={{marginTop: '30px', borderTop: '1px solid #DDD'}}>
-                        <TextField type="text" floatingLabelText="Test Input" style={inlineTestfield}
+                        <TextField type="text" floatingLabelText="Test Input" style={inlineTestfield} name="testInput"
                                    value={selected.testInput} onChange={this.updateSelected.bind(this, 'testInput')}/>
-                        <TextField type="text" floatingLabelText="Test Output" style={inlineTestfield}
+                        <TextField type="text" floatingLabelText="Test Output" style={inlineTestfield} name="testOutput"
                                    value={selected.testOutput} onChange={this.updateSelected.bind(this, 'testOutput')}/>
+                    </div>
+                    <div>
+                        <RaisedButton label="Add Verifycation" primary={true} onTouchTap={this.addVerificationCase.bind(this)}/>
+                        {this.renderVerification()}
                     </div>
                 </div>
             </div>

@@ -82,10 +82,10 @@ class ProblemEditor extends Component {
     updatePageData () {
         if (!updateLock) {
             let tmpObj = localStorage.getItem(this.props.data._id);
-            if (tmpObj || tmpObj !== '') {
+            if (tmpObj) {
                 tmpObj = JSON.parse(tmpObj);
                 this.setState ({
-                    code: tmpObj.code
+                    code: tmpObj.code? tmpObj.code:''
                 });
             }
             updateLock = true;
@@ -138,7 +138,8 @@ class ProblemEditor extends Component {
     }
     render () {
         const  editorOption = {
-            $blockScrolling: true
+            $blockScrolling: true,
+
         };
         const actions = [
             <FlatButton label="Exit" secondary={true} onTouchTap={this.closeDialog.bind(this)}/>
@@ -167,11 +168,11 @@ class ProblemEditor extends Component {
                         <div>
                             <div style={{width:'50%', display:'inline-block'}}>
                                 <SelectField value={this.state.language} onChange={this.updateLang.bind(this)}
-                                             floatingLabelText="Language" style={{width:'50%'}}>
+                                             floatingLabelText="Language" style={{width:'50%'}} selectFieldRoot={{width:'100%'}}>
                                              {this.renderLangOptions()}
                                 </SelectField>
                                 <SelectField value={this.state.theme} onChange={this.updateTheme.bind(this)}
-                                             floatingLabelText="Theme" style={{width:'50%'}}>
+                                             floatingLabelText="Theme" style={{width:'50%'}} selectFieldRoot={{width:'100%'}}>
                                              {this.renderThemeOptions()}
                                 </SelectField>
                             </div>
@@ -182,7 +183,7 @@ class ProblemEditor extends Component {
                         </div>
                         {this.state.langType?
                             <AceEditor mode={this.state.langType} theme={this.state.theme} onChange={this.updateCode.bind(this)} value={this.state.code} width='100%'
-                                  name="UNIQUE_ID_OF_DIV" editorProps={editorOption} enableBasicAutocompletion={false} enableLiveAutocompletion={false}/>
+                                       name="UNIQUE_ID_OF_DIV" editorProps={editorOption} />
                               :''
                         }
 
@@ -201,7 +202,7 @@ class ProblemEditor extends Component {
 
 ProblemEditor.propTypes = {
     _docker: PropTypes.object,
-    currentUser: PropTypes.object,
+    currentUser: PropTypes.object
 };
 
 export default createContainer(() => {

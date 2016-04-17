@@ -15,17 +15,17 @@ class Timer extends Component {
                 return (<span>End</span>);
             } else {
                 return (
-                    <span>
-                        {(!schedule.start && !schedule.end)? 'Will begin in: ': 'Remaining time: '}
-                        {schedule.time.min} min {schedule.time.sec} sec
-                    </span>
+                        <span>
+                            {(!schedule.start && !schedule.end)? 'Starts in: ': ''}
+                            {schedule.time.min} min {schedule.time.sec} sec
+                        </span>
                 );
             }
         }
     }
     render () {
         return (
-            <div>
+            <div style={{verticalAlign:'middle'}}>
                 {this.display()}
             </div>
         );

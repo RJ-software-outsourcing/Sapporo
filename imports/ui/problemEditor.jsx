@@ -147,7 +147,7 @@ class ProblemEditor extends Component {
         return (
             <div>
                 <div style={{display:'inline-block', width: '100%', padding:'10px 0'}} >
-                    <Paper style={{width: '49.5%', float:'left'}} zDepth={2}>
+                    <Paper style={{width: '49.5%', float:'left'}} zDepth={1}>
                         <div style={textDiv}>
                             <TextField  floatingLabelText="Title" type="text" style={{width: '80%'}}
                                         value={this.props.data.title}/>

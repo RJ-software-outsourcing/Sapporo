@@ -121,9 +121,19 @@ Meteor.startup(() => {
             };
             if (isTest) {
                 let testInput = problemData.testInput;
-                console.log(problemData.testOutput);
                 output.stdout = userSubmit(_docker, data, langObj, testInput);
                 output.pass   = resultCompare(output.stdout, problemData.testOutput);
+            } else {
+                let success = true;
+                for (key in problemData.verfication) {
+                    let output = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
+                    if (!resultCompare(output, problemData.verfication[key].output)) {
+                        success = false;
+                        break;
+                    }
+                }
+                output.stdout = null;
+                output.pass = success;
             }
             return output;
         }

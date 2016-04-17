@@ -64,7 +64,7 @@ class Dashboard extends Component {
             cols: 2,
             image: '/images/1.jpg'
         }, {
-            title: 'GG',
+            title: 'Live Feed Messages',
             cols: 2,
             image: '/images/6.jpg'
         }, {
@@ -74,13 +74,22 @@ class Dashboard extends Component {
             backgroundColor: 'rgba(255,255,255,0.8)',
             content: getTimerTile(<Timer/>)
         }, {
-            title: 'Morning',
+            title: 'Total Score',
             featured: true,
-            cols: 3,
+            cols: 1.5,
             image: '/images/4.jpg'
         }, {
+            title: 'Passed Problems',
+            cols: 1.5,
+            image: '/images/5.jpg'
+        }, {
+            title: 'Online Help',
+            featured: true,
+            cols: 1.5,
+            image: '/images/3.jpg'
+        }, {
             title: 'About Us',
-            cols: 3,
+            cols: 1.5,
             image: '/images/5.jpg'
         }];
         return (

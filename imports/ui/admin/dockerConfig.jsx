@@ -16,6 +16,8 @@ import MenuItem from 'material-ui/lib/menus/menu-item';
 
 import { docker } from '../../api/db.js';
 import { commandForTest } from '../../library/docker.js';
+import {setLock, freeLock, isLock} from '../../library/updateControl.js';
+
 import brace from 'brace';
 import * as langType from '../../library/lang_import.js';
 
@@ -37,7 +39,7 @@ class DockerConfig extends Component {
             addDialogOpen: false,
             docker: defaultDocker
         };
-        updateDockerLock = false;
+        freeLock();
     }
     addNewLang () {
         Meteor.call('docker.add', this.state.add, () => {
@@ -50,27 +52,27 @@ class DockerConfig extends Component {
     removeLang (key) {
         Meteor.call('docker.remove', key, () => {
             this.setState({docker:defaultDocker});
-            updateDockerLock = false;
+            freeLock();
         });
     }
     updateAll () {
-        updateDockerLock = false;
+        freeLock();
         Meteor.call('docker.update', this.state.docker, (err)=>{
             (err)? alert('Update Failed'):alert('Update Success');
         });
     }
     componentDidMount () {
-        updateDockerLock = false;
+        freeLock();
     }
     componentDidUpdate () {
-        if (!updateDockerLock) this.updateDocker();
+        if (!isLock()) this.updateDocker();
     }
     updateDocker () {
         if (this.props._docker) {
             this.setState({
                 docker: this.props._docker
             });
-            updateDockerLock = true;
+            setLock();
         }
     }
     updateLang (key, attr, event) {

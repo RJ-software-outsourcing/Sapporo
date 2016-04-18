@@ -19,6 +19,7 @@ import * as themeType from '../library/theme_import.js';
 import 'brace/theme/tomorrow_night_blue';
 
 import { docker } from '../api/db.js';
+import {setLock, freeLock, isLock} from '../library/updateControl.js';
 
 const split = {
     width: '50%',
@@ -28,7 +29,7 @@ const textDiv = {
     width: '96%',
     padding: '0px 2%'
 };
-let updateLock = false;
+
 class ProblemEditor extends Component {
     constructor(props) {
         super(props);
@@ -45,7 +46,7 @@ class ProblemEditor extends Component {
             code: code
         };
         localStorage.setItem(tmpObj._id, JSON.stringify(tmpObj));
-        updateLock = false;
+        freeLock();
     }
     updateLang(event, index, value) {
         for (var key in this.props._docker.languages) {
@@ -80,7 +81,7 @@ class ProblemEditor extends Component {
         ));
     }
     updatePageData () {
-        if (!updateLock) {
+        if (!isLock()) {
             let tmpObj = localStorage.getItem(this.props.data._id);
             if (tmpObj) {
                 tmpObj = JSON.parse(tmpObj);
@@ -88,7 +89,7 @@ class ProblemEditor extends Component {
                     code: tmpObj.code? tmpObj.code:''
                 });
             }
-            updateLock = true;
+            setLock();
         }
         if (this.state.langType === null && this.props._docker) {
             let _docker = this.props._docker;
@@ -108,7 +109,7 @@ class ProblemEditor extends Component {
     }
     componentWillUpdate (nextProp) {
         if (nextProp.data._id !== this.props.data._id) {
-            updateLock = false;
+            freeLock();
         }
     }
     submitCode (isTest) {

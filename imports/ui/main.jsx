@@ -23,7 +23,7 @@ import Admin from './admin.jsx';
 import ProblemEditor from './problemEditor.jsx';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
-
+import {freeLock} from '../library/updateControl.js';
 
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
 
@@ -54,6 +54,7 @@ class Main extends Component {
         this.navClose();
     }
     renderSection () {
+        freeLock();
         const sectionDOM = document.getElementById('section');
         if (this.props.currentUser) {
             switch (this.state.sectionState) {

@@ -9,6 +9,7 @@ import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
 import Divider from 'material-ui/lib/divider';
 import AccountIcon from 'material-ui/lib/svg-icons/action/account-circle';
+import HelpIcon from 'material-ui/lib/svg-icons/action/help-outline';
 import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
 import ClockIcon from 'material-ui/lib/svg-icons/device/access-time';
 import TotalIcon from 'material-ui/lib/svg-icons/toggle/star-half';
@@ -116,7 +117,7 @@ class Dashboard extends Component {
             cols: 2,
             image: '/images/6.jpg',
             backgroundColor: 'rgba(0,165,165,1)',
-            icon: <IconButton><MessageIcon color="white" /></IconButton>
+            icon: <IconButton><HelpIcon color="white" /></IconButton>
         }, {
             title: 'Time',
             cols: 2,
@@ -155,7 +156,7 @@ class Dashboard extends Component {
         }, {
             title: 'Live Feed Messages',
             cols: 3,
-            backgroundColor: 'rgba(255,255,255,0.7)',
+            backgroundColor: 'rgba(255,255,255,0.8)',
             image: '/images/2.jpg',
             icon: <IconButton><MessageIcon color="white" /></IconButton>,
             content: this.getLiveFeedTile(),

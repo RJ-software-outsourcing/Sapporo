@@ -8,6 +8,7 @@ import ProblemConfig from './admin/problemConfig.jsx';
 import DockerConfig from './admin/dockerConfig.jsx';
 import Rank from './admin/rank.jsx';
 
+import {freeLock} from '../library/updateControl.js';
 
 const tabStyle = {
     backgroundColor: 'white',
@@ -16,6 +17,7 @@ const tabStyle = {
 
 export default class Admin extends Component {
     render () {
+        freeLock();
         return (
             <Tabs primary={false}>
                 <Tab label="System" style={tabStyle}>

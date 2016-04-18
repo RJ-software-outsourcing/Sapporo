@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { render, unmountComponentAtNode } from 'react-dom';
+import { render } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
@@ -14,8 +14,8 @@ import DashboardIcon from 'material-ui/lib/svg-icons/action/dashboard';
 import AdminIcon from 'material-ui/lib/svg-icons/action/settings';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import LogoutIcon from 'material-ui/lib/svg-icons/action/exit-to-app';
-import PassIcon from 'material-ui/lib/svg-icons/navigation/check';
-import Colors from 'material-ui/lib/styles/colors';
+import NotpassIcon from 'material-ui/lib/svg-icons/image/panorama-fish-eye';
+import DoneIcon from 'material-ui/lib/svg-icons/action/check-circle';
 
 import Login from './login.jsx';
 import Dashboard from './dashboard.jsx';
@@ -82,16 +82,27 @@ class Main extends Component {
         this.navClose();
     }
     renderProblems () {
-        return this.props._problem.map((problem, key) => {
+        let array = this.props._problem;
+        array.sort((a, b) => {
+            let _a = parseInt(a.score);
+            let _b = parseInt(b.score);
+            if (_a < _b) {
+                return -1;
+            } else if (_a > _b) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        return array.map((problem, key) => {
             let currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
-            let icon = <AboutIcon />;
+            let icon = <NotpassIcon />;
             if (isUserPassedProblem(currentUser, problem._id)) {
-                icon = <PassIcon />;
+                icon = <DoneIcon />;
             }
             return (
-                <MenuItem key={key} leftIcon={icon} onTouchTap={this.renderProblemEditor.bind(this, problem)}>
-                    {problem.title}
-                </MenuItem>
+                <MenuItem key={key} leftIcon={icon} onTouchTap={this.renderProblemEditor.bind(this, problem)}
+                          primaryText={problem.title} secondaryText={problem.score}/>
             );
         });
     }
@@ -135,7 +146,7 @@ export default createContainer(() => {
     Meteor.subscribe('userData');
     return {
         currentUser: Meteor.user(),
-        _userData: userData.find({}).fetch(),
+        _userData: userData.find({}, {sort: {score: 1}}).fetch(),
         _problem: problem.find({}).fetch()
     };
 }, Main);

@@ -138,8 +138,7 @@ class ProblemEditor extends Component {
     }
     render () {
         const  editorOption = {
-            $blockScrolling: true,
-
+            $blockScrolling: true
         };
         const actions = [
             <FlatButton label="Exit" secondary={true} onTouchTap={this.closeDialog.bind(this)}/>

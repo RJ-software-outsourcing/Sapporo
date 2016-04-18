@@ -95,7 +95,7 @@ class Main extends Component {
             }
         });
         return array.map((problem, key) => {
-            if (!this.props._timer || !this.props._timer.coding) {
+            if (!this.props._timer || !this.props._timer.coding || !Meteor.user()) {
                 return ;
             } else {
                 let currentUser = null;

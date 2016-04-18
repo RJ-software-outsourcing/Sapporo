@@ -5,6 +5,9 @@ import Timer from './Timer.jsx';
 
 import GridList from 'material-ui/lib/grid-list/grid-list';
 import GridTile from 'material-ui/lib/grid-list/grid-tile';
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
+import Divider from 'material-ui/lib/divider';
 import AccountIcon from 'material-ui/lib/svg-icons/action/account-circle';
 import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
 import ClockIcon from 'material-ui/lib/svg-icons/device/access-time';
@@ -69,6 +72,15 @@ class Dashboard extends Component {
             </div>
         );
     }
+    getLiveFeedTile () {
+        return (
+            <List>
+              <ListItem primaryText="Will be starting soon!" /><Divider />
+              <ListItem primaryText="Feel free to drink or eat"  /><Divider />
+              <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+            </List>
+        );
+    }
     getPassProblemTile () {
         if (!this.props._problem || !Meteor.user()) return;
         let totalProblem = this.props._problem.length;
@@ -100,10 +112,10 @@ class Dashboard extends Component {
             backgroundColor: 'rgba(0,40,80,0.3)',
             icon: <IconButton><AccountIcon color="white" /></IconButton>
         }, {
-            title: 'Live Feed Messages',
+            title: 'Q&A',
             cols: 2,
             image: '/images/6.jpg',
-            backgroundColor: 'rgba(0,165,200,1)',
+            backgroundColor: 'rgba(0,165,165,1)',
             icon: <IconButton><MessageIcon color="white" /></IconButton>
         }, {
             title: 'Time',
@@ -132,14 +144,36 @@ class Dashboard extends Component {
             featured: true,
             cols: 1.5,
             image: '/images/3.jpg',
-            backgroundColor: 'rgba(0,165,165,1)',
+            backgroundColor: 'rgba(0,165,200,1)',
             icon: <IconButton><OnlineIcon color="white" /></IconButton>
         }, {
             title: 'About Us',
             cols: 1.5,
             image: '/images/5.jpg',
-            backgroundColor: 'rgba(0,80,160,0.5)',
+            backgroundColor: 'rgba(0,80,100,0.6)',
             icon: <IconButton><AboutIcon color="white" /></IconButton>
+        }, {
+            title: 'Live Feed Messages',
+            cols: 3,
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            image: '/images/2.jpg',
+            icon: <IconButton><MessageIcon color="white" /></IconButton>,
+            content: this.getLiveFeedTile(),
+            rows: 2
+        }, {
+            title: 'Top 5',
+            cols: 1.5,
+            backgroundColor: 'rgba(212,106,106,0.6)',
+            image: '/images/7.png',
+            icon: <IconButton><AboutIcon color="white" /></IconButton>,
+            rows: 2
+        }, {
+            title: 'Codewars Everywhere',
+            cols: 1.5,
+            backgroundColor: 'rgba(0,165,165,0.6)',
+            icon: <IconButton><AboutIcon color="white" /></IconButton>,
+            image: '/images/8.jpg',
+            rows: 2
         }];
         return (
             <div>
@@ -149,7 +183,7 @@ class Dashboard extends Component {
                               actionIcon={tile.icon}
                               actionPosition="left" titlePosition="bottom"
                               titleBackground="rgba(0, 0, 0, 0.6)" children={this.getContent(tile)}
-                              cols={tile.cols} rows={1} style={this.tileStyle(tile)}>
+                              cols={tile.cols} rows={tile.rows? tile.rows:1} style={this.tileStyle(tile)}>
                     </GridTile>
                   ))}
                 </GridList>

@@ -4,7 +4,7 @@ import { render, unmountComponentAtNode } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import { problem } from '../api/db.js';
+import { problem, userData } from '../api/db.js';
 
 import AppBar from 'material-ui/lib/app-bar';
 import LeftNav from 'material-ui/lib/left-nav';
@@ -14,12 +14,16 @@ import DashboardIcon from 'material-ui/lib/svg-icons/action/dashboard';
 import AdminIcon from 'material-ui/lib/svg-icons/action/settings';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import LogoutIcon from 'material-ui/lib/svg-icons/action/exit-to-app';
+import PassIcon from 'material-ui/lib/svg-icons/navigation/check';
+import Colors from 'material-ui/lib/styles/colors';
 
-import Timer from './Timer.jsx';
 import Login from './login.jsx';
 import Dashboard from './dashboard.jsx';
 import Admin from './admin.jsx';
 import ProblemEditor from './problemEditor.jsx';
+
+import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
+
 
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
 
@@ -41,7 +45,7 @@ class Main extends Component {
         Meteor.logout((err)=>{
             this.navClose();
             if (err) {
-                console.log(err);
+                alert(err);
             }
         });
     }
@@ -78,11 +82,18 @@ class Main extends Component {
         this.navClose();
     }
     renderProblems () {
-        return this.props._problem.map((problem, key) => (
-            <MenuItem key={key} leftIcon={<AboutIcon />} onTouchTap={this.renderProblemEditor.bind(this, problem)}>
-                {problem.title}
-            </MenuItem>
-        ));
+        return this.props._problem.map((problem, key) => {
+            let currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
+            let icon = <AboutIcon />;
+            if (isUserPassedProblem(currentUser, problem._id)) {
+                icon = <PassIcon />;
+            }
+            return (
+                <MenuItem key={key} leftIcon={icon} onTouchTap={this.renderProblemEditor.bind(this, problem)}>
+                    {problem.title}
+                </MenuItem>
+            );
+        });
     }
     componentDidMount () {
         this.renderSection();
@@ -114,14 +125,17 @@ class Main extends Component {
 
 
 Main.propTypes = {
+    _userData: PropTypes.array.isRequired,
     currentUser: PropTypes.object,
     _problem: PropTypes.array.isRequired
 };
 
 export default createContainer(() => {
     Meteor.subscribe('problem');
+    Meteor.subscribe('userData');
     return {
         currentUser: Meteor.user(),
+        _userData: userData.find({}).fetch(),
         _problem: problem.find({}).fetch()
     };
 }, Main);

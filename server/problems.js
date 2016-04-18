@@ -8,7 +8,6 @@ Meteor.startup(() => {
     Meteor.methods({
         'problem.add'(data) {
             problem.insert(data);
-            console.log(data);
         },
         'problem.update'(data) {
             problem.update({
@@ -16,16 +15,13 @@ Meteor.startup(() => {
             }, {
                 $set: data
             });
-            console.log(data);
         },
         'problem.delete'(data) {
             problem.remove({
                 _id: data._id
             }, function (err) {
                 if (err) {
-                    console.log(err)
-                } else {
-                    console.log(data._id + ' deleted');
+                    alert(err);
                 }
             });
         }

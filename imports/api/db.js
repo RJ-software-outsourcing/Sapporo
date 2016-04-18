@@ -11,7 +11,10 @@ if (Meteor.isServer) {
         return timer.find();
     });
     Meteor.publish('problem', function problemPublication() {
-        return problem.find();
+        let time = timer.findOne({timeSync: true});
+        if (time && time.coding) {
+            return problem.find();
+        }
     });
     Meteor.publish('docker', function dockerPublication() {
         return docker.find();

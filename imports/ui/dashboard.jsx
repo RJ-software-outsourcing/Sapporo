@@ -117,7 +117,7 @@ class Dashboard extends Component {
             featured: true,
             cols: 1.5,
             image: '/images/4.jpg',
-            backgroundColor: 'rgba(255,80,80,1)',
+            backgroundColor: 'rgba(120,30,30,0.6)',
             content: this.getScoreTile(),
             icon: <IconButton><TotalIcon color="white" /></IconButton>
         }, {

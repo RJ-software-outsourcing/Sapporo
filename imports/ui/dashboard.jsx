@@ -93,7 +93,7 @@ class Dashboard extends Component {
     }
     render () {
         const tilesData = [{
-            title: Meteor.user().username,
+            title: Meteor.user()? Meteor.user().username:'',
             featured: true,
             cols: 2,
             image: '/images/1.jpg',

@@ -2,6 +2,7 @@ import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
 import {timer} from '../imports/api/db.js';
+import {problem} from '../imports/api/db.js';
 import { isCoding } from '../imports/library/timeLib.js';
 
 let initGameTime = {
@@ -14,18 +15,26 @@ let initGameTime = {
         min: 0
     }
 };
+let problemPublished = false;
 
 function updateTime () {
     let _time = new Date;
     let db_time = timer.findOne({timeSync: true});
+    let coding = isCoding(_time, db_time.gameTime);
     timer.update({
         timeSync: true
     }, {
         $set: {
             systemTime: _time,
-            coding: isCoding(_time, db_time.gameTime)
+            coding: coding
         }
     });
+    if (!problemPublished && coding) {
+        Meteor.publish('problem', function dockerPublication() {
+            return problem.find();
+        });
+        problemPublished = true;
+    }
     Meteor.setTimeout(updateTime, 1000);
 }
 
@@ -38,7 +47,6 @@ Meteor.startup(() => {
             }, {
                 $set: {gameTime: time}
             });
-            console.log(time);
         }
     });
 

@@ -6,15 +6,10 @@ const problem = new Mongo.Collection('problem');
 const docker  = new Mongo.Collection('docker');
 const userData  = new Mongo.Collection('userData');
 
+
 if (Meteor.isServer) {
     Meteor.publish('timer', function timerPublication() {
         return timer.find();
-    });
-    Meteor.publish('problem', function problemPublication() {
-        let time = timer.findOne({timeSync: true});
-        if (time && time.coding) {
-            return problem.find();
-        }
     });
     Meteor.publish('docker', function dockerPublication() {
         return docker.find();

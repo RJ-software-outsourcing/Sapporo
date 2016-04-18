@@ -37,7 +37,7 @@ const getUserPassedProblem = function (user, problem) {
 };
 
 const isUserPassedProblem = function (user, problemID) {
-    if (user[problemID] && user[problemID].result) {
+    if (user && user[problemID] && user[problemID].result) {
         return true;
     } else {
         return false;

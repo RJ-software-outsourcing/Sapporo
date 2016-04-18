@@ -4,7 +4,7 @@ import { render } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import { problem, userData } from '../api/db.js';
+import { problem, userData, timer } from '../api/db.js';
 
 import AppBar from 'material-ui/lib/app-bar';
 import LeftNav from 'material-ui/lib/left-nav';
@@ -95,15 +95,22 @@ class Main extends Component {
             }
         });
         return array.map((problem, key) => {
-            let currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
-            let icon = <NotpassIcon />;
-            if (isUserPassedProblem(currentUser, problem._id)) {
-                icon = <DoneIcon />;
+            if (!this.props._timer || !this.props._timer.coding) {
+                return ;
+            } else {
+                let currentUser = null;
+                if (Meteor.user()) {
+                    currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
+                }
+                let icon = <NotpassIcon />;
+                if (isUserPassedProblem(currentUser, problem._id)) {
+                    icon = <DoneIcon />;
+                }
+                return (
+                    <MenuItem key={key} leftIcon={icon} onTouchTap={this.renderProblemEditor.bind(this, problem)}
+                              primaryText={problem.title} secondaryText={problem.score}/>
+                );
             }
-            return (
-                <MenuItem key={key} leftIcon={icon} onTouchTap={this.renderProblemEditor.bind(this, problem)}
-                          primaryText={problem.title} secondaryText={problem.score}/>
-            );
         });
     }
     componentDidMount () {
@@ -138,15 +145,18 @@ class Main extends Component {
 Main.propTypes = {
     _userData: PropTypes.array.isRequired,
     currentUser: PropTypes.object,
-    _problem: PropTypes.array.isRequired
+    _problem: PropTypes.array.isRequired,
+    _timer: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('problem');
     Meteor.subscribe('userData');
+    Meteor.subscribe('timer');
     return {
         currentUser: Meteor.user(),
-        _userData: userData.find({}, {sort: {score: 1}}).fetch(),
-        _problem: problem.find({}).fetch()
+        _userData: userData.find({}).fetch(),
+        _problem: problem.find({}).fetch(),
+        _timer: timer.findOne({timeSync: true})
     };
 }, Main);

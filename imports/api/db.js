@@ -5,7 +5,7 @@ const timer   = new Mongo.Collection('timer');
 const problem = new Mongo.Collection('problem');
 const docker  = new Mongo.Collection('docker');
 const userData  = new Mongo.Collection('userData');
-
+const liveFeed  = new Mongo.Collection('liveFeed');
 
 if (Meteor.isServer) {
     Meteor.publish('timer', function timerPublication() {
@@ -17,6 +17,9 @@ if (Meteor.isServer) {
     Meteor.publish('userData', function userDataPublication() {
         return userData.find();
     });
+    Meteor.publish('liveFeed', function liveFeedPublication() {
+        return liveFeed.find();
+    });
 }
 
-export {timer, problem, docker, userData};
+export {timer, problem, docker, userData, liveFeed};

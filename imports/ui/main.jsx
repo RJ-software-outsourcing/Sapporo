@@ -16,11 +16,19 @@ import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import LogoutIcon from 'material-ui/lib/svg-icons/action/exit-to-app';
 import NotpassIcon from 'material-ui/lib/svg-icons/image/panorama-fish-eye';
 import DoneIcon from 'material-ui/lib/svg-icons/action/check-circle';
+import ProblemIcon from 'material-ui/lib/svg-icons/editor/insert-drive-file';
+import ChartIcon from 'material-ui/lib/svg-icons/editor/insert-chart';
+import ExtensionIcon from 'material-ui/lib/svg-icons/action/extension';
+import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
 
 import Login from './login.jsx';
 import Dashboard from './dashboard.jsx';
-import Admin from './admin.jsx';
 import ProblemEditor from './problemEditor.jsx';
+import System from './admin/system.jsx';
+import ProblemConfig from './admin/problemConfig.jsx';
+import DockerConfig from './admin/dockerConfig.jsx';
+import Rank from './admin/rank.jsx';
+import LiveFeed from './admin/liveFeed.jsx';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import {freeLock} from '../library/updateControl.js';
@@ -49,23 +57,31 @@ class Main extends Component {
             }
         });
     }
-    adminPage () {
-        this.setState({sectionState: 'admin'});
-        this.navClose();
-    }
     renderSection () {
         freeLock();
         const sectionDOM = document.getElementById('section');
         if (this.props.currentUser) {
             switch (this.state.sectionState) {
-            case 'admin':
-                render(<Admin />, sectionDOM);
-                break;
             case 'dashboard':
                 render(<Dashboard />, sectionDOM);
                 break;
             case 'problemEditor':
                 render(<ProblemEditor data={this.state.problem}/>, sectionDOM);
+                break;
+            case 'system':
+                render(<System />, sectionDOM);
+                break;
+            case 'problemConfig':
+                render(<ProblemConfig />, sectionDOM);
+                break;
+            case 'dockerConfig':
+                render(<DockerConfig />, sectionDOM);
+                break;
+            case 'analyse':
+                render(<Rank />, sectionDOM);
+                break;
+            case 'liveFeed':
+                render(<LiveFeed />, sectionDOM);
                 break;
             default:
                 render(<Dashboard />, sectionDOM);
@@ -73,14 +89,6 @@ class Main extends Component {
         } else {
             render(React.createElement(Login), sectionDOM);
         }
-    }
-    dashboard () {
-        this.setState({sectionState: 'dashboard'});
-        this.navClose();
-    }
-    renderProblemEditor (problem) {
-        this.setState({sectionState: 'problemEditor', problem: problem});
-        this.navClose();
     }
     renderProblems () {
         let array = this.props._problem;
@@ -108,11 +116,19 @@ class Main extends Component {
                     icon = <DoneIcon />;
                 }
                 return (
-                    <MenuItem key={key} leftIcon={icon} onTouchTap={this.renderProblemEditor.bind(this, problem)}
+                    <MenuItem key={key} leftIcon={icon} onTouchTap={this.renderPage.bind(this, 'problemEditor', problem)}
                               primaryText={problem.title} secondaryText={problem.score}/>
                 );
             }
         });
+    }
+    renderPage (page, arg) {
+        let state = {
+            sectionState: page
+        };
+        if (page === 'problemEditor' && arg) state.problem = arg;
+        this.setState(state);
+        this.navClose();
     }
     componentDidMount () {
         this.renderSection();
@@ -127,11 +143,17 @@ class Main extends Component {
                 </AppBar>
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
-                    <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.dashboard.bind(this)}>Dashboard</MenuItem>
-                    <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.adminPage.bind(this)}>Administrator</MenuItem>
+                    <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>
+                    <Divider />
+                    <MenuItem>Administrator</MenuItem>
+                    <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.renderPage.bind(this, 'system')}>System Settings</MenuItem>
+                    <MenuItem leftIcon={<ProblemIcon />} onTouchTap={this.renderPage.bind(this, 'problemConfig')}>Problem Configuration</MenuItem>
+                    <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.renderPage.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
+                    <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.renderPage.bind(this, 'analyse')}>Data Analyse</MenuItem>
+                    <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.renderPage.bind(this, 'liveFeed')}>Live Feed</MenuItem>
                     <Divider />
                     <MenuItem>problem</MenuItem>
                     {this.renderProblems()}

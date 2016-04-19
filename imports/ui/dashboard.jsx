@@ -75,10 +75,24 @@ class Dashboard extends Component {
     }
     getLiveFeedTile () {
         return (
-            <List>
-              <ListItem primaryText="Will be starting soon!" /><Divider />
-              <ListItem primaryText="Feel free to drink or eat"  /><Divider />
-              <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+            <List style={{overflow:'scroll'}}>
+                <ListItem primaryText="Will be starting soon!" /><Divider />
+                <ListItem primaryText="Feel free to drink or eat"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
             </List>
         );
     }
@@ -157,6 +171,7 @@ class Dashboard extends Component {
             title: 'Live Feed Messages',
             cols: 3,
             backgroundColor: 'rgba(255,255,255,0.8)',
+            titleBG: 'rgba(0,0,0,0.8)',
             image: '/images/2.jpg',
             icon: <IconButton><MessageIcon color="white" /></IconButton>,
             content: this.getLiveFeedTile(),
@@ -183,7 +198,7 @@ class Dashboard extends Component {
                     <GridTile key={key} title={tile.title}
                               actionIcon={tile.icon}
                               actionPosition="left" titlePosition="bottom"
-                              titleBackground="rgba(0, 0, 0, 0.6)" children={this.getContent(tile)}
+                              titleBackground={tile.titleBG?tile.titleBG:'rgba(0, 0, 0, 0.6)'} children={this.getContent(tile)}
                               cols={tile.cols} rows={tile.rows? tile.rows:1} style={this.tileStyle(tile)}>
                     </GridTile>
                   ))}

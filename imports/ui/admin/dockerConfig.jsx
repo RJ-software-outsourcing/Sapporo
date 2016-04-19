@@ -7,7 +7,6 @@ import RaisedButton from 'material-ui/lib/raised-button';
 import Toolbar from 'material-ui/lib/toolbar/toolbar';
 import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
 import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
-import Divider from 'material-ui/lib/divider';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import LinearProgress from 'material-ui/lib/linear-progress';
@@ -30,7 +29,6 @@ const defaultDocker = {
     port: '',
     languages: []
 };
-let updateDockerLock = false;
 
 class DockerConfig extends Component {
     constructor(props) {
@@ -156,7 +154,7 @@ class DockerConfig extends Component {
         this.setState({
             addDialogOpen: false
         });
-        updateDockerLock = false;
+        freeLock();
     }
     startTesting () {
         this.setState({runTest: true});

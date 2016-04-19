@@ -18,8 +18,12 @@ import OnlineIcon from 'material-ui/lib/svg-icons/action/question-answer';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import IconButton from 'material-ui/lib/icon-button';
 
-import { problem, userData } from '../api/db.js';
+import { problem, userData, liveFeed} from '../api/db.js';
 import { getTotalScore, getUserTotalScore, getCurrentUserData, getUserPassedProblem } from '../library/score_lib.js';
+
+const dateOption = {
+    hour: '2-digit', minute: '2-digit'
+};
 
 const styles = {
     gridList: {
@@ -73,26 +77,16 @@ class Dashboard extends Component {
             </div>
         );
     }
+    liveFeedLogs () {
+        return this.props._liveFeed.map((item, key) => (
+            <ListItem key={key} style={{borderBottom:'1px solid #AAA'}}
+                      primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString(navigator.language,dateOption)}/>
+        ));
+    }
     getLiveFeedTile () {
         return (
-            <List style={{overflow:'scroll'}}>
-                <ListItem primaryText="Will be starting soon!" /><Divider />
-                <ListItem primaryText="Feel free to drink or eat"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
-                <ListItem primaryText="Welcome to CodeWars 2017 :D"  /><Divider />
+            <List>
+                {this.liveFeedLogs(this)}
             </List>
         );
     }
@@ -211,15 +205,18 @@ class Dashboard extends Component {
 Dashboard.propTypes = {
     _userData: PropTypes.array.isRequired,
     _problem: PropTypes.array.isRequired,
+    _liveFeed: PropTypes.array.isRequired,
     currentUser: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('userData');
     Meteor.subscribe('problem');
+    Meteor.subscribe('liveFeed');
     return {
         currentUser: Meteor.user(),
         _userData: userData.find({}).fetch(),
-        _problem: problem.find({}).fetch()
+        _problem: problem.find({}).fetch(),
+        _liveFeed: liveFeed.find({}, {sort: {date_created: -1}}).fetch()
     };
 }, Dashboard);

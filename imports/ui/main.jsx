@@ -20,6 +20,7 @@ import ProblemIcon from 'material-ui/lib/svg-icons/editor/insert-drive-file';
 import ChartIcon from 'material-ui/lib/svg-icons/editor/insert-chart';
 import ExtensionIcon from 'material-ui/lib/svg-icons/action/extension';
 import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
+import MailIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
 
 import Login from './login.jsx';
 import Dashboard from './dashboard.jsx';
@@ -144,6 +145,7 @@ class Main extends Component {
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Dashboard</MenuItem>
+                    <MenuItem leftIcon={<MailIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Inbox</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>

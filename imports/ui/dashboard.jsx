@@ -162,7 +162,7 @@ class Dashboard extends Component {
             backgroundColor: 'rgba(0,80,100,0.6)',
             icon: <IconButton><AboutIcon color="white" /></IconButton>
         }, {
-            title: 'Live Feed Messages',
+            title: 'Inbox Preview',
             cols: 3,
             backgroundColor: 'rgba(255,255,255,0.8)',
             titleBG: 'rgba(0,0,0,0.8)',

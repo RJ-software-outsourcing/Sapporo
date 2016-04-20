@@ -7,7 +7,8 @@ import GridList from 'material-ui/lib/grid-list/grid-list';
 import GridTile from 'material-ui/lib/grid-list/grid-tile';
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
-import Divider from 'material-ui/lib/divider';
+import Dialog from 'material-ui/lib/dialog';
+import FlatButton from 'material-ui/lib/flat-button';
 import AccountIcon from 'material-ui/lib/svg-icons/action/account-circle';
 import HelpIcon from 'material-ui/lib/svg-icons/action/help-outline';
 import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
@@ -20,6 +21,7 @@ import IconButton from 'material-ui/lib/icon-button';
 
 import { problem, userData, liveFeed} from '../api/db.js';
 import { getTotalScore, getUserTotalScore, getCurrentUserData, getUserPassedProblem } from '../library/score_lib.js';
+import { setMailAsRead } from '../library/mail.js';
 
 const dateOption = {
     hour: '2-digit', minute: '2-digit'
@@ -58,6 +60,13 @@ const getTimerTile = function (timer) {
 
 
 class Dashboard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            dialogOpen: false,
+            clickFeed: null
+        };
+    }
     tileStyle(tile) {
         return {
             backgroundImage: 'url("' + tile.image + '")',
@@ -80,7 +89,8 @@ class Dashboard extends Component {
     liveFeedLogs () {
         return this.props._liveFeed.map((item, key) => (
             <ListItem key={key} style={{borderBottom:'1px solid #AAA'}}
-                      primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString(navigator.language,dateOption)}/>
+                      primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString(navigator.language,dateOption)}
+                      onTouchTap={this.openFeed.bind(this, item)}/>
         ));
     }
     getLiveFeedTile () {
@@ -111,6 +121,19 @@ class Dashboard extends Component {
                 {tile.content}
             </div>
         );
+    }
+    openFeed (item) {
+        this.setState({
+            dialogOpen: true,
+            clickFeed: item
+        });
+        setMailAsRead(item);
+    }
+    closeFeed () {
+        this.setState({
+            dialogOpen: false,
+            clickFeed: null
+        });
     }
     render () {
         const tilesData = [{
@@ -185,6 +208,9 @@ class Dashboard extends Component {
             image: '/images/8.jpg',
             rows: 2
         }];
+        const actions = [
+            <FlatButton label="exit" primary={true} onTouchTap={this.closeFeed.bind(this)} />
+        ];
         return (
             <div>
                 <GridList cols={6} cellHeight={cellHeight()} padding={5} style={styles.gridList}>
@@ -197,6 +223,14 @@ class Dashboard extends Component {
                     </GridTile>
                   ))}
                 </GridList>
+                { this.state.clickFeed?
+                    <Dialog title={this.state.clickFeed.title} actions={actions} modal={false}
+                            open={this.state.dialogOpen} onRequestClose={this.closeFeed.bind(this)}>
+                        <h5>{this.state.clickFeed.date_created.toLocaleTimeString('en-us', dateOption)}</h5>
+                        <textArea value={this.state.clickFeed.content} style={{width:'100%', height:'200px', maxHeight:'200px'}} readOnly={true}></textArea>
+                    </Dialog>
+                :''
+                }
             </div>
         );
     }

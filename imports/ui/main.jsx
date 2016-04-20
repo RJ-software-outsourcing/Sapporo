@@ -4,7 +4,7 @@ import { render } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import { problem, userData, timer } from '../api/db.js';
+import { problem, userData, timer, liveFeed } from '../api/db.js';
 
 import AppBar from 'material-ui/lib/app-bar';
 import LeftNav from 'material-ui/lib/left-nav';
@@ -32,6 +32,7 @@ import Rank from './admin/rank.jsx';
 import LiveFeed from './admin/liveFeed.jsx';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
+import { setMailAsRead, isMailRead, getNumberOfUnread } from '../library/mail.js';
 import {freeLock} from '../library/updateControl.js';
 
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
@@ -123,6 +124,10 @@ class Main extends Component {
             }
         });
     }
+    unreadMailCount () {
+        let count = getNumberOfUnread(this.props._liveFeed);
+        return (count === 0)? '':String(count);
+    }
     renderPage (page, arg) {
         let state = {
             sectionState: page
@@ -145,7 +150,7 @@ class Main extends Component {
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Dashboard</MenuItem>
-                    <MenuItem leftIcon={<MailIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Inbox</MenuItem>
+                    <MenuItem leftIcon={<MailIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>
@@ -171,6 +176,7 @@ Main.propTypes = {
     _userData: PropTypes.array.isRequired,
     currentUser: PropTypes.object,
     _problem: PropTypes.array.isRequired,
+    _liveFeed: PropTypes.array.isRequired,
     _timer: PropTypes.object
 };
 
@@ -178,10 +184,12 @@ export default createContainer(() => {
     Meteor.subscribe('problem');
     Meteor.subscribe('userData');
     Meteor.subscribe('timer');
+    Meteor.subscribe('liveFeed');
     return {
         currentUser: Meteor.user(),
         _userData: userData.find({}).fetch(),
         _problem: problem.find({}).fetch(),
-        _timer: timer.findOne({timeSync: true})
+        _timer: timer.findOne({timeSync: true}),
+        _liveFeed: liveFeed.find({}, {sort: {date_created: -1}}).fetch()
     };
 }, Main);

@@ -23,10 +23,6 @@ import { problem, userData, liveFeed} from '../api/db.js';
 import { getTotalScore, getUserTotalScore, getCurrentUserData, getUserPassedProblem } from '../library/score_lib.js';
 import { setMailAsRead } from '../library/mail.js';
 
-const dateOption = {
-    hour: '2-digit', minute: '2-digit'
-};
-
 const styles = {
     gridList: {
         width: '100%',
@@ -89,7 +85,7 @@ class Dashboard extends Component {
     liveFeedLogs () {
         return this.props._liveFeed.map((item, key) => (
             <ListItem key={key} style={{borderBottom:'1px solid #AAA'}}
-                      primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString(navigator.language,dateOption)}
+                      primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
                       onTouchTap={this.openFeed.bind(this, item)}/>
         ));
     }

@@ -29,6 +29,7 @@ import System from './admin/system.jsx';
 import ProblemConfig from './admin/problemConfig.jsx';
 import DockerConfig from './admin/dockerConfig.jsx';
 import Rank from './admin/rank.jsx';
+import Mailbox from './mailbox.jsx';
 import LiveFeed from './admin/liveFeed.jsx';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
@@ -66,6 +67,9 @@ class Main extends Component {
             switch (this.state.sectionState) {
             case 'dashboard':
                 render(<Dashboard />, sectionDOM);
+                break;
+            case 'mailbox':
+                render(<Mailbox />, sectionDOM);
                 break;
             case 'problemEditor':
                 render(<ProblemEditor data={this.state.problem}/>, sectionDOM);
@@ -150,7 +154,7 @@ class Main extends Component {
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Dashboard</MenuItem>
-                    <MenuItem leftIcon={<MailIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>
+                    <MenuItem leftIcon={<MailIcon />} onTouchTap={this.renderPage.bind(this, 'mailbox')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>

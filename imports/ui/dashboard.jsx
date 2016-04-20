@@ -222,8 +222,8 @@ class Dashboard extends Component {
                 { this.state.clickFeed?
                     <Dialog title={this.state.clickFeed.title} actions={actions} modal={false}
                             open={this.state.dialogOpen} onRequestClose={this.closeFeed.bind(this)}>
-                        <h5>{this.state.clickFeed.date_created.toLocaleTimeString('en-us', dateOption)}</h5>
-                        <textArea value={this.state.clickFeed.content} style={{width:'100%', height:'200px', maxHeight:'200px'}} readOnly={true}></textArea>
+                        <h5>{this.state.clickFeed.date_created.toLocaleTimeString()}</h5>
+                        <textArea value={this.state.clickFeed.content} style={{width:'100%', height:'200px', maxHeight:'200px', border:'none'}} readOnly={true}></textArea>
                     </Dialog>
                 :''
                 }

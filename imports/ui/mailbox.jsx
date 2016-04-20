@@ -26,9 +26,9 @@ class Mailbox extends Component {
         };
     }
     renderLiveFeeds () {
-        return this.props._liveFeed.map((item, key) => (
+        return this.props._liveFeed.map((item) => (
             <div>
-                <ListItem key={key} primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
+                <ListItem key={item._id} primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
                           onTouchTap={this.openFeed.bind(this, item)} leftIcon={this.hasRead(item)}/>
             </div>
         ));
@@ -63,7 +63,7 @@ class Mailbox extends Component {
                     <Dialog title={this.state.clickFeed.title} actions={actions} modal={false}
                             open={this.state.dialogOpen} onRequestClose={this.closeFeed.bind(this)}>
                         <h5>{this.state.clickFeed.date_created.toLocaleTimeString('en-us', dateOption)}</h5>
-                        <textArea value={this.state.clickFeed.content} style={{width:'100%', height:'200px'}} readOnly={true}></textArea>
+                        <textArea value={this.state.clickFeed.content} style={{width:'100%', height:'200px', maxHeight:'200px', border:'none'}} readOnly={true}></textArea>
                     </Dialog>
                 :''
                 }

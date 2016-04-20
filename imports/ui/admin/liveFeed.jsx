@@ -81,7 +81,7 @@ class LiveFeed extends Component {
                     <TextField type="text" floatingLabelText="Content" style={{width: '100%'}}
                                multiLine={true} name="content" rows={4} value={this.state.content}
                                onChange={this.updateField.bind(this, 'content')}/>
-                           <RaisedButton label="submit" primary={true} onTouchTap={this.sendLiveFeed.bind(this)}/>
+                           <RaisedButton label="Send" primary={true} onTouchTap={this.sendLiveFeed.bind(this)}/>
                 </div>
                 <Paper style={{width: '49%', float:'right', marginTop: '10px'}} zDepth={1}>
                     <List>

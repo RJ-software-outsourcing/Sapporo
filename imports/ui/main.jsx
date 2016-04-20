@@ -11,6 +11,8 @@ import LeftNav from 'material-ui/lib/left-nav';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import Divider from 'material-ui/lib/divider';
 import DashboardIcon from 'material-ui/lib/svg-icons/action/dashboard';
+import Snackbar from 'material-ui/lib/snackbar';
+
 import AdminIcon from 'material-ui/lib/svg-icons/action/settings';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import LogoutIcon from 'material-ui/lib/svg-icons/action/exit-to-app';
@@ -33,7 +35,7 @@ import Mailbox from './mailbox.jsx';
 import LiveFeed from './admin/liveFeed.jsx';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
-import { setMailAsRead, isMailRead, getNumberOfUnread } from '../library/mail.js';
+import { getNumberOfUnread } from '../library/mail.js';
 import {freeLock} from '../library/updateControl.js';
 
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
@@ -43,7 +45,9 @@ class Main extends Component {
         super(props);
         this.state = {
             open : false,
-            sectionState: 'login'
+            sectionState: 'login',
+            prompt: false,
+            mailCount: 0
         };
     }
     navOpen () {
@@ -144,13 +148,26 @@ class Main extends Component {
         this.renderSection();
     }
     componentDidUpdate () {
+        if (this.props._liveFeed.length !== this.state.mailCount) {
+            this.setState({
+                mailCount: this.props._liveFeed.length,
+                prompt: true
+            });
+        }
         this.renderSection();
+    }
+    closePrompt () {
+        this.setState({
+            prompt: false
+        });
     }
     render () {
         return (
             <div>
                 <AppBar title="Sapporo" onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
+                <Snackbar open={this.state.prompt} message="You've Got New Mail"
+                          autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
                 <LeftNav  docked={false} open={this.state.open}
                           onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Dashboard</MenuItem>
@@ -164,7 +181,7 @@ class Main extends Component {
                     <MenuItem leftIcon={<ProblemIcon />} onTouchTap={this.renderPage.bind(this, 'problemConfig')}>Problem Configuration</MenuItem>
                     <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.renderPage.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
                     <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.renderPage.bind(this, 'analyse')}>Data Analyse</MenuItem>
-                    <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.renderPage.bind(this, 'liveFeed')}>Live Feed</MenuItem>
+                    <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.renderPage.bind(this, 'liveFeed')}>Send Mail</MenuItem>
                     <Divider />
                     <MenuItem>problem</MenuItem>
                     {this.renderProblems()}

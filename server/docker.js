@@ -103,7 +103,6 @@ Meteor.startup(() => {
             return result;
         },
         'docker.submitCode'(data, isTest){
-            console.log(data);
             let dockerData = docker.findOne({docker: true});
             let problemData = problem.findOne({_id:data.problemID});
             let _docker = getDockerInstance(dockerData);
@@ -124,6 +123,8 @@ Meteor.startup(() => {
                 let testInput = problemData.testInput;
                 output.stdout = userSubmit(_docker, data, langObj, testInput);
                 output.pass   = resultCompare(output.stdout, problemData.testOutput);
+                output.expected = problemData.testOutput;
+                output.testInput = problemData.testInput;
             } else {
                 let success = true;
                 for (key in problemData.verfication) {

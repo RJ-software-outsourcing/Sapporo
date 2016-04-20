@@ -122,20 +122,26 @@ class ProblemEditor extends Component {
             user: this.props.currentUser
         };
         Meteor.call('docker.submitCode', obj, isTest, (err, result) => {
+            this.setState({testResult:null});
             if (!err) {
                 if (result.pass) {
                     alert('Success :D');
+                    this.closeDialog();
                 } else {
-                    alert('failed');
+                    if (isTest) {
+                        this.setState({testResult:result});
+                    } else {
+                        alert('Failed');
+                        this.closeDialog();
+                    }
                 }
-                this.closeDialog();
             } else {
                 alert(err);
             }
         });
     }
     closeDialog() {
-        this.setState({runCode: false});
+        this.setState({runCode: false, testResult: null});
     }
     render () {
         const  editorOption = {
@@ -192,7 +198,24 @@ class ProblemEditor extends Component {
                 <span>{this.props.data._id}</span>
                 <Dialog title="Verifying..." actions={actions} modal={false}
                         open={this.state.runCode}>
-                    <LinearProgress mode="indeterminate"/>
+                    {this.state.testResult?
+                        <div>
+                            <TextField floatingLabelText="Test Input" type="text" style={{width:'100%'}}
+                                       value={this.state.testResult.testInput}/>
+                            <div style={{width:'100%'}}>
+                                <div style={{width:'48%',float:'left'}}>
+                                    <TextField  floatingLabelText="My Output" type="text" style={{width: '100%'}}
+                                                value={this.state.testResult.stdout} multiLine={true} />
+                                </div>
+                                <div style={{width:'48%', float:'right'}}>
+                                    <TextField  floatingLabelText="Expected Output" type="text" style={{width: '100%'}}
+                                                value={this.state.testResult.expected} multiLine={true} />
+                                </div>
+                            </div>
+                        </div>
+                        :
+                        <LinearProgress mode="indeterminate"/>
+                    }
                 </Dialog>
             </div>
         );

@@ -6,16 +6,16 @@
     "build:css": "node-sass --include-path node_modules main.scss bundle.css"
   },
   "dependencies": {
-    "brace": "^0.8.0",
+    "brace": "0.8.0",
     "dockerode": "^2.2.10",
     "fibers": "^1.0.10",
     "material-ui": "0.15.0-alpha.2",
     "meteor-node-stubs": "~0.2.0",
-    "react": "^0.14.8",
-    "react-ace": "^3.2.0",
-    "react-addons-pure-render-mixin": "^0.14.6",
-    "react-dom": "^0.14.8",
-    "react-tap-event-plugin": "^0.2.2"
+    "react": "0.14.8",
+    "react-ace": "3.2.0",
+    "react-addons-pure-render-mixin": "0.14.6",
+    "react-dom": "0.14.8",
+    "react-tap-event-plugin": "0.2.2"
   },
   "devDependencies": {
     "eslint": "^2.7.0",

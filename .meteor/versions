@@ -27,7 +27,7 @@ ejson@1.0.10
 email@1.0.11
 es5-shim@4.5.9
 fastclick@1.0.10
-fourseven:scss@3.4.1
+fourseven:scss@3.4.3
 geojson-utils@1.0.7
 hot-code-push@1.0.3
 html-tools@1.0.8
@@ -57,7 +57,7 @@ ordered-dict@1.0.6
 promise@0.6.6
 random@1.0.8
 rate-limit@1.0.3
-react-meteor-data@0.2.7
+react-meteor-data@0.2.9
 reactive-var@1.0.8
 reload@1.1.7
 retry@1.0.6

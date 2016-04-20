@@ -149,9 +149,10 @@ class Main extends Component {
     }
     componentDidUpdate () {
         if (this.props._liveFeed.length !== this.state.mailCount) {
+            let showPrompt = (this.props._liveFeed.length > this.state.mailCount)? true:false;
             this.setState({
                 mailCount: this.props._liveFeed.length,
-                prompt: true
+                prompt: showPrompt
             });
         }
         this.renderSection();

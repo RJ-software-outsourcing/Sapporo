@@ -51,7 +51,7 @@ class Mailbox extends Component {
     }
     render () {
         const actions = [
-            <FlatButton label="exit" primary={true} onTouchTap={this.closeFeed.bind(this)} />
+            <FlatButton label="exit" primary={true} onTouchTap={this.closeFeed.bind(this)} key="exitButton"/>
         ];
         return (
             <Paper style={{marginTop:'10px'}}>
@@ -60,7 +60,7 @@ class Mailbox extends Component {
                     </List>
 
                 {this.state.clickFeed?
-                    <Dialog title={this.state.clickFeed.title} actions={actions} modal={false}
+                    <Dialog title={this.state.clickFeed.title} actions={actions} modal={false} key="mailDialog"
                             open={this.state.dialogOpen} onRequestClose={this.closeFeed.bind(this)}>
                         <h5>{this.state.clickFeed.date_created.toLocaleTimeString('en-us', dateOption)}</h5>
                         <textArea value={this.state.clickFeed.content} style={{width:'100%', height:'200px', maxHeight:'200px', border:'none'}} readOnly={true}></textArea>

@@ -11,7 +11,7 @@ import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import AccountIcon from 'material-ui/lib/svg-icons/action/account-circle';
 import HelpIcon from 'material-ui/lib/svg-icons/action/help-outline';
-import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
+import MessageIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
 import ClockIcon from 'material-ui/lib/svg-icons/device/access-time';
 import TotalIcon from 'material-ui/lib/svg-icons/toggle/star-half';
 import PassIcon from 'material-ui/lib/svg-icons/navigation/check';

@@ -49,18 +49,18 @@ class ProblemEditor extends Component {
         freeLock();
     }
     updateLang(event, index, value) {
-        for (var key in this.props._docker.languages) {
-            if (this.props._docker.languages[key].title === value) {
+        for (var key in this.props._docker) {
+            if (this.props._docker[key].title === value) {
                 this.setState({
                     language: value,
-                    langType: this.props._docker.languages[key].langType
+                    langType: this.props._docker[key].langType
                 });
             }
         }
     }
     renderLangOptions () {
         if (!this.props._docker) return;
-        return this.props._docker.languages.map((lang, key) => (
+        return this.props._docker.map((lang, key) => (
             <MenuItem key={key} value={lang.title} primaryText={lang.title}></MenuItem>
         ));
     }
@@ -92,11 +92,10 @@ class ProblemEditor extends Component {
             setLock();
         }
         if (this.state.langType === null && this.props._docker) {
-            let _docker = this.props._docker;
-            if (_docker.languages && _docker.languages.length > 0) {
+            if (this.props._docker.length > 0) {
                 this.setState({
-                    langType: this.props._docker.languages[0].langType,
-                    language: this.props._docker.languages[0].title
+                    langType: this.props._docker[0].langType,
+                    language: this.props._docker[0].title
                 });
             }
         }
@@ -224,14 +223,14 @@ class ProblemEditor extends Component {
 
 
 ProblemEditor.propTypes = {
-    _docker: PropTypes.object,
+    _docker: PropTypes.array.isRequired,
     currentUser: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('docker');
     return {
-        _docker: docker.findOne({docker: true}),
+        _docker: docker.find({languages: true}).fetch(),
         currentUser: Meteor.user()
     };
 }, ProblemEditor);

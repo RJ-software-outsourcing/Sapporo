@@ -2,15 +2,17 @@
     Common Library for Docker
 */
 
-const testFileName = 'testing';
-
 const commandForImage = function (lang, parameter) {
     let stringArray = [];
     let preArg = [];
+    let middleArg = [];
     let postArg = [];
     let input = [];
     if (lang.preArg) {
         preArg = lang.preArg.split(' ');
+    }
+    if (lang.middleArg) {
+        middleArg = lang.middleArg.split(' ');
     }
     if (lang.postArg) {
         postArg = lang.postArg.split(' ');
@@ -18,10 +20,11 @@ const commandForImage = function (lang, parameter) {
     if (parameter) {
         input = parameter.split(' ');
     }
-    let filePath = lang.mountPath + testFileName;
+    let filePath = lang.mountPath + lang.file;
     stringArray.push(lang.executable);
     stringArray = stringArray.concat(preArg);
     stringArray.push(filePath);
+    stringArray = stringArray.concat(middleArg);
     if (input.length > 0) {
         stringArray = stringArray.concat(input);
     }
@@ -30,7 +33,7 @@ const commandForImage = function (lang, parameter) {
 };
 
 const commandForTest = function (lang) {
-    return commandForImage(lang, 'helloworld', testFileName);
+    return commandForImage(lang, lang.testInput);
 };
 
 const resultCompare = function (output, expectedOutput) {
@@ -50,4 +53,4 @@ const resultCompare = function (output, expectedOutput) {
     }
 };
 
-export {commandForImage, commandForTest, testFileName, resultCompare};
+export {commandForImage, commandForTest, resultCompare};

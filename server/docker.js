@@ -12,55 +12,59 @@ import {updateProblem} from './userData.js';
 Meteor.startup(() => {
     Meteor.methods({
         'docker.add'(data) {
-            let temp = docker.findOne({docker: true});
-            temp.languages.push(data);
-            docker.update({
-                _id: temp._id
-            }, {
-                $set: {languages: temp.languages}
-            });
+            if (data._id) {
+                docker.update({
+                    _id: data._id
+                }, {
+                    $set: data
+                });
+            } else {
+                data.languages = true;
+                docker.insert(data);
+            }
         },
-        'docker.remove'(key) {
-            let temp = docker.findOne({docker: true});
-            temp.languages.splice(key, 1);
-            docker.update({
-                _id: temp._id
-            }, {
-                $set: temp
-            });
-        },
-        'docker.update'(data) {
-            docker.update({
+        'docker.remove'(data) {
+            docker.remove({
                 _id: data._id
-            }, {
-                $set: data
+            }, (err) => {
+                if (err) {
+                    alert(err);
+                }
             });
         }
     });
 
-    if ( (docker.find({docker: true}).fetch()).length === 0 ) {
+    if ( (docker.find({global: true}).fetch()).length === 0 ) {
         docker.insert({
-            docker: true,
+            global: true,
             ip: 'localhost',
             timeout: 3,
-            port: 1234,
-            languages: [{
-                title: 'Python 3',
-                image: 'python:latest',
-                mountPath: '/usr/src/myapp/',
-                executable: 'python',
-                preArg: '',
-                postArg: ''
-            }]
+            port: 1234
         });
     }
-
+    /*
+    if ( (docker.find({languages: true}).fetch()).length === 0 ) {
+        docker.insert({
+            languages: true,
+            title: 'Python 3',
+            image: 'python:latest',
+            executable: 'python',
+            preArg: '',
+            mountPath: '/usr/src/myapp/',
+            file: 'test.py',
+            middleArg: '',
+            testInput: 'helloworld',
+            postArg: ''
+        });
+    }
+    */
     //Checking Docker
     Meteor.methods({
         'docker.checkImage'() {
             let future = new Future();
-            let dockerData = docker.findOne({docker: true});
-            if (dockerData.languages.length === 0) {
+            //let dockerConfig = docker.findOne({global: true});
+            let dockerLangs = docker.find({languages: true}).fetch();
+            if (dockerLangs.length === 0) {
                 throw new Meteor.Error(500, 'No Programming Language Configuration');
             }
             let testDocker = getDockerInstance();
@@ -72,7 +76,7 @@ Meteor.startup(() => {
                 let images = data.map((image)=>{
                     return image.RepoTags[0];
                 });
-                let result = dockerData.languages.map((lang)=>{
+                let result = dockerLangs.map((lang)=>{
                     for (var key in images) {
                         if (lang.image === images[key]) {
                             return {
@@ -91,25 +95,27 @@ Meteor.startup(() => {
             return future.wait();
         },
         'docker.testImage'(){
-            let dockerData = docker.findOne({docker: true});
+            //let dockerConfig = docker.findOne({global: true});
+            let dockerLangs = docker.find({languages: true}).fetch();
             let testDocker = getDockerInstance();
             let result = [];
-            for (var key in dockerData.languages) {
+            for (var key in dockerLangs) {
                 result.push({
-                    title  : dockerData.languages[key].title,
-                    output : dockerTest(testDocker, dockerData.languages[key])
+                    title  : dockerLangs[key].title,
+                    output : dockerTest(testDocker, dockerLangs[key])
                 });
             }
             return result;
         },
         'docker.submitCode'(data, isTest){
-            let dockerData = docker.findOne({docker: true});
+            //let dockerConfig = docker.findOne({docker: true});
+            let dockerLangs = docker.find({languages: true}).fetch();
             let problemData = problem.findOne({_id:data.problemID});
-            let _docker = getDockerInstance(dockerData);
+            let _docker = getDockerInstance();
             let langObj = null;
-            for (var key in dockerData.languages) {
-                if (dockerData.languages[key].title === data.language) {
-                    langObj = dockerData.languages[key];
+            for (var key in dockerLangs) {
+                if (dockerLangs[key].title === data.language) {
+                    langObj = dockerLangs[key];
                 }
             }
             if (!langObj) {
@@ -154,7 +160,7 @@ const dockerTest = function (dockerObj, lang) {
     return result;
 };
 const userSubmit = function (_docker, data, langObj, testInput) {
-    let localTestFolder = createUserFile(data);
+    let localTestFolder = createUserFile(data, langObj);
     let command = commandForImage(langObj, testInput);
     let result = dockerRun(_docker, langObj.image, command, localTestFolder, langObj.mountPath);
     return result;

@@ -2,8 +2,6 @@ import { Meteor } from 'meteor/meteor';
 import fs from 'fs';
 import path from 'path';
 
-import { testFileName } from '../imports/library/docker.js';
-
 const rootPath = process.env.PWD;
 const submittedPath = path.join(rootPath, '../submitted');
 const testPath = path.join(rootPath, '../testing');
@@ -18,7 +16,7 @@ Meteor.startup(() => {
 });
 
 const createTestingFile = function (lang) {
-    let testFile = path.join(testPath, testFileName);
+    let testFile = path.join(testPath, lang.file);
     if (fs.existsSync(testFile)) {
         fs.unlinkSync(testFile);
     }
@@ -26,9 +24,9 @@ const createTestingFile = function (lang) {
     return testPath;
 };
 
-const createUserFile = function (data) {
+const createUserFile = function (data, lang) {
     let userPath = path.join(submittedPath, data.user._id);
-    let userFile = path.join(userPath, testFileName);
+    let userFile = path.join(userPath, lang.file);
     if (!fs.existsSync(userPath)) {
         fs.mkdirSync(userPath);
     }

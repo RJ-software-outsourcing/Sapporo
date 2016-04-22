@@ -7,96 +7,70 @@ import RaisedButton from 'material-ui/lib/raised-button';
 import Toolbar from 'material-ui/lib/toolbar/toolbar';
 import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
 import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import LinearProgress from 'material-ui/lib/linear-progress';
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
+import DeleteIcon from 'material-ui/lib/svg-icons/action/delete';
+import IconButton from 'material-ui/lib/icon-button';
 
 import { docker } from '../../api/db.js';
 import { commandForTest } from '../../library/docker.js';
-import {setLock, freeLock, isLock} from '../../library/updateControl.js';
 
 import brace from 'brace';
 import * as langType from '../../library/lang_import.js';
 
-const langField = {
+const fieldStyle = {
     display: 'inline-block',
-    width: '25%'
-};
-const defaultDocker = {
-    ip: '',
-    port: '',
-    languages: []
+    width: '16.6%'
 };
 
 class DockerConfig extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            addDialogOpen: false,
-            docker: defaultDocker
+            dialogOpen: false,
+            selectLang: null,
+            runTest: false
         };
-        freeLock();
     }
-    addNewLang () {
-        Meteor.call('docker.add', this.state.add, () => {
-            this.setState({
-                docker:defaultDocker
-            });
+    closeAddDialog () {
+        this.setState({
+            dialogOpen: false,
+            selectLang: null
+        });
+    }
+    clickLang (lang) {
+        this.setState({
+            dialogOpen: true,
+            selectLang: lang
+        });
+    }
+    addLang () {
+        this.setState({
+            dialogOpen: true,
+            selectLang: {
+                mountPath:'/usr/src/myapp/'
+            }
+        });
+    }
+    updateLang () {
+        Meteor.call('docker.add', this.state.selectLang, (err) => {
+            if (err) {
+                alert(err);
+            }
             this.closeAddDialog();
         });
     }
-    removeLang (key) {
-        Meteor.call('docker.remove', key, () => {
-            this.setState({docker:defaultDocker});
-            freeLock();
+    removeLang (lang) {
+        Meteor.call('docker.remove', lang, (err) => {
+            if (err) {
+                alert(err);
+            }
         });
-    }
-    updateAll () {
-        freeLock();
-        Meteor.call('docker.update', this.state.docker, (err)=>{
-            (err)? alert('Update Failed'):alert('Update Success');
-        });
-    }
-    componentDidMount () {
-        freeLock();
-    }
-    componentDidUpdate () {
-        if (!isLock()) this.updateDocker();
-    }
-    updateDocker () {
-        if (this.props._docker) {
-            this.setState({
-                docker: this.props._docker
-            });
-            setLock();
-        }
-    }
-    updateLang (key, attr, event) {
-        let temp = this.state.docker;
-        temp.languages[key][attr] = event.target.value;
-        this.setState({
-            docker: temp
-        });
-    }
-    updateType (key, event, index, value) {
-        let temp = this.state.docker;
-        temp.languages[key]['langType'] = value;
-        this.setState({
-            docker: temp
-        });
-    }
-    updateAdd (attr, event) {
-        let temp = this.state.add;
-        temp[attr] = event.target.value;
-        this.setState({
-            add: temp
-        });
-    }
-    showCommandLine (lang) {
-        let strArray = commandForTest(lang);
-        return strArray.join(' ');
     }
     renderLangOptions () {
         let langList = [];
@@ -109,55 +83,39 @@ class DockerConfig extends Component {
             <MenuItem key={key} value={lang} primaryText={lang}></MenuItem>
         ));
     }
+    deleteIcon (lang) {
+        return (
+            <IconButton touch={true} tooltip="delete" tooltipPosition="bottom-left" onTouchTap={this.removeLang.bind(this, lang)}>
+                <DeleteIcon />
+            </IconButton>
+        );
+    }
     renderLanguages () {
-        if (!this.state.docker.languages) {
-            return;
-        }
-        return this.state.docker.languages.map((language, key) => (
-            <div key={key} style={{width: '100%', marginTop: '30px'}}>
-                <div>
-                    <TextField type="text" value={language.title} floatingLabelText="Programming Language" onChange={this.updateLang.bind(this, key, 'title')}/>
-                    <TextField type="text" value={language.image} floatingLabelText="Docker Image (repo:tag)" onChange={this.updateLang.bind(this, key, 'image')} />
-                    <SelectField value={language.langType}  onChange={this.updateType.bind(this, key)}
-                                 floatingLabelText="Language Family" style={{top:'-8px'}}>{this.renderLangOptions()}</SelectField>
-                    <RaisedButton label="Remove" secondary={true} style={{margin: '20px 0px 0px', float: 'right'}} onTouchTap={this.removeLang.bind(this, key)}/>
-                </div>
-                <div style={{width: '100%'}}>
-                    <TextField type="text" style={langField} value={language.executable} floatingLabelText="Executable" onChange={this.updateLang.bind(this, key, 'executable')} />
-                    <TextField type="text" style={langField} value={language.preArg} floatingLabelText="Args Before Input File (Optional)" onChange={this.updateLang.bind(this, key, 'preArg')} />
-                    <TextField type="text" style={langField} value={language.mountPath} floatingLabelText="Mounted Path on Docker" onChange={this.updateLang.bind(this, key, 'mountPath')} />
-                    <TextField type="text" style={langField} value={language.postArg} floatingLabelText="Args After Input File (Optional)" onChange={this.updateLang.bind(this, key, 'postArg')} />
-                </div>
-                <div>
-                    <span style={{float:'right'}}>{this.showCommandLine(language)}</span>
-                </div>
-                <div>
-                    <TextField type="text" style={{width:'100%'}} value={language.helloworld} floatingLabelText="Testing Script" hintText="Write script which prints 'helloworld' for testing"
-                               onChange={this.updateLang.bind(this, key, 'helloworld')} rows={2} rowsMax={2} multiLine={true}/>
-                </div>
-
-            </div>
+        return this.props._dockerLangs.map((lang, key) => (
+            <ListItem key={key} primaryText={lang.title} secondaryText={lang.image} rightIconButton={this.deleteIcon(lang)}
+                      onTouchTap={this.clickLang.bind(this, lang)} style={{borderBottom: '1px solid #DDD'}}/>
         ));
     }
-    openAddDialog () {
+    updateLangState (field, event) {
+        let temp = this.state.selectLang;
+        temp[field] = event.target.value;
         this.setState({
-            addDialogOpen: true,
-            add: {
-                title: null,
-                image: null,
-                executable: null,
-                mountPath: '/usr/src/myapp/'
-            }
+            selectLang : temp
         });
     }
-    closeAddDialog () {
+    updateLangType (event, index, value) {
+        let temp = this.state.selectLang;
+        temp['langType'] = value;
         this.setState({
-            addDialogOpen: false
+            selectLang: temp
         });
-        freeLock();
+    }
+    showCommandLine (lang) {
+        let strArray = commandForTest(lang);
+        return strArray.join(' ');
     }
     startTesting () {
-        this.setState({runTest: true});
+        //this.setState({runTest: true});
         Meteor.call('docker.checkImage', (err, result) => {
             if (err) {
                 alert(err);
@@ -165,7 +123,7 @@ class DockerConfig extends Component {
                 for (var key in result) {
                     if (!result[key].find) {
                         alert(result[key].image + ' not found, abort.');
-                        this.setState({runTest: false});
+                        //this.setState({runTest: false});
                         return;
                     }
                 }
@@ -182,56 +140,55 @@ class DockerConfig extends Component {
             }
         });
     }
-    abortTest () {
-        this.setState({
-            runTest: false
-        });
-    }
     render () {
         const actions = [
             <FlatButton label="Cancel" secondary={true} onTouchTap={this.closeAddDialog.bind(this)}/>,
-            <FlatButton label="Submit" primary={true}   onTouchTap={this.addNewLang.bind(this)}/>
-        ];
-        const testActions = [
-            <FlatButton label="Abort" secondary={true} onTouchTap={this.abortTest.bind(this)}/>
+            <FlatButton label="Submit" primary={true}   onTouchTap={this.updateLang.bind(this, null)}/>
         ];
         return (
             <div style={{}}>
                 <div>
-                    <TextField type="text" id="IP address" value={this.state.docker.ip} floatingLabelText="IP address"/>
-                    <TextField type="text" id="port" value={this.state.docker.port} floatingLabelText="Port number"/>
-                    <RaisedButton label="Update" primary={true} onTouchTap={this.updateAll.bind(this)}/>
+                    <TextField type="text" id="IP address"  floatingLabelText="IP address"/>
+                    <TextField type="text" id="port" floatingLabelText="Port number"/>
+                    <RaisedButton label="Check Connection" primary={true} />
                     <RaisedButton label="Test" secondary={true} onTouchTap={this.startTesting.bind(this)}/>
                 </div>
                 <div>
                     <Toolbar style={{marginTop:'30px'}}>
                         <ToolbarGroup float="left">
                             <ToolbarTitle text="Language Configuration" />
-                            <RaisedButton label="Add" onTouchTap={this.openAddDialog.bind(this)}/>
+                            <RaisedButton label="Add" onTouchTap={this.addLang.bind(this)}/>
                         </ToolbarGroup >
                         <ToolbarGroup float="right">
 
                         </ToolbarGroup >
                     </Toolbar>
-                    {this.renderLanguages()}
-                </div>
-                {this.state.add?
-                    <Dialog title="Add New Language Support" actions={actions} modal={false}
-                            open={this.state.addDialogOpen} onRequestClose={this.closeAddDialog.bind(this)}>
-                        <div>
-                            <TextField type="text" value={this.state.add.title} floatingLabelText="Programming Language" onChange={this.updateAdd.bind(this, 'title')}/>
-                            <TextField type="text" value={this.state.add.image} floatingLabelText="Docker Image"         onChange={this.updateAdd.bind(this, 'image')}/>
-                            <TextField type="text" value={this.state.add.executable} floatingLabelText="Executable"      onChange={this.updateAdd.bind(this, 'executable')}/>
-                        </div>
-                    </Dialog>
-                :''
-                }
-                {this.state.runTest?
-                    <Dialog title="Running Docker testing...." actions={testActions} modal={false}
-                            open={this.state.runTest} onRequestClose={this.abortTest.bind(this)}>
-                        <LinearProgress mode="indeterminate"/>
-                        <div>
+                    <List>
+                        {this.renderLanguages()}
+                    </List>
 
+                </div>
+                {this.state.selectLang?
+                    <Dialog title="Programming Language Configuration" actions={actions} modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%'}}
+                            open={this.state.dialogOpen} onRequestClose={this.closeAddDialog.bind(this)} autoDetectWindowHeight={true}>
+                        <div>
+                            <SelectField  value={this.state.selectLang.langType}  onChange={this.updateLangType.bind(this)}
+                                          floatingLabelText="Language Family" style={{top:'-8px'}}>{this.renderLangOptions()}</SelectField>
+                            <TextField type="text" value={this.state.selectLang.title} floatingLabelText="Language Name" onChange={this.updateLangState.bind(this, 'title')} />
+                            <TextField type="text" value={this.state.selectLang.image} floatingLabelText="Docker Image"  onChange={this.updateLangState.bind(this, 'image')}/>
+                            <TextField type="text" value={this.state.selectLang.mountPath} floatingLabelText="Mounted Path on Docker" onChange={this.updateLangState.bind(this, 'mountPath')} />
+                        </div>
+                        <div>
+                            <TextField type="text" value={this.state.selectLang.executable} floatingLabelText="Executable" onChange={this.updateLangState.bind(this, 'executable')} style={fieldStyle}/>
+                            <TextField type="text" value={this.state.selectLang.preArg} floatingLabelText="Args_1" onChange={this.updateLangState.bind(this, 'preArg')} style={fieldStyle}/>
+                            <TextField type="text" value={this.state.selectLang.file} floatingLabelText="File Name" onChange={this.updateLangState.bind(this, 'file')} style={fieldStyle}/>
+                            <TextField type="text" value={this.state.selectLang.middleArg} floatingLabelText="Args_2" onChange={this.updateLangState.bind(this, 'middleArg')} style={fieldStyle}/>
+                            <TextField type="text" value={this.state.selectLang.testInput} floatingLabelText="Test Input" onChange={this.updateLangState.bind(this, 'testInput')} style={fieldStyle}/>
+                            <TextField type="text" value={this.state.selectLang.postArg} floatingLabelText="Args_3" onChange={this.updateLangState.bind(this, 'postArg')} style={fieldStyle}/>
+                            <span style={{float:'right'}}>{this.showCommandLine(this.state.selectLang)}</span>
+                        </div>
+                        <div>
+                            <TextField type="text" value={this.state.selectLang.helloworld} floatingLabelText="Testing Script" onChange={this.updateLangState.bind(this, 'helloworld')} multiLine={true} style={fieldStyle}/>
                         </div>
 
                     </Dialog>
@@ -243,12 +200,15 @@ class DockerConfig extends Component {
 }
 
 DockerConfig.propTypes = {
-    _docker: PropTypes.object
+    _dockerGlobal: PropTypes.object,
+    _dockerLangs:  PropTypes.array.isRequired
 };
 
 export default createContainer(() => {
     Meteor.subscribe('docker');
     return {
-        _docker: docker.findOne({docker: true})
+        _dockerGlobal: docker.findOne({global: true}),
+        _dockerLangs:  docker.find({languages: true}).fetch()
+
     };
 }, DockerConfig);

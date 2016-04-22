@@ -180,15 +180,20 @@ const dockerRun = function (dockerObj, image, command, localFolder, dockerFolder
         err = err + chunk.toString();
         done();
     };
-    dockerObj.run(image, command, [stdout, stderr], {Tty:false}, function (error) {
+    let inputCommand = '';
+    for (var key in command) {
+        var space = '';
+        if (key!==0) space = ' ';
+        inputCommand = inputCommand + space + command[key];
+    }
+
+    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, function (error) {
         if (err !== '') {
             future.return(err);
         } else if (error) {
             future.return(error);
-        } else if (output) {
-            future.return(output);
         } else {
-            future.return('Weird');
+            future.return(output);
         }
     }).on('container', function (container) {
         container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];

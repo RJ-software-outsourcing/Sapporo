@@ -16,6 +16,9 @@ Meteor.startup(() => {
 });
 
 const createTestingFile = function (lang) {
+    if (!lang.file) {
+        return null;
+    }
     let testFile = path.join(testPath, lang.file);
     if (fs.existsSync(testFile)) {
         fs.unlinkSync(testFile);
@@ -25,6 +28,9 @@ const createTestingFile = function (lang) {
 };
 
 const createUserFile = function (data, lang) {
+    if (!lang.file) {
+        return null;
+    }
     let userPath = path.join(submittedPath, data.user._id);
     let userFile = path.join(userPath, lang.file);
     if (!fs.existsSync(userPath)) {

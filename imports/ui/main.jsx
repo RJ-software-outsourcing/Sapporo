@@ -162,6 +162,21 @@ class Main extends Component {
             prompt: false
         });
     }
+    renderAdmin () {
+        if (Meteor.user() && Meteor.user().username === 'admin') {
+            return (
+                <div>
+                    <MenuItem>Administrator</MenuItem>
+                    <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.renderPage.bind(this, 'system')}>System Settings</MenuItem>
+                    <MenuItem leftIcon={<ProblemIcon />} onTouchTap={this.renderPage.bind(this, 'problemConfig')}>Problem Configuration</MenuItem>
+                    <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.renderPage.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
+                    <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.renderPage.bind(this, 'analyse')}>Data Analyse</MenuItem>
+                    <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.renderPage.bind(this, 'liveFeed')}>Send Mail</MenuItem>
+                    <Divider />
+                </div>
+            );
+        }
+    }
     render () {
         return (
             <div>
@@ -177,13 +192,7 @@ class Main extends Component {
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>
                     <Divider />
-                    <MenuItem>Administrator</MenuItem>
-                    <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.renderPage.bind(this, 'system')}>System Settings</MenuItem>
-                    <MenuItem leftIcon={<ProblemIcon />} onTouchTap={this.renderPage.bind(this, 'problemConfig')}>Problem Configuration</MenuItem>
-                    <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.renderPage.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
-                    <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.renderPage.bind(this, 'analyse')}>Data Analyse</MenuItem>
-                    <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.renderPage.bind(this, 'liveFeed')}>Send Mail</MenuItem>
-                    <Divider />
+                    {this.renderAdmin()}
                     <MenuItem>problem</MenuItem>
                     {this.renderProblems()}
                 </LeftNav>

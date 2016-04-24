@@ -187,7 +187,7 @@ const dockerRun = function (dockerObj, image, command, localFolder, dockerFolder
         inputCommand = inputCommand + space + command[key];
     }
 
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, function (error) {
+    dockerObj.run(image, ['timeout', '5s', '/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, function (error) {
         if (err !== '') {
             future.return(err);
         } else if (error) {

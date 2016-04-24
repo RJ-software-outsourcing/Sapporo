@@ -26,11 +26,9 @@ class Mailbox extends Component {
         };
     }
     renderLiveFeeds () {
-        return this.props._liveFeed.map((item) => (
-            <div>
-                <ListItem key={item._id} primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
-                          onTouchTap={this.openFeed.bind(this, item)} leftIcon={this.hasRead(item)}/>
-            </div>
+        return this.props._liveFeed.map((item, key) => (
+            <ListItem key={key} primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
+                      onTouchTap={this.openFeed.bind(this, item)} leftIcon={this.hasRead(item)}/>
         ));
     }
     hasRead (item) {

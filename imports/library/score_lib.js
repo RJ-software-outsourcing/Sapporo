@@ -53,10 +53,21 @@ const getCurrentUserData = function (id, user) {
     return null;
 };
 
+const problemSolvedCount = function (item, user) {
+    let count = 0;
+    for (var key in user) {
+        if (user[key][item._id] && user[key][item._id].result) {
+            count += 1;
+        }
+    }
+    return count;
+};
+
 export {
     getTotalScore,
     getUserTotalScore,
     getUserPassedProblem,
     getCurrentUserData,
-    isUserPassedProblem
+    isUserPassedProblem,
+    problemSolvedCount
 };

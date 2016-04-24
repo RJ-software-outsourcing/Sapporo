@@ -2,28 +2,74 @@ import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
+import LinearProgress from 'material-ui/lib/linear-progress';
+import Divider from 'material-ui/lib/divider';
 
 import { problem, userData } from '../../api/db.js';
-import { getUserTotalScore } from '../../library/score_lib.js';
+import { getUserTotalScore, problemSolvedCount, getTotalScore } from '../../library/score_lib.js';
 
 class Rank extends Component {
-
-    displayText (item) {
-        let totalScore = getUserTotalScore(item, this.props._problem);
-        return "Team " + item.userID + ' has ' + String(totalScore);
+    problemSolvedCounting (item) {
+        return problemSolvedCount(item, this.props._userData);
+    }
+    renderProblemAnswerRate () {
+        this.sortPropsArray('_problem', (item) => {
+            return this.problemSolvedCounting(item);
+        });
+        return this.props._problem.map((item, key) => {
+            let solvedCount = this.problemSolvedCounting(item);
+            return (
+                <ListItem key={key} primaryText={item.title} secondaryText={String(solvedCount)}>
+                    <LinearProgress mode="determinate" max={this.props._userData.length} value={solvedCount}
+                                    color="green" style={{height:'15px'}}/>
+                </ListItem>
+            );
+        });
+    }
+    sortPropsArray (arrayName, compare) {
+        let array = this.props[arrayName];
+        array.sort((a, b) => {
+            let _a = compare(a);
+            let _b = compare(b);
+            if (_a > _b) {
+                return -1;
+            } else if (_a < _b) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
     }
     renderAllUser () {
         if (!this.props._userData || this.props._userData.length === 0) return;
-        return this.props._userData.map((item, key) => (
-            <div key={key}>
-                <span>{this.displayText(item)}</span>
-            </div>
-        ));
+        this.sortPropsArray('_userData', (item) => {
+            return getUserTotalScore(item, this.props._problem);
+        });
+        return this.props._userData.map((item, key) => {
+            let userTotalScore = getUserTotalScore(item, this.props._problem);
+            return (
+                <ListItem key={key} primaryText={item.userID} secondaryText={String(userTotalScore)}>
+                    <LinearProgress mode="determinate" max={getTotalScore(this.props._problem)} value={userTotalScore}
+                                    color="coral" style={{height:'15px'}}/>
+                </ListItem>
+            );
+        });
     }
     render () {
         return (
             <div>
-                {this.renderAllUser()}
+                <h3>Problem Solving Count</h3>
+                <List>
+                    {this.renderProblemAnswerRate()}
+                </List>
+                <Divider />
+                <h3>Ranking</h3>
+                <List>
+                    {this.renderAllUser()}
+                </List>
+
             </div>
         );
     }

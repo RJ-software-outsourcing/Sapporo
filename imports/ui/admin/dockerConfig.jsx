@@ -34,7 +34,7 @@ class DockerConfig extends Component {
         this.state = {
             dialogOpen: false,
             selectLang: null,
-            runTest: false
+            runningTest: false
         };
     }
     closeAddDialog () {
@@ -112,10 +112,10 @@ class DockerConfig extends Component {
     }
     showCommandLine (lang) {
         let strArray = commandForTest(lang);
-        return strArray.join(' ');
+        return '/bin/bash -c "' + strArray.join(' ') + '"';
     }
     startTesting () {
-        //this.setState({runTest: true});
+        this.setState({runningTest: true});
         Meteor.call('docker.checkImage', (err, result) => {
             if (err) {
                 alert(err);
@@ -123,7 +123,7 @@ class DockerConfig extends Component {
                 for (var key in result) {
                     if (!result[key].find) {
                         alert(result[key].image + ' not found, abort.');
-                        //this.setState({runTest: false});
+                        this.setState({runningTest: false});
                         return;
                     }
                 }
@@ -136,6 +136,7 @@ class DockerConfig extends Component {
                             alert(result[key].title + ' : ' + result[key].output);
                         }
                     }
+                    this.setState({runningTest: false});
                 });
             }
         });
@@ -188,12 +189,15 @@ class DockerConfig extends Component {
                             <span style={{float:'right'}}>{this.showCommandLine(this.state.selectLang)}</span>
                         </div>
                         <div>
-                            <TextField type="text" value={this.state.selectLang.helloworld} floatingLabelText="Testing Script" onChange={this.updateLangState.bind(this, 'helloworld')} multiLine={true} style={fieldStyle}/>
+                            <TextField type="text" value={this.state.selectLang.helloworld} floatingLabelText="Testing Script" onChange={this.updateLangState.bind(this, 'helloworld')} multiLine={true} style={{width:'50%'}}/>
                         </div>
 
                     </Dialog>
                 :''
                 }
+                <Dialog title="Runnung Test..." modal={false} open={this.state.runningTest} >
+                    <LinearProgress />
+                </Dialog>
             </div>
         );
     }

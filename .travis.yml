@@ -10,4 +10,4 @@ services:
 env:
   #- LAIKA_OPTIONS="-t 5000"
 after_success:
-  -  meteor build
+  -  meteor --version

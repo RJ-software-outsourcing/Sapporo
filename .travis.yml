@@ -14,5 +14,5 @@ after_success:
   -  ls ./
   -  docker --version
   -  docker pull node:0.12
-  -  docker build catsass19/sapporo:v1 .
+  -  docker build -t catsass19/sapporo:v1 .
   -  docker images

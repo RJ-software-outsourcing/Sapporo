@@ -1,4 +1,4 @@
-FROM node:0.12
+FROM node:0.10
 MAINTAINER Sapporo
 ADD ./Sapporo.tar.gz /sapporo/
 RUN apt-get update

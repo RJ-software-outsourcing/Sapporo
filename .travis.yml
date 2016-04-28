@@ -6,7 +6,7 @@
 #
 
 sudo: required,
-language: node_js
+#language: node_js
 node_js:
   - "0.12"
 before_install:
@@ -21,10 +21,10 @@ after_success:
   -  ls ./
   -  docker --version
   -  docker pull node:0.12
-  -  docker build -t sapporo/sapporo:$TRAVIS_BUILD_NUMBER .
+  -  docker build -t sapporo/sapporo:0.$TRAVIS_BUILD_NUMBER .
   -  docker build -t sapporo/sapporo:latest .
   -  docker images
   -  docker run catsass19/sapporo:v1 node /sapporo/bundle/main.js #If it's valid, it should throw the error of missing MongoDB URL
   -  docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  -  docker push sapporo/sapporo:$TRAVIS_BUILD_NUMBER
+  -  docker push sapporo/sapporo:0.$TRAVIS_BUILD_NUMBER
   -  docker push sapporo/sapporo:latest

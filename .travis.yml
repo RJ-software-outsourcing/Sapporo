@@ -6,9 +6,13 @@ before_install:
   - curl https://install.meteor.com/ | sh
   - meteor npm install
 services:
-  - mongodb
+  - docker
 env:
   #- LAIKA_OPTIONS="-t 5000"
 after_success:
-  -  meteor build --directory ../build
-  -  ls ../build
+  -  meteor build ./
+  -  ls ./
+  -  docker --version
+  -  docker pull node:0.12
+  -  docker build catsass19/sapporo:v1 .
+  -  docker images

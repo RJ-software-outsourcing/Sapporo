@@ -160,8 +160,8 @@ const dockerTest = function (dockerObj, lang) {
     return result;
 };
 const userSubmit = function (_docker, data, langObj, testInput) {
-    let localTestFolder = createUserFile(data, langObj);
-    let command = commandForImage(langObj, testInput);
+    let localTestFolder = createUserFile(data, langObj, testInput);
+    let command = commandForImage(langObj);
     let result = dockerRun(_docker, langObj.image, command, localTestFolder, langObj.mountPath);
     return result;
 };

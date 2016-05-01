@@ -2,12 +2,11 @@
     Common Library for Docker
 */
 
-const commandForImage = function (lang, parameter) {
+const commandForImage = function (lang) {
     let stringArray = [];
     let preArg = [];
     let middleArg = [];
     let postArg = [];
-    let input = [];
     if (lang.preArg) {
         preArg = lang.preArg.split(' ');
     }
@@ -17,17 +16,13 @@ const commandForImage = function (lang, parameter) {
     if (lang.postArg) {
         postArg = lang.postArg.split(' ');
     }
-    if (parameter) {
-        input = parameter.split(' ');
-    }
     let filePath = lang.mountPath + lang.file;
+    let testFile = lang.mountPath + lang.testInputFile;
     stringArray.push(lang.executable);
     stringArray = stringArray.concat(preArg);
     stringArray.push(filePath);
     stringArray = stringArray.concat(middleArg);
-    if (input.length > 0) {
-        stringArray = stringArray.concat(input);
-    }
+    stringArray.push(testFile);
     stringArray = stringArray.concat(postArg);
     return stringArray;
 };

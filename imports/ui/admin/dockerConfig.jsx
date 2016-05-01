@@ -184,12 +184,13 @@ class DockerConfig extends Component {
                             <TextField type="text" value={this.state.selectLang.preArg} floatingLabelText="Args_1" onChange={this.updateLangState.bind(this, 'preArg')} style={fieldStyle}/>
                             <TextField type="text" value={this.state.selectLang.file} floatingLabelText="File Name" onChange={this.updateLangState.bind(this, 'file')} style={fieldStyle}/>
                             <TextField type="text" value={this.state.selectLang.middleArg} floatingLabelText="Args_2" onChange={this.updateLangState.bind(this, 'middleArg')} style={fieldStyle}/>
-                            <TextField type="text" value={this.state.selectLang.testInput} floatingLabelText="Test Input" onChange={this.updateLangState.bind(this, 'testInput')} style={fieldStyle}/>
+                            <TextField type="text" value={this.state.selectLang.testInputFile} floatingLabelText="Test Input File" onChange={this.updateLangState.bind(this, 'testInputFile')} style={fieldStyle}/>
                             <TextField type="text" value={this.state.selectLang.postArg} floatingLabelText="Args_3" onChange={this.updateLangState.bind(this, 'postArg')} style={fieldStyle}/>
                             <span style={{float:'right'}}>{this.showCommandLine(this.state.selectLang)}</span>
                         </div>
                         <div>
-                            <TextField type="text" value={this.state.selectLang.helloworld} floatingLabelText="Testing Script" onChange={this.updateLangState.bind(this, 'helloworld')} multiLine={true} style={{width:'50%'}}/>
+                            <TextField type="text" value={this.state.selectLang.testInput} floatingLabelText="STD input for test" onChange={this.updateLangState.bind(this, 'testInput')} multiLine={true} style={{width:'100%'}}/>
+                            <TextField type="text" value={this.state.selectLang.helloworld} floatingLabelText="Testing Script" onChange={this.updateLangState.bind(this, 'helloworld')} multiLine={true} style={{width:'100%'}}/>
                         </div>
 
                     </Dialog>

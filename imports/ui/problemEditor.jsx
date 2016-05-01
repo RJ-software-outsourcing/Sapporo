@@ -199,7 +199,7 @@ class ProblemEditor extends Component {
                         open={this.state.runCode}>
                     {this.state.testResult?
                         <div>
-                            <TextField floatingLabelText="Test Input" type="text" style={{width:'100%'}}
+                            <TextField floatingLabelText="Test Input" type="text" style={{width:'100%'}} multiLine={true} 
                                        value={this.state.testResult.testInput}/>
                             <div style={{width:'100%'}}>
                                 <div style={{width:'48%',float:'left'}}>

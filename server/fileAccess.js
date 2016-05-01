@@ -15,32 +15,39 @@ Meteor.startup(() => {
     }
 });
 
-const createTestingFile = function (lang) {
-    if (!lang.file) {
-        return null;
+const createFiles = function (folderPath, lang, stdinput, script) {
+    let inputFile = path.join(folderPath, lang.testInputFile);
+
+    if (fs.existsSync(inputFile)) {
+        fs.unlinkSync(inputFile);
     }
-    let testFile = path.join(testPath, lang.file);
-    if (fs.existsSync(testFile)) {
-        fs.unlinkSync(testFile);
+    fs.writeFileSync(inputFile, stdinput);
+    let scriptFile = path.join(folderPath, lang.file);
+    if (fs.existsSync(scriptFile)) {
+        fs.unlinkSync(scriptFile);
     }
-    fs.writeFileSync(testFile, lang.helloworld);
-    return testPath;
+    fs.writeFileSync(scriptFile, script);
+
+    return folderPath;
 };
 
-const createUserFile = function (data, lang) {
-    if (!lang.file) {
+const createTestingFile = function (lang) {
+    if (!lang.file || !lang.testInputFile) {
+        return null;
+    }
+    return createFiles(testPath, lang, lang.testInput, lang.helloworld);
+};
+
+const createUserFile = function (data, lang, input) {
+    if (!lang.file || !data) {
         return null;
     }
     let userPath = path.join(submittedPath, data.user._id);
-    let userFile = path.join(userPath, lang.file);
     if (!fs.existsSync(userPath)) {
         fs.mkdirSync(userPath);
     }
-    if (fs.existsSync(userFile)) {
-        fs.unlinkSync(userFile);
-    }
-    fs.writeFileSync(userFile, data.code);
-    return userPath;
+    return createFiles(userPath, lang, input, data.code);
 };
+
 
 export {createTestingFile, createUserFile};

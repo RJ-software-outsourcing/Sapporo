@@ -11,6 +11,8 @@ import RaisedButton from 'material-ui/lib/raised-button';
 
 import ProblemIcon from 'material-ui/lib/svg-icons/editor/insert-comment';
 
+const workaroundStyle = {marginTop: '30px', borderTop: '1px solid #DDD'};
+
 const addStyle = {
     textAlign: 'center',
     marginTop: '20px'
@@ -118,11 +120,11 @@ class ProblemConfig extends Component {
             return;
         }
         return this.state.selectProblem.verfication.map((item, key) => (
-            <div style={{width: '100%'}} key={key}>
-                <TextField type="text" placeholder="Input"  value={item.input}  name={key+'input'}
-                           onChange={this.updateVerificationCase.bind(this, key, 'input')}/>
-                       <TextField type="text" placeholder="Output" value={item.output} name={key+'output'}
-                           onChange={this.updateVerificationCase.bind(this, key, 'output')}/>
+            <div style={{marginTop:'20px', borderBottom: '1px solid #DDD'}} key={key}>
+                <TextField type="text" floatingLabelText="Input" value={item.input}  name={key+'input'} multiLine={true} underlineShow={false}
+                           onChange={this.updateVerificationCase.bind(this, key, 'input')} rows={1} rowsMax={1}/>
+                       <TextField type="text" floatingLabelText="Output" value={item.output} name={key+'output'} multiLine={true} underlineShow={false}
+                           onChange={this.updateVerificationCase.bind(this, key, 'output')} rows={1} rowsMax={1}/>
                 <RaisedButton label="Delete" secondary={true} onTouchTap={this.deleteVerificationCase.bind(this, key)}/>
             </div>
         ));
@@ -147,19 +149,19 @@ class ProblemConfig extends Component {
                         <TextField type="text" floatingLabelText="Problem Description" multiLine={true} value={selected.description} name="description"
                                    rows={2} rowsMax={4} underlineShow={false} style={{width: '100%'}} onChange={this.updateSelected.bind(this, 'description')}/>
                     </div>
-                    <div style={{marginTop: '30px', borderTop: '1px solid #DDD'}}>
+                    <div style={workaroundStyle}>
                         <TextField type="text" floatingLabelText="Input Example" multiLine={true}  value={selected.exampleInput} name="exampleInput"
                                    rows={2} rowsMax={2} underlineShow={false} style={inlineTestfield} onChange={this.updateSelected.bind(this, 'exampleInput')}/>
                         <TextField type="text" floatingLabelText="Output Example" multiLine={true} value={selected.exampleOutput} name="exampleOutput"
                                    rows={2} rowsMax={2} underlineShow={false} style={inlineTestfield} onChange={this.updateSelected.bind(this, 'exampleOutput')}/>
                     </div>
-                    <div style={{marginTop: '30px', borderTop: '1px solid #DDD'}}>
-                        <TextField type="text" floatingLabelText="Test Input" style={inlineTestfield} name="testInput"
-                                   value={selected.testInput} onChange={this.updateSelected.bind(this, 'testInput')}/>
-                        <TextField type="text" floatingLabelText="Test Output" style={inlineTestfield} name="testOutput"
-                                   value={selected.testOutput} onChange={this.updateSelected.bind(this, 'testOutput')}/>
+                    <div style={workaroundStyle}>
+                        <TextField type="text" floatingLabelText="Test Input" style={inlineTestfield} name="testInput" multiLine={true} underlineShow={false}
+                                   value={selected.testInput} onChange={this.updateSelected.bind(this, 'testInput')} rows={1} rowsMax={1}/>
+                        <TextField type="text" floatingLabelText="Test Output" style={inlineTestfield} name="testOutput" multiLine={true} underlineShow={false}
+                                   value={selected.testOutput} onChange={this.updateSelected.bind(this, 'testOutput')} rows={1} rowsMax={1}/>
                     </div>
-                    <div>
+                    <div style={workaroundStyle}>
                         <RaisedButton label="Add Verifycation" primary={true} onTouchTap={this.addVerificationCase.bind(this)}/>
                         {this.renderVerification()}
                     </div>

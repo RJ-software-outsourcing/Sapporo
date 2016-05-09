@@ -1,12 +1,11 @@
-import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
 import {docker, problem} from '../imports/api/db.js';
-import { commandForImage, commandForTest, resultCompare, allInOneCommand} from '../imports/library/docker.js';
+import {resultCompare, allInOneCommand} from '../imports/library/docker.js';
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
 import stream from 'stream';
-import {createTestingFile, createUserFile} from './fileAccess.js';
+
 import {updateProblem} from './userData.js';
 
 Meteor.startup(() => {

@@ -2,7 +2,7 @@ import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
 import {docker, problem} from '../imports/api/db.js';
-import { commandForImage, commandForTest, resultCompare} from '../imports/library/docker.js';
+import { commandForImage, commandForTest, resultCompare, allInOneCommand} from '../imports/library/docker.js';
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
 import stream from 'stream';
@@ -159,19 +159,19 @@ const getDockerInstance = function() {
 };
 
 const dockerTest = function (dockerObj, lang) {
-    let localTestFolder = createTestingFile(lang);
-    let command = commandForTest(lang);
-    let result = dockerRun(dockerObj, lang.image, command, localTestFolder, lang.mountPath);
+    //let localTestFolder = createTestingFile(lang);
+    let test = allInOneCommand(lang, lang.helloworld, lang.testInput);
+    let result = dockerRun(dockerObj, lang.image, test);
     return result;
 };
 const userSubmit = function (_docker, data, langObj, testInput) {
-    let localTestFolder = createUserFile(data, langObj, testInput);
-    let command = commandForImage(langObj);
-    let result = dockerRun(_docker, langObj.image, command, localTestFolder, langObj.mountPath);
+    //let localTestFolder = createUserFile(data, langObj, testInput);
+    let command = allInOneCommand(langObj, data.code, testInput);
+    let result = dockerRun(_docker, langObj.image, command);
     return result;
 };
 
-const dockerRun = function (dockerObj, image, command, localFolder, dockerFolder) {
+const dockerRun = function (dockerObj, image, command) {
     let future = new Future();
     let stdout = stream.Writable();
     let stderr = stream.Writable();
@@ -200,8 +200,9 @@ const dockerRun = function (dockerObj, image, command, localFolder, dockerFolder
         } else {
             future.return(output);
         }
-    }).on('container', function (container) {
-        container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];
+    }).on('container', function () {
+        //We don't bind volume from now on....
+        //container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];
     });
     return future.wait();
 };

@@ -28,7 +28,7 @@ const commandForImage = function (lang) {
 };
 
 const commandForTest = function (lang) {
-    return commandForImage(lang, lang.testInput);
+    return commandForImage(lang);
 };
 
 const resultCompare = function (output, expectedOutput) {
@@ -48,4 +48,35 @@ const resultCompare = function (output, expectedOutput) {
     }
 };
 
-export {commandForImage, commandForTest, resultCompare};
+const allInOneCommand = function (lang, code, input) {
+    let strArray = [];
+    code = code.replace(/"/g, '\\"');
+    input = input.replace(/"/g, '\\"');
+    let saveCodeFile  = ['echo', '"'+code+'"', '>', './'+lang.file];
+    let saveInputFile = ['echo', '"'+input+'"','>', './'+lang.testInputFile];
+    let preArg = [];
+    let middleArg = [];
+    let postArg = [];
+    if (lang.preArg) {
+        preArg = lang.preArg.split(' ');
+    }
+    if (lang.middleArg) {
+        middleArg = lang.middleArg.split(' ');
+    }
+    if (lang.postArg) {
+        postArg = lang.postArg.split(' ');
+    }
+    strArray = strArray.concat(saveCodeFile);
+    strArray.push('&&');
+    strArray = strArray.concat(saveInputFile);
+    strArray.push('&&');
+    strArray.push(lang.executable);
+    strArray = strArray.concat(preArg);
+    strArray.push(lang.file);
+    strArray = strArray.concat(middleArg);
+    strArray.push(lang.testInputFile);
+    strArray = strArray.concat(postArg);
+    return strArray;
+};
+
+export {commandForImage, commandForTest, resultCompare, allInOneCommand};

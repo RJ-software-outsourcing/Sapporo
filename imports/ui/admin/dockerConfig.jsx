@@ -34,7 +34,12 @@ class DockerConfig extends Component {
         this.state = {
             dialogOpen: false,
             selectLang: null,
-            runningTest: false
+            runningTest: false,
+            _dockerGlobal: {
+                ip:'',
+                port:'',
+                global: true
+            }
         };
     }
     closeAddDialog () {
@@ -58,12 +63,16 @@ class DockerConfig extends Component {
         });
     }
     updateLang () {
-        Meteor.call('docker.add', this.state.selectLang, (err) => {
-            if (err) {
-                alert(err);
-            }
-            this.closeAddDialog();
-        });
+        let obj = this.state.selectLang;
+        if (obj !== null) {
+            obj['languages'] = true;
+            Meteor.call('docker.add', obj, (err) => {
+                if (err) {
+                    alert(err);
+                }
+                this.closeAddDialog();
+            });
+        }
     }
     removeLang (lang) {
         Meteor.call('docker.remove', lang, (err) => {
@@ -141,24 +150,57 @@ class DockerConfig extends Component {
             }
         });
     }
+    updateGlobal (field, event) {
+        let tmp = this.state._dockerGlobal;
+        tmp[field] = event.target.value;
+        this.setState({
+            _dockerGlobal : tmp
+        });
+    }
+    checkDockerHost () {
+        let obj = this.state._dockerGlobal;
+        Meteor.call('docker.add', obj, (err) => {
+            if (err) {
+                alert(err);
+            } else {
+                Meteor.call('docker.listImage', (err, result) => {
+                    if (err) {
+                        alert(err);
+                    }  else {
+                        alert(result);
+                    }
+                });
+            }
+        });
+    }
+    componentWillUpdate (nextProp) {
+        if ((nextProp._dockerGlobal.ip !== this.state._dockerGlobal.ip) ||
+            (nextProp._dockerGlobal.port !== this.state._dockerGlobal.port)) {
+            this.setState({
+                _dockerGlobal: nextProp._dockerGlobal
+            });
+        }
+    }
     render () {
         const actions = [
             <FlatButton label="Cancel" secondary={true} onTouchTap={this.closeAddDialog.bind(this)}/>,
             <FlatButton label="Submit" primary={true}   onTouchTap={this.updateLang.bind(this, null)}/>
         ];
         return (
-            <div style={{}}>
+            <div>
                 <div>
-                    <TextField type="text" id="IP address"  floatingLabelText="IP address"/>
-                    <TextField type="text" id="port" floatingLabelText="Port number"/>
-                    <RaisedButton label="Check Connection" primary={true} />
-                    <RaisedButton label="Test" secondary={true} onTouchTap={this.startTesting.bind(this)}/>
+                    <TextField type="text" id="IP address"  floatingLabelText="IP address"
+                               value={this.state._dockerGlobal.ip} onChange={this.updateGlobal.bind(this, 'ip')}/>
+                    <TextField type="text" id="port" floatingLabelText="Port number"
+                               value={this.state._dockerGlobal.port} onChange={this.updateGlobal.bind(this, 'port')}/>
+                           <RaisedButton label="Check Connection" primary={true} onTouchTap={this.checkDockerHost.bind(this)}/>
                 </div>
                 <div>
                     <Toolbar style={{marginTop:'30px'}}>
                         <ToolbarGroup float="left">
                             <ToolbarTitle text="Language Configuration" />
                             <RaisedButton label="Add" onTouchTap={this.addLang.bind(this)}/>
+                            <RaisedButton label="Test" secondary={true} onTouchTap={this.startTesting.bind(this)}/>
                         </ToolbarGroup >
                         <ToolbarGroup float="right">
 
@@ -214,6 +256,5 @@ export default createContainer(() => {
     return {
         _dockerGlobal: docker.findOne({global: true}),
         _dockerLangs:  docker.find({languages: true}).fetch()
-
     };
 }, DockerConfig);

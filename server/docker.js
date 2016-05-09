@@ -19,7 +19,6 @@ Meteor.startup(() => {
                     $set: data
                 });
             } else {
-                data.languages = true;
                 docker.insert(data);
             }
         },
@@ -39,27 +38,25 @@ Meteor.startup(() => {
             global: true,
             ip: 'localhost',
             timeout: 3,
-            port: 1234
+            port: ''
         });
     }
-    /*
-    if ( (docker.find({languages: true}).fetch()).length === 0 ) {
-        docker.insert({
-            languages: true,
-            title: 'Python 3',
-            image: 'python:latest',
-            executable: 'python',
-            preArg: '',
-            mountPath: '/usr/src/myapp/',
-            file: 'test.py',
-            middleArg: '',
-            testInput: 'helloworld',
-            postArg: ''
-        });
-    }
-    */
+
     //Checking Docker
     Meteor.methods({
+        'docker.listImage'() {
+            let future = new Future();
+            let testDocker = getDockerInstance();
+            testDocker.listImages({}, (err, data) => {
+                if (err) {
+                    future.throw('cannot connect to Docker');
+                    return;
+                } else {
+                    future.return(data);
+                }
+            });
+            return future.wait();
+        },
         'docker.checkImage'() {
             let future = new Future();
             //let dockerConfig = docker.findOne({global: true});
@@ -149,8 +146,16 @@ Meteor.startup(() => {
     });
 });
 
-const getDockerInstance = function(dockerData) {
-    return new Dockerode();
+const getDockerInstance = function() {
+    let dockerGlobalConfig = docker.findOne({global: true});
+    if (!dockerGlobalConfig.ip || dockerGlobalConfig.ip === '') {
+        return new Dockerode();
+    } else {
+        return new Dockerode({
+            host: dockerGlobalConfig.ip,
+            port: dockerGlobalConfig.port
+        });
+    }
 };
 
 const dockerTest = function (dockerObj, lang) {

@@ -21,10 +21,6 @@ import 'brace/theme/tomorrow_night_blue';
 import { docker } from '../api/db.js';
 import {setLock, freeLock, isLock} from '../library/updateControl.js';
 
-const split = {
-    width: '50%',
-    display: 'inline-block'
-};
 const textDiv = {
     width: '96%',
     padding: '0px 2%'
@@ -41,16 +37,24 @@ class ProblemEditor extends Component {
         };
     }
     updateCode(code) {
-        let tmpObj = {
-            _id: this.props.data._id,
-            code: code
-        };
-        localStorage.setItem(tmpObj._id, JSON.stringify(tmpObj));
+        let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+        if (!tmpObj) {
+            tmpObj = {};
+        }
+        tmpObj.code = code;
+        localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
         freeLock();
     }
     updateLang(event, index, value) {
         for (var key in this.props._docker) {
             if (this.props._docker[key].title === value) {
+                let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+                if (!tmpObj) {
+                    tmpObj = {};
+                }
+                tmpObj.language = value;
+                tmpObj.langType = this.props._docker[key].langType;
+                localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
                 this.setState({
                     language: value,
                     langType: this.props._docker[key].langType
@@ -85,8 +89,15 @@ class ProblemEditor extends Component {
             let tmpObj = localStorage.getItem(this.props.data._id);
             if (tmpObj) {
                 tmpObj = JSON.parse(tmpObj);
+                console.log(tmpObj);
                 this.setState ({
-                    code: tmpObj.code? tmpObj.code:''
+                    code: tmpObj.code? tmpObj.code:'',
+                    language: tmpObj.language? tmpObj.language: '',
+                    langType: tmpObj.langType? tmpObj.langType: null
+                });
+            } else {
+                this.setState({
+                    code: ''
                 });
             }
             setLock();
@@ -164,8 +175,10 @@ class ProblemEditor extends Component {
                                        multiLine={true} rows={2} value={this.props.data.description}/>
                         </div>
                         <div style={textDiv}>
-                            <TextField floatingLabelText="Input Example" type="text" multiLine={true} rows={2} style={split} value={this.props.data.exampleInput}/>
-                            <TextField floatingLabelText="Output Example" type="text" multiLine={true} rows={2} style={split} value={this.props.data.exampleOutput}/>
+                            <TextField floatingLabelText="Input Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleInput}/>
+                        </div>
+                        <div style={textDiv}>
+                            <TextField floatingLabelText="Output Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleOutput}/>
                         </div>
 
                     </Paper>

@@ -205,9 +205,3 @@ const dockerRun = function (dockerObj, image, command) {
     });
     return future.wait();
 };
-
-/*
-testDocker.run('python', ['python','--version'], process.stdout, function (err, data) {
-    console.log(data);
-});
-*/

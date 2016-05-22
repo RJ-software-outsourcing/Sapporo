@@ -69,7 +69,8 @@ class ProblemConfig extends Component {
         Meteor.call('problem.add', {
             title: this.state.addTitle,
             score: this.state.addScore,
-            verfication: []
+            verfication: [],
+            images: []
         });
         this.setState(initState);
     }
@@ -129,6 +130,38 @@ class ProblemConfig extends Component {
             </div>
         ));
     }
+    renderImages () {
+        if (!this.state.selectProblem.images) {
+            return;
+        }
+        return this.state.selectProblem.images.map((item, key) => (
+            <div key={key}>
+                <img src={item.content} onTouchTap={this.deleteImage.bind(this, key)} style={{height: '200px'}}/>
+            </div>
+        ));
+    }
+    addImage (e) {
+        let reader = new FileReader();
+        let file = e.target.files;
+        let selected = this.state.selectProblem;
+        reader.onload = (upload)=>{
+            selected.images.push({
+                title: 'test',
+                content: upload.target.result
+            });
+            this.setState({
+                selectProblem: selected
+            });
+        };
+        reader.readAsDataURL(file[0]);
+    }
+    deleteImage (key) {
+        let selected = this.state.selectProblem;
+        selected.images.splice(key, 1);
+        this.setState({
+            selectProblem: selected
+        });
+    }
     renderEditor () {
         let selected = this.state.selectProblem;
         return (
@@ -164,6 +197,10 @@ class ProblemConfig extends Component {
                     <div style={workaroundStyle}>
                         <RaisedButton label="Add Verifycation" primary={true} onTouchTap={this.addVerificationCase.bind(this)}/>
                         {this.renderVerification()}
+                    </div>
+                    <div style={{marginTop:'10px'}}>
+                        <input type="file" onChange={this.addImage.bind(this)}/>
+                        {this.renderImages()}
                     </div>
                 </div>
             </div>

@@ -89,7 +89,6 @@ class ProblemEditor extends Component {
             let tmpObj = localStorage.getItem(this.props.data._id);
             if (tmpObj) {
                 tmpObj = JSON.parse(tmpObj);
-                console.log(tmpObj);
                 this.setState ({
                     code: tmpObj.code? tmpObj.code:'',
                     language: tmpObj.language? tmpObj.language: '',
@@ -153,6 +152,14 @@ class ProblemEditor extends Component {
     closeDialog() {
         this.setState({runCode: false, testResult: null});
     }
+    renderImages () {
+        if (!this.props.data.images) {
+            return;
+        }
+        return this.props.data.images.map((item, key) => (
+            <img key={key} src={item.content} style={{height: '200px'}}/>
+        ));
+    }
     render () {
         const  editorOption = {
             $blockScrolling: true
@@ -179,6 +186,9 @@ class ProblemEditor extends Component {
                         </div>
                         <div style={textDiv}>
                             <TextField floatingLabelText="Output Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleOutput}/>
+                        </div>
+                        <div>
+                            {this.renderImages()}
                         </div>
 
                     </Paper>

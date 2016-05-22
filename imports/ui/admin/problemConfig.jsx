@@ -136,7 +136,10 @@ class ProblemConfig extends Component {
         }
         return this.state.selectProblem.images.map((item, key) => (
             <div key={key}>
-                <img src={item.content} onTouchTap={this.deleteImage.bind(this, key)} style={{height: '200px'}}/>
+                <img src={item.content} style={{height: '200px'}}/>
+                <TextField type="text" placeholder="Title" style={titleStyle} name="title"
+                           value={item.title} onChange={this.updateImageTitle.bind(this, key)}/>
+                <RaisedButton label="Delete" secondary={true} onTouchTap={this.deleteImage.bind(this, key)}/>
             </div>
         ));
     }
@@ -146,7 +149,7 @@ class ProblemConfig extends Component {
         let selected = this.state.selectProblem;
         reader.onload = (upload)=>{
             selected.images.push({
-                title: 'test',
+                title: 'Figure ' + selected.images.length,
                 content: upload.target.result
             });
             this.setState({
@@ -154,6 +157,13 @@ class ProblemConfig extends Component {
             });
         };
         reader.readAsDataURL(file[0]);
+    }
+    updateImageTitle (key, event) {
+        let selected = this.state.selectProblem;
+        selected.images[key].title = event.target.value;
+        this.setState({
+            selectProblem : selected
+        });
     }
     deleteImage (key) {
         let selected = this.state.selectProblem;

@@ -11,6 +11,8 @@ import FlatButton from 'material-ui/lib/flat-button';
 import Dialog from 'material-ui/lib/dialog';
 import LinearProgress from 'material-ui/lib/linear-progress';
 
+import Carousel from 'nuka-carousel';
+
 import brace from 'brace';
 import AceEditor from 'react-ace';
 
@@ -157,7 +159,10 @@ class ProblemEditor extends Component {
             return;
         }
         return this.props.data.images.map((item, key) => (
-            <img key={key} src={item.content} style={{height: '200px'}}/>
+            <div key={key}>
+                <span style={{textAlign:'center', width:'100%'}}>{item.title}</span>
+                <img  src={item.content} style={{width:'100%', opacity:'0.9'}}/>
+            </div>
         ));
     }
     render () {
@@ -187,9 +192,14 @@ class ProblemEditor extends Component {
                         <div style={textDiv}>
                             <TextField floatingLabelText="Output Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleOutput}/>
                         </div>
-                        <div>
-                            {this.renderImages()}
-                        </div>
+                        {
+                            (this.props.data.images.length > 0)?
+                            <Carousel showArrows={true} framePadding={'10px'}>
+                                {this.renderImages()}
+                            </Carousel>
+                            :''
+                        }
+
 
                     </Paper>
                     <div style={{width: '49.5%', float:'right'}}>

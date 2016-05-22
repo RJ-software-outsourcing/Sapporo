@@ -11,6 +11,7 @@
     "fibers": "^1.0.10",
     "material-ui": "0.15.0-alpha.2",
     "meteor-node-stubs": "~0.2.0",
+    "nuka-carousel": "^1.2.1",
     "react": "0.14.8",
     "react-ace": "3.2.0",
     "react-addons-pure-render-mixin": "0.14.6",

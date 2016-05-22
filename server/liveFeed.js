@@ -7,6 +7,7 @@ Meteor.startup(() => {
 
     Meteor.methods({
         'liveFeed.add'(data) {
+            if (Meteor.user().username !== 'admin') return;
             liveFeed.insert({
                 title: data.title,
                 content: data.content,
@@ -14,6 +15,7 @@ Meteor.startup(() => {
             });
         },
         'liveFeed.delete'(data) {
+            if (Meteor.user().username !== 'admin') return;
             liveFeed.remove({
                 _id: data._id
             }, function (err) {

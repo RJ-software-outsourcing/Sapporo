@@ -31,7 +31,25 @@ function updateTime () {
     });
     if (!problemPublished && coding) {
         Meteor.publish('problem', function dockerPublication() {
-            return problem.find();
+            var user = Meteor.users.findOne(this.userId);
+            if (!user) {
+                return;
+            } else if (user.username && (user.username === 'admin')) {
+                return problem.find();
+            } else {
+                return problem.find({}, {
+                    fields: {
+                        description: 1,
+                        exampleInput: 1,
+                        exampleOutput: 1,
+                        images: 1,
+                        score: 1,
+                        testInput: 1,
+                        testOutput: 1,
+                        title: 1
+                    }
+                });
+            }
         });
         problemPublished = true;
     }
@@ -42,6 +60,7 @@ Meteor.startup(() => {
 
     Meteor.methods({
         'time.update'(time) {
+            if (Meteor.user().username !== 'admin') return;
             timer.update({
                 timeSync: true
             }, {

@@ -11,6 +11,7 @@ import {updateProblem} from './userData.js';
 Meteor.startup(() => {
     Meteor.methods({
         'docker.add'(data) {
+            if (Meteor.user().username !== 'admin') return;
             if (data._id) {
                 docker.update({
                     _id: data._id
@@ -22,6 +23,7 @@ Meteor.startup(() => {
             }
         },
         'docker.remove'(data) {
+            if (Meteor.user().username !== 'admin') return;
             docker.remove({
                 _id: data._id
             }, (err) => {

@@ -7,9 +7,11 @@ Meteor.startup(() => {
 
     Meteor.methods({
         'problem.add'(data) {
+            if (Meteor.user().username !== 'admin') return;
             problem.insert(data);
         },
         'problem.update'(data) {
+            if (Meteor.user().username !== 'admin') return;
             problem.update({
                 _id: data._id
             }, {
@@ -17,6 +19,7 @@ Meteor.startup(() => {
             });
         },
         'problem.delete'(data) {
+            if (Meteor.user().username !== 'admin') return;
             problem.remove({
                 _id: data._id
             }, function (err) {

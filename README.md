@@ -13,7 +13,7 @@ Docker image is also available
 ```
 docker pull sapporo/sapporo:latest
 ```
-Docker run. Please be aware that there are three mandatory EVs to configured <br>
+Command to run in docker. Please be aware that there are three mandatory EVs to be configured <br>
 More detail please read /sapporo/bundle/README (in the container)
 ```
 docker run -d -p 3000:80 \

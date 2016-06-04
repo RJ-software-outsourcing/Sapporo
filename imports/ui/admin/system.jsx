@@ -1,4 +1,7 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
+import { Template } from 'meteor/templating';
+import { Blaze } from 'meteor/blaze';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
@@ -8,10 +11,10 @@ import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';
 
 const style = {
-    width: '100%',
-    textAlign : 'center',
+    width: '60%',
+    textAlign : 'left',
     display: 'inline-block',
-    marginTop : '10px'
+    margin : '10px 0 0 20%'
 };
 const inlineDiv = {
     display: 'inline-block',
@@ -44,6 +47,8 @@ class System extends Component {
     }
     submit () {
         Meteor.call('time.update', this.state.time);
+        Meteor.call('codewarsPassportConfiguration', this.state.codewarsPassport);
+
         updateLock = false;
     }
     updateTime (type, unit, event) {
@@ -56,12 +61,18 @@ class System extends Component {
     updateSystemData () {
         if (updateLock) return;
         this.setState({
-            time: this.props._timer.gameTime
+            time: this.props._timer.gameTime,
+            codewarsPassport: this.props._passport
         });
         updateLock = true;
     }
     componentDidUpdate () {
         if (!updateLock) this.updateSystemData();
+    }
+    componentDidMount() {
+        // Use Meteor Blaze to render login buttons
+        this.view = Blaze.render(Template.configureLoginServiceDialogForMeteorOAuth2Server,
+            ReactDOM.findDOMNode(this.refs.container));
     }
     render () {
         return (
@@ -91,7 +102,9 @@ class System extends Component {
                               id="endMin"/>
                     </div>
                 </div>
-
+                <div style={style}>
+                    <span ref="container" />
+                </div>
                 <div style={style}>
                     <RaisedButton label="Submit"  primary={true} onTouchTap={this.submit.bind(this)}/>
                 </div>
@@ -106,6 +119,7 @@ System.propTypes = {
 
 export default createContainer(() => {
     Meteor.subscribe('timer');
+    Meteor.subscribe('passport');
     return {
         _timer: timer.findOne({timeSync: true})
     };

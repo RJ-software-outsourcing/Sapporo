@@ -137,7 +137,7 @@ class ProblemConfig extends Component {
         return this.state.selectProblem.images.map((item, key) => (
             <div key={key}>
                 <img src={item.content} style={{height: '200px'}}/>
-                <TextField type="text" placeholder="Title" style={titleStyle} name="title"
+                <TextField type="text" placeholder="Title" name="title"
                            value={item.title} onChange={this.updateImageTitle.bind(this, key)}/>
                 <RaisedButton label="Delete" secondary={true} onTouchTap={this.deleteImage.bind(this, key)}/>
             </div>

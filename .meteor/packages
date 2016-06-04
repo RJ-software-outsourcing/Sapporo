@@ -11,7 +11,6 @@ blaze-html-templates    # Compile .html files into Meteor Blaze views
 reactive-var            # Reactive variable for tracker
 jquery                  # Helpful client-side library
 tracker                 # Meteor's client-side reactive programming library
-
 standard-minifier-js    # JS minifier run for production mode
 es5-shim                # ECMAScript 5 compatibility for older browsers.
 ecmascript              # Enable ECMAScript2015+ syntax in app code
@@ -21,3 +20,12 @@ accounts-base
 accounts-password
 react-meteor-data
 standard-minifier-css
+http
+webapp
+accounts-ui
+
+# Packages for oAuth
+accounts-facebook
+prime8consulting:meteor-oauth2-client
+service-configuration
+oauth

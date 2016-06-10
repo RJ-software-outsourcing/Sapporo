@@ -133,7 +133,7 @@ class Dashboard extends Component {
     }
     render () {
         const tilesData = [{
-            title: Meteor.user()? Meteor.user().username:'',
+            title: Meteor.user()? (Meteor.user().username? Meteor.user().username:(Meteor.user().profile?Meteor.user().profile.name:'')):'Invalid User', //Will create Library for user credential later
             featured: true,
             cols: 2,
             image: '/images/1.jpg',

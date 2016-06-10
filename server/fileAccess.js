@@ -8,10 +8,10 @@ const testPath = path.join(rootPath, '../testing');
 
 Meteor.startup(() => {
     if (!fs.existsSync(submittedPath)) {
-        fs.mkdirSync(submittedPath);
+        //fs.mkdirSync(submittedPath);
     }
     if (!fs.existsSync(testPath)) {
-        fs.mkdirSync(testPath);
+        //fs.mkdirSync(testPath);
     }
 });
 

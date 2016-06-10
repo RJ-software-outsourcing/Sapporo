@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import ReactDOM from 'react-dom';
-import { Template } from 'meteor/templating';
-import { Blaze } from 'meteor/blaze';
 import { userData } from '../api/db.js';
 
 import TextField from 'material-ui/lib/text-field';
@@ -97,9 +95,6 @@ export default class Login extends Component {
         });
     }
     componentDidMount() {
-        // Use Meteor Blaze to render login buttons
-        this.view = Blaze.render(Template.loginButtons,
-            ReactDOM.findDOMNode(this.refs.container));
     }
     render () {
         const staffLoginAction = [
@@ -108,13 +103,11 @@ export default class Login extends Component {
         return (
             <div style={loginStyle}>
                 <div>
-                    <RaisedButton style={loginButton} label="CodeWars Passport"    primary={true} onTouchTap={this.loginOauth.bind(this)}/>
-                    <RaisedButton style={loginButton} label="Delete Passport"    primary={true} onTouchTap={this.removeOauth.bind(this)}/>
-                    <RaisedButton style={loginButton} label="Administrator"      secondary={true} onTouchTap={this.openStaffLogin.bind(this)}/>
+                    <RaisedButton style={loginButton} label="CodeWars Passport" primary={true} onTouchTap={this.loginOauth.bind(this)}/>
+                    <RaisedButton style={loginButton} label="Administrator"     secondary={true} onTouchTap={this.openStaffLogin.bind(this)}/>
                     <RaisedButton style={loginButton} label="Facebook"          secondary={true} onTouchTap={this.loginFacebook.bind(this)}/>
-                    <span ref="container" />
                 </div>
-                <Dialog title="Login as Staff" modal={false} open={this.state.stafflogin} actions={staffLoginAction} open={this.state.stafflogin}>
+                <Dialog title="Login as Staff" modal={false} open={this.state.stafflogin} actions={staffLoginAction}>
                     <div>
                         <TextField  style={textFieldStyle} floatingLabelText="User Name" onChange={this.updateUsername.bind(this)}/>
                         <TextField  style={textFieldStyle} type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)}/>

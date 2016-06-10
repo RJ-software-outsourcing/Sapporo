@@ -1,7 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import { Template } from 'meteor/templating';
-import { Blaze } from 'meteor/blaze';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
@@ -9,8 +7,12 @@ import { timer } from '../../api/db.js';
 
 import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';
+import Toggle from 'material-ui/lib/toggle';
+import Dialog from 'material-ui/lib/dialog';
+import FlatButton from 'material-ui/lib/flat-button';
 
 const style = {
+    padding: '10px 0',
     width: '60%',
     textAlign : 'left',
     display: 'inline-block',
@@ -35,7 +37,14 @@ const initState = {
             hr: null,
             min: null
         }
-    }
+    },
+    facebookLoginDialog: false,
+    codewarsPassportDialog: false,
+    facebookID: '',
+    facebookSecret: '',
+    codewarsPassportID:'',
+    codewarsPassportSecret:'',
+    codewarsPassportUrl:''
 };
 let updateLock = false;
 
@@ -47,8 +56,6 @@ class System extends Component {
     }
     submit () {
         Meteor.call('time.update', this.state.time);
-        Meteor.call('codewarsPassportConfiguration', this.state.codewarsPassport);
-
         updateLock = false;
     }
     updateTime (type, unit, event) {
@@ -60,21 +67,111 @@ class System extends Component {
     }
     updateSystemData () {
         if (updateLock) return;
+        Meteor.call('findLoginService', 'facebook', (err, toggle) => {
+            if (err) {
+                alert(err);
+                return;
+            }
+            this.setState({
+                facebookLogin: toggle
+            });
+        });
+        Meteor.call('findLoginService', 'MeteorOAuth2Server', (err, toggle) => {
+            if (err) {
+                alert(err);
+                return;
+            }
+            this.setState({
+                codewarsPassportLogin: toggle
+            });
+        });
         this.setState({
-            time: this.props._timer.gameTime,
-            codewarsPassport: this.props._passport
+            time: this.props._timer.gameTime
         });
         updateLock = true;
+    }
+    toggleLogin (service) {
+        switch (service) {
+        case 'facebook':
+            if (!this.state.facebookLogin) {
+                this.toggleLoginConfigDialog('facebookLoginDialog');
+            } else {
+                Meteor.call('resetFacebookLogin');
+                this.setState({
+                    facebookLogin: false
+                });
+            }
+            break;
+        case 'codewarsPassport':
+            if (!this.state.codewarsPassportLogin) {
+                this.toggleLoginConfigDialog('codewarsPassportDialog');
+                //this.configCodewarsPassportLogin();
+            } else {
+                Meteor.call('resetCodewarsPassportLogin');
+                this.setState({
+                    codewarsPassportLogin: false
+                });
+            }
+            break;
+        default:
+        }
+        updateLock = false;
+    }
+    toggleLoginConfigDialog(target) {
+        let tmp = this.state;
+        tmp[target] = !tmp[target];
+        this.setState(tmp);
+    }
+    updateLoginConfig (field, event) {
+        let tmp = this.state;
+        tmp[field] = event.target.value;
+        this.setState(tmp);
+    }
+    configFacebookLogin () {
+        let id = this.state.facebookID;
+        let secret = this.state.facebookSecret;
+        Meteor.call('configFacebookLogin', {
+            appID: id,
+            secret: secret
+        }, (err) => {
+            if (err) {
+                alert('Failed to configure Facebook Login');
+            } else {
+                this.setState({
+                    facebookLogin: true
+                });
+            }
+            this.toggleLoginConfigDialog('facebookLoginDialog');
+        });
+    }
+    configCodewarsPassportLogin () {
+        Meteor.call('configCodewarsPassportLogin', {
+            appID: this.state.codewarsPassportID,
+            secret: this.state.codewarsPassportSecret,
+            url: this.state.codewarsPassportUrl
+        }, (err) => {
+            if (err) {
+                alert('Failed to configure CodeWars Passport Login');
+            } else {
+                this.setState({
+                    codewarsPassportLogin: true
+                });
+            }
+            this.toggleLoginConfigDialog('codewarsPassportDialog');
+        });
     }
     componentDidUpdate () {
         if (!updateLock) this.updateSystemData();
     }
-    componentDidMount() {
-        // Use Meteor Blaze to render login buttons
-        this.view = Blaze.render(Template.configureLoginServiceDialogForMeteorOAuth2Server,
-            ReactDOM.findDOMNode(this.refs.container));
-    }
     render () {
+        const facebookLoginAction = [
+            <FlatButton label="Submit" primary={true} onTouchTap={this.configFacebookLogin.bind(this)}/>,
+            <FlatButton label="cancel" secondary={true} onTouchTap={this.toggleLoginConfigDialog.bind(this, 'facebookLoginDialog')}/>
+        ];
+        const codewarsPassportLoginAction = [
+            <FlatButton label="Submit" primary={true} onTouchTap={this.configCodewarsPassportLogin.bind(this)}/>,
+            <FlatButton label="cancel" secondary={true} onTouchTap={this.toggleLoginConfigDialog.bind(this, 'codewarsPassportDialog')}/>
+        ];
         return (
             <div>
                 <div style={style}>
@@ -103,11 +200,26 @@ class System extends Component {
                     </div>
                 </div>
                 <div style={style}>
-                    <span ref="container" />
+                    <Toggle labelPosition="right" label="CodeWars Passport" onToggle={this.toggleLogin.bind(this, 'codewarsPassport')} toggled={this.state.codewarsPassportLogin}/>
+                    <Toggle labelPosition="right" label="Facebook" onToggle={this.toggleLogin.bind(this, 'facebook')} toggled={this.state.facebookLogin}/>
                 </div>
                 <div style={style}>
                     <RaisedButton label="Submit"  primary={true} onTouchTap={this.submit.bind(this)}/>
                 </div>
+
+                <Dialog title="Facebook Login Configuration" modal={false} open={this.state.facebookLoginDialog} actions={facebookLoginAction}>
+                    <TextField floatingLabelText="App ID" value={this.state.facebookID} onChange={this.updateLoginConfig.bind(this, 'facebookID')} />
+                    <TextField floatingLabelText="App Secret" value={this.state.facebookSecret} onChange={this.updateLoginConfig.bind(this, 'facebookSecret')} />
+                </Dialog>
+                <Dialog title="CodeWars Passport Login Configuration" modal={false} open={this.state.codewarsPassportDialog} actions={codewarsPassportLoginAction}>
+                    <div>
+                        <TextField floatingLabelText="App ID" value={this.state.codewarsPassportID} onChange={this.updateLoginConfig.bind(this, 'codewarsPassportID')} />
+                        <TextField floatingLabelText="App Secret" value={this.state.codewarsPassportSecret} onChange={this.updateLoginConfig.bind(this, 'codewarsPassportSecret')} />
+                    </div>
+                    <div>
+                        <TextField floatingLabelText="Base URL" value={this.state.codewarsPassportUrl} onChange={this.updateLoginConfig.bind(this, 'codewarsPassportUrl')} />
+                    </div>
+                </Dialog>
             </div>
         );
     }

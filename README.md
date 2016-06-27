@@ -1,4 +1,4 @@
-# Sapporo <img src="https://travis-ci.org/catsass19/Sapporo.svg?branch=master"/>
+# Sapporo <img src="https://travis-ci.org/catsass19/Sapporo.svg?branch=master"/> [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b7b87100ff544c75a9b95cdda192d089)](https://www.codacy.com/app/catsass19/Sapporo?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=catsass19/Sapporo&amp;utm_campaign=Badge_Grade)
 Sapporo is a web app for hosting online coding competition
 
 #####How to run

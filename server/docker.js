@@ -148,14 +148,14 @@ Meteor.startup(() => {
             let lang = docker.findOne({_id:data.langType});
             let _docker = getDockerInstance();
             //let result = userSubmit(_docker, data, lang, data.input);
-            result = data;
+            let test_result = data;
             let sleep = function (ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
             }
             var sleepMS = (Math.random() * 5000);
-            console.log("Sleep for " + String(sleepMS));
+            //console.log("Sleep for " + String(sleepMS));
             await sleep(sleepMS);
-            return result;
+            return test_result.langType;
         }
     });
 });

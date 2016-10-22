@@ -12,9 +12,13 @@ import Dialog from 'material-ui/lib/dialog';
 import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
+import LinearProgress from 'material-ui/lib/linear-progress';
 
 import { docker } from '../../api/db.js';
 import { testCases } from '../../api/db.js';
+
+var sentCount = 0;
+var resolveCount = 0;
 
 class PerformanceTest extends Component {
     constructor(props) {
@@ -24,7 +28,8 @@ class PerformanceTest extends Component {
             resultDialog: false,
             selectCase: null,
             testCaseSent: 0,
-            testCaseResolved: 0
+            testCaseResolved: 0,
+            repeat: 1
         };
     }
     renderLangOptions () {
@@ -97,6 +102,11 @@ class PerformanceTest extends Component {
             selectCase : temp
         });
     }
+    updateRepeat (event) {
+        this.setState({
+            repeat: event.target.value
+        });
+    }
     updateLangType (event, index, value) {
         let temp = this.state.selectCase;
         temp['langType'] = value;
@@ -105,25 +115,33 @@ class PerformanceTest extends Component {
         });
     }
     startTest () {
+        var repeatTimes = Number(this.state.repeat);
+        if (isNaN(repeatTimes) || repeatTimes <= 0) {
+            alert("Invalid repeat time");
+            return;
+        }
         var testCases = this.props._testCases;
-        var sentCount = 0;
-        var resolveCount = 0;
+        sentCount = 0;
+        resolveCount = 0;
         this.resultDialogOpen(true);
-        for (var key in testCases) {
-            sentCount += 1;
-            this.setState({testCaseSent: sentCount});
-            Meteor.call('docker.performanceTest', {
-                code: testCases[key].testScript,
-                input: testCases[key].testInput,
-                langType: testCases[key].langType
-            }, (err, result) => {
-                if (err) {
-                    console.log(err);
-                }
-                console.log(result);
-                resolveCount += 1;
-                this.setState({testCaseResolved: resolveCount});
-            });
+        for (var repeat=0; repeat < repeatTimes; repeat++) {
+            for (var key in testCases) {
+                sentCount += 1;
+                this.setState({testCaseSent: sentCount});
+                console.log('Sent key:' + testCases[key].langType);
+                Meteor.call('docker.performanceTest', {
+                    code: testCases[key].testScript,
+                    input: testCases[key].testInput,
+                    langType: testCases[key].langType
+                }, (err, result) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log(result);
+                    resolveCount += 1;
+                    this.setState({testCaseResolved: resolveCount});
+                });
+            }
         }
     }
     render () {
@@ -139,6 +157,7 @@ class PerformanceTest extends Component {
                 </List>
                 <RaisedButton label="Add Test Case" primary={true} onTouchTap={this.addCase.bind(this)}/>
                 <RaisedButton label="Start Performance Test" secondary={true} onTouchTap={this.startTest.bind(this)}/>
+                <TextField type="text" value={this.state.repeat} floatingLabelText="Repeat Times" onChange={this.updateRepeat.bind(this)} multiLine={false}/>
                 {this.state.selectCase?
                 <Dialog actions={actions} modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%'}}
                         open={this.state.caseDialog} onRequestClose={this.caseDialogOpen.bind(this, false)} autoDetectWindowHeight={true}>
@@ -154,6 +173,7 @@ class PerformanceTest extends Component {
                 {this.state.resultDialog?
                     <Dialog modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%'}}
                             open={this.state.resultDialog} onRequestClose={this.resultDialogOpen.bind(this, false)} autoDetectWindowHeight={true}>
+                            <LinearProgress mode="determinate" value={this.state.testCaseResolved} max={this.state.testCaseSent}/>
                             {this.state.testCaseResolved}/{this.state.testCaseSent}
                     </Dialog>
                 : ''}

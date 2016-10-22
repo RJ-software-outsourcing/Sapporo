@@ -139,7 +139,7 @@ class PerformanceTest extends Component {
                     if (err) {
                         console.log(err);
                     }
-                    //console.log(result);
+                    console.log(result);
                     resolveCount += 1;
                     this.setState({testCaseResolved: resolveCount});
                     if (resolveCount === sentCount) {

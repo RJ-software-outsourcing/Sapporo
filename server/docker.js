@@ -144,18 +144,20 @@ Meteor.startup(() => {
             }
             return output;
         },
-        async 'docker.performanceTest'(data) {
+        'docker.performanceTest'(data) {
             let lang = docker.findOne({_id:data.langType});
+            console.log(lang);
             let _docker = getDockerInstance();
-            //let result = userSubmit(_docker, data, lang, data.input);
-            let test_result = data;
-            let sleep = function (ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            }
-            var sleepMS = (Math.random() * 5000);
+            let test_result = userSubmit(_docker, data, lang, data.input);
+
+            //let test_result = data;
+            // let sleep = function (ms) {
+            //     return new Promise(resolve => setTimeout(resolve, ms));
+            // }
+            //var sleepMS = (Math.random() * 5000);
             //console.log("Sleep for " + String(sleepMS));
-            await sleep(sleepMS);
-            return test_result.langType;
+            //await sleep(sleepMS);
+            return test_result;
         }
     });
 });

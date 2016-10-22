@@ -23,6 +23,7 @@ import ChartIcon from 'material-ui/lib/svg-icons/editor/insert-chart';
 import ExtensionIcon from 'material-ui/lib/svg-icons/action/extension';
 import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
 import MailIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
+import PowerIcon from 'material-ui/lib/svg-icons/notification/power';
 
 import Login from './login.jsx';
 import Dashboard from './dashboard.jsx';
@@ -33,6 +34,7 @@ import DockerConfig from './admin/dockerConfig.jsx';
 import Rank from './admin/rank.jsx';
 import Mailbox from './mailbox.jsx';
 import LiveFeed from './admin/liveFeed.jsx';
+import PerformanceTest from './admin/performanceTest.jsx';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
@@ -92,6 +94,9 @@ class Main extends Component {
                 break;
             case 'liveFeed':
                 render(<LiveFeed />, sectionDOM);
+                break;
+            case 'performance':
+                render(<PerformanceTest />, sectionDOM);
                 break;
             default:
                 render(<Dashboard />, sectionDOM);
@@ -172,6 +177,7 @@ class Main extends Component {
                     <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.renderPage.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
                     <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.renderPage.bind(this, 'analyse')}>Data Analyse</MenuItem>
                     <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.renderPage.bind(this, 'liveFeed')}>Send Mail</MenuItem>
+                    <MenuItem leftIcon={<PowerIcon />} onTouchTap={this.renderPage.bind(this, 'performance')}>Performance Test</MenuItem>
                     <Divider />
                 </div>
             );

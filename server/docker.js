@@ -143,6 +143,19 @@ Meteor.startup(() => {
                 updateProblem(data.user._id, data.problemID, success, data.code);
             }
             return output;
+        },
+        async 'docker.performanceTest'(data) {
+            let lang = docker.findOne({_id:data.langType});
+            let _docker = getDockerInstance();
+            //let result = userSubmit(_docker, data, lang, data.input);
+            result = data;
+            let sleep = function (ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            var sleepMS = (Math.random() * 5000);
+            console.log("Sleep for " + String(sleepMS));
+            await sleep(sleepMS);
+            return result;
         }
     });
 });

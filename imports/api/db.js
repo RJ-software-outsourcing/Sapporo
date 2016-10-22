@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 const timer   = new Mongo.Collection('timer');
 const problem = new Mongo.Collection('problem');
 const docker  = new Mongo.Collection('docker');
+const testCases  = new Mongo.Collection('testCases');
 const userData  = new Mongo.Collection('userData');
 const liveFeed  = new Mongo.Collection('liveFeed');
 
@@ -20,6 +21,9 @@ if (Meteor.isServer) {
     Meteor.publish('liveFeed', function liveFeedPublication() {
         return liveFeed.find();
     });
+    Meteor.publish('testCases', function testCasesPublication() {
+        return testCases.find();
+    });
 }
 
-export {timer, problem, docker, userData, liveFeed};
+export {timer, problem, docker, userData, liveFeed, testCases};

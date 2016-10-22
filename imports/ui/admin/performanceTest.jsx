@@ -120,6 +120,8 @@ class PerformanceTest extends Component {
             alert("Invalid repeat time");
             return;
         }
+        var ticks_start = performance.now();
+        var ticks_end = null;
         var testCases = this.props._testCases;
         sentCount = 0;
         resolveCount = 0;
@@ -128,7 +130,7 @@ class PerformanceTest extends Component {
             for (var key in testCases) {
                 sentCount += 1;
                 this.setState({testCaseSent: sentCount});
-                console.log('Sent key:' + testCases[key].langType);
+                //console.log('Sent key:' + testCases[key].langType);
                 Meteor.call('docker.performanceTest', {
                     code: testCases[key].testScript,
                     input: testCases[key].testInput,
@@ -137,12 +139,18 @@ class PerformanceTest extends Component {
                     if (err) {
                         console.log(err);
                     }
-                    console.log(result);
+                    //console.log(result);
                     resolveCount += 1;
                     this.setState({testCaseResolved: resolveCount});
+                    if (resolveCount === sentCount) {
+                        ticks_end =  performance.now();
+                        var totalTime = (ticks_end - ticks_start)/1000;
+                        alert('It takes ' + String(Math.round((totalTime*1000))/1000) + ' seconds to execute ' + String(sentCount) + ' Submission');
+                    }
                 });
             }
         }
+
     }
     render () {
         const actions = [

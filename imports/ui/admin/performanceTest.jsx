@@ -33,6 +33,7 @@ class PerformanceTest extends Component {
             testCaseResolved: 0,
             repeat: 1,
             period: 1,
+            repeatMyself: false,
             result: '',
             keepTestingExeTIme: 0
         };
@@ -179,6 +180,9 @@ class PerformanceTest extends Component {
             clearInterval(keepTestingInterval);
             console.log("Closing interval: " + String(keepTestingInterval));
             keepTestingInterval = null;
+            this.setState({
+                repeatMyself: false
+            });
         }
     }
     runSingleTest() {
@@ -200,16 +204,27 @@ class PerformanceTest extends Component {
             this.setState({
                 keepTestingExeTIme: (ticks_end - ticks_start)/1000
             });
+            if (this.state.repeatMyself) {
+                this.runSingleTest();
+            }
         });
     }
-    keepTesting () {
+    keepTesting (isRepeat) {
         this.keepTestingDialogOpen(true);
-        var period = Number(this.state.period);
-        if (isNaN(period) || period <= 0) {
-            alert('Invalid period value');
-            return;
+        if (!isRepeat) { //Submit test case periodically
+            var period = Number(this.state.period);
+            if (isNaN(period) || period <= 0) {
+                alert('Invalid period value');
+                return;
+            }
+            keepTestingInterval = setInterval(this.runSingleTest.bind(this), period * 1000);
+        } else { //Test another case after a finished one
+            this.setState({
+                repeatMyself: true
+            });
+            this.runSingleTest();
         }
-        keepTestingInterval = setInterval(this.runSingleTest.bind(this), period * 1000);
+
     }
     render () {
         const actions = [
@@ -228,11 +243,13 @@ class PerformanceTest extends Component {
 
 
                 <div>
-                    <RaisedButton label="Keep Sending Random Test Case" primary={true} onTouchTap={this.keepTesting.bind(this)}/>
+                    <RaisedButton label="Keep Sending Random Test Case Periodically" primary={true} onTouchTap={this.keepTesting.bind(this, false)}/>
                     <TextField type="text" value={this.state.period} floatingLabelText="Period (seconds)" onChange={this.updatePeriod.bind(this)} multiLine={false}/>
                 </div>
 
-
+                <div>
+                    <RaisedButton label="Sending Random Test Case after one another" primary={true} onTouchTap={this.keepTesting.bind(this, true)}/>
+                </div>
 
 
                 {this.state.selectCase?

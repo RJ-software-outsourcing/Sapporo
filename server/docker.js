@@ -208,14 +208,21 @@ const dockerRun = function (dockerObj, image, command) {
         inputCommand = inputCommand + space + command[key];
     }
 
-    dockerObj.run(image, ['timeout', '5s', '/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, function (error) {
-        if (err !== '') {
-            future.return(err);
-        } else if (error) {
-            future.return(error);
-        } else {
-            future.return(output);
-        }
+    dockerObj.run(image, ['timeout', '5s', '/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, containerID) => {
+        var container = dockerObj.getContainer(containerID.id);
+        container.remove(function (removeError) { //Container should be removed on exit
+            if (removeError) {
+                console.log(removeError);
+            }
+            if (err !== '') {
+                future.return(err);
+            } else if (error) {
+                future.return(error);
+            } else {
+                future.return(output);
+            }
+        });
+
     }).on('container', function () {
         //We don't bind volume from now on....
         //container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];

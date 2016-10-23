@@ -19,6 +19,7 @@ import { testCases } from '../../api/db.js';
 
 var sentCount = 0;
 var resolveCount = 0;
+var keepTestingInterval = null;
 
 class PerformanceTest extends Component {
     constructor(props) {
@@ -26,10 +27,14 @@ class PerformanceTest extends Component {
         this.state = {
             caseDialog: false,
             resultDialog: false,
+            keepTestingDialog: false,
             selectCase: null,
             testCaseSent: 0,
             testCaseResolved: 0,
-            repeat: 1
+            repeat: 1,
+            period: 1,
+            result: '',
+            keepTestingExeTIme: 0
         };
     }
     renderLangOptions () {
@@ -74,6 +79,13 @@ class PerformanceTest extends Component {
         this.setState({
             resultDialog: isOpen
         });
+        if (!isOpen) {
+            this.setState({
+                testCaseSent: 0,
+                testCaseResolved: 0,
+                result: ''
+            });
+        }
     }
     deleteIcon (cases) {
         return (
@@ -105,6 +117,11 @@ class PerformanceTest extends Component {
     updateRepeat (event) {
         this.setState({
             repeat: event.target.value
+        });
+    }
+    updatePeriod (event) {
+        this.setState({
+            period: event.target.value
         });
     }
     updateLangType (event, index, value) {
@@ -145,12 +162,54 @@ class PerformanceTest extends Component {
                     if (resolveCount === sentCount) {
                         ticks_end =  performance.now();
                         var totalTime = (ticks_end - ticks_start)/1000;
-                        alert('It takes ' + String(Math.round((totalTime*1000))/1000) + ' seconds to execute ' + String(sentCount) + ' Submission');
+                        this.setState({
+                            result: 'It takes ' + String(Math.round((totalTime*1000))/1000) + ' seconds to execute ' + String(sentCount) + ' Submission'
+                        });
                     }
                 });
             }
         }
 
+    }
+    keepTestingDialogOpen (isOpen) {
+        this.setState ({
+            keepTestingDialog: isOpen
+        });
+        if (!isOpen) {
+            clearInterval(keepTestingInterval);
+            console.log("Closing interval: " + String(keepTestingInterval));
+            keepTestingInterval = null;
+        }
+    }
+    runSingleTest() {
+        var testCases = this.props._testCases;
+        var testCasesCount = testCases.length;
+        var choosenCase = testCases[(Math.floor((Math.random() * 100) + 1) % testCasesCount)]; //Randomly choose one case
+        var ticks_start = performance.now();
+        var ticks_end = null;
+        Meteor.call('docker.performanceTest', {
+            code: choosenCase.testScript,
+            input: choosenCase.testInput,
+            langType: choosenCase.langType
+        }, (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+            //console.log(result);
+            ticks_end =  performance.now();
+            this.setState({
+                keepTestingExeTIme: (ticks_end - ticks_start)/1000
+            });
+        });
+    }
+    keepTesting () {
+        this.keepTestingDialogOpen(true);
+        var period = Number(this.state.period);
+        if (isNaN(period) || period <= 0) {
+            alert('Invalid period value');
+            return;
+        }
+        keepTestingInterval = setInterval(this.runSingleTest.bind(this), period * 1000);
     }
     render () {
         const actions = [
@@ -166,6 +225,16 @@ class PerformanceTest extends Component {
                 <RaisedButton label="Add Test Case" primary={true} onTouchTap={this.addCase.bind(this)}/>
                 <RaisedButton label="Start Performance Test" secondary={true} onTouchTap={this.startTest.bind(this)}/>
                 <TextField type="text" value={this.state.repeat} floatingLabelText="Repeat Times" onChange={this.updateRepeat.bind(this)} multiLine={false}/>
+
+
+                <div>
+                    <RaisedButton label="Keep Sending Random Test Case" primary={true} onTouchTap={this.keepTesting.bind(this)}/>
+                    <TextField type="text" value={this.state.period} floatingLabelText="Period (seconds)" onChange={this.updatePeriod.bind(this)} multiLine={false}/>
+                </div>
+
+
+
+
                 {this.state.selectCase?
                 <Dialog actions={actions} modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%'}}
                         open={this.state.caseDialog} onRequestClose={this.caseDialogOpen.bind(this, false)} autoDetectWindowHeight={true}>
@@ -183,6 +252,16 @@ class PerformanceTest extends Component {
                             open={this.state.resultDialog} onRequestClose={this.resultDialogOpen.bind(this, false)} autoDetectWindowHeight={true}>
                             <LinearProgress mode="determinate" value={this.state.testCaseResolved} max={this.state.testCaseSent}/>
                             {this.state.testCaseResolved}/{this.state.testCaseSent}
+                            <div>
+                                <span>{this.state.result}</span>
+                            </div>
+                    </Dialog>
+                : ''}
+
+                {this.state.keepTestingDialog?
+                    <Dialog modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%'}}
+                            open={this.state.keepTestingDialog} onRequestClose={this.keepTestingDialogOpen.bind(this, false)} autoDetectWindowHeight={true}>
+                            {this.state.keepTestingExeTIme}
                     </Dialog>
                 : ''}
 

@@ -146,7 +146,7 @@ Meteor.startup(() => {
         },
         'docker.performanceTest'(data) {
             let lang = docker.findOne({_id:data.langType});
-            console.log(lang);
+            //console.log(lang);
             let _docker = getDockerInstance();
             let test_result = userSubmit(_docker, data, lang, data.input);
 

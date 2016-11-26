@@ -224,12 +224,12 @@ const dockerRun = function (dockerObj, image, command) {
         if (key!==0) space = ' ';
         inputCommand = inputCommand + space + command[key];
     }
-    console.log(inputCommand);
+    //console.log(inputCommand);
     dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, containerID) => {
         var container = dockerObj.getContainer(containerID.id);
         container.remove(function (removeError) { //Container should be removed on exit
             if (removeError) {
-                console.log(removeError);
+                console.log(removeError); //Perhaps we should start a routine to make sure container is removed.
             }
             if (err !== '') {
                 future.return(err);

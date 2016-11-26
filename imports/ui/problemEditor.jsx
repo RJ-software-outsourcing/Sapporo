@@ -227,7 +227,6 @@ class ProblemEditor extends Component {
 
                     </div>
                 </div>
-                <span>{this.props.data._id}</span>
 
                 <Dialog title="Verifying..." actions={actions} modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%', height: '95vh'}}
                         open={this.state.runCode} autoDetectWindowHeight={false}>
@@ -235,6 +234,9 @@ class ProblemEditor extends Component {
                         <div>
                             <TextField floatingLabelText="Test Input" type="text" style={{width:'100%'}} multiLine={true}
                                        value={this.state.testResult.testInput}/>
+                                   <div style={{width: '100%', color:'red'}}>
+                                {(!(this.state.testResult.stdout))? <span>No test result. Maybe execution time exceeds the limitation?</span>:''}
+                            </div>
                             <div style={{width:'100%'}}>
                                 <div style={{width:'48%',float:'left'}}>
                                     <TextField  floatingLabelText="My Output" type="text" style={{width: '100%'}}

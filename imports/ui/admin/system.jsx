@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { timer } from '../../api/db.js';
+import { sapporo } from '../../api/db.js';
 
 import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';
@@ -38,6 +39,11 @@ const initState = {
             min: null
         }
     },
+    sapporo: {
+        title: '',
+        timeout: 10,
+        createAccount: true
+    },
     facebookLoginDialog: false,
     codewarsPassportDialog: false,
     facebookID: '',
@@ -56,6 +62,7 @@ class System extends Component {
     }
     submit () {
         Meteor.call('time.update', this.state.time);
+        Meteor.call('sapporo.updateSapporo', this.state.sapporo);
         updateLock = false;
     }
     updateTime (type, unit, event) {
@@ -63,6 +70,17 @@ class System extends Component {
         time[type][unit] = event.target.value;
         this.setState({
             time: time
+        });
+    }
+    updateSapporo (field, event) {
+        let sapporo = this.state.sapporo;
+        if (field === 'createAccount') {
+            sapporo[field] = !(sapporo[field]);
+        } else {
+            sapporo[field] = event.target.value;
+        }
+        this.setState({
+            sapporo: sapporo
         });
     }
     updateSystemData () {
@@ -86,7 +104,8 @@ class System extends Component {
             });
         });
         this.setState({
-            time: this.props._timer.gameTime
+            time: this.props._timer.gameTime,
+            sapporo: this.props._sapporo
         });
         updateLock = true;
     }
@@ -176,8 +195,11 @@ class System extends Component {
             <div>
                 <div style={style}>
                     <div style={inlineDiv}>
-                            <TextField type="text" id="projectName" value="Sapporo Project" floatingLabelText="Project Name"/>
+                            <TextField type="text" id="projectName" value="Sapporo Project" floatingLabelText="Project Name"
+                                       value={this.state.sapporo.title} onChange={this.updateSapporo.bind(this, 'title')}/>
+                            <TextField type="number" min="0" style={numberInput} value={this.state.sapporo.timeout} onChange={this.updateSapporo.bind(this, 'timeout')} id="timeout"/>
                     </div>
+                    <Toggle labelPosition="right" label="Allow Account Creation" onToggle={this.updateSapporo.bind(this, 'createAccount')} toggled={this.state.sapporo.createAccount}/>
                 </div>
                 <div style={style}>
                     <div style={inlineDiv}>
@@ -226,13 +248,16 @@ class System extends Component {
 }
 
 System.propTypes = {
-    _timer: PropTypes.object
+    _timer: PropTypes.object,
+    _sapporo: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('timer');
+    Meteor.subscribe('sapporo');
     Meteor.subscribe('passport');
     return {
-        _timer: timer.findOne({timeSync: true})
+        _timer: timer.findOne({timeSync: true}),
+        _sapporo: sapporo.findOne({sapporo: true})
     };
 }, System);

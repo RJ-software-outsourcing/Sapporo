@@ -4,7 +4,7 @@ import { render } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import { problem, userData, timer, liveFeed } from '../api/db.js';
+import { problem, userData, timer, liveFeed, sapporo } from '../api/db.js';
 
 import AppBar from 'material-ui/lib/app-bar';
 import LeftNav from 'material-ui/lib/left-nav';
@@ -186,7 +186,7 @@ class Main extends Component {
     render () {
         return (
             <div>
-                <AppBar title="Sapporo" onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
+                <AppBar title={this.props._sapporo? this.props._sapporo.title:''} onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
                 <Snackbar open={this.state.prompt} message="You've Got New Mail"
                           autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
@@ -214,7 +214,8 @@ Main.propTypes = {
     currentUser: PropTypes.object,
     _problem: PropTypes.array.isRequired,
     _liveFeed: PropTypes.array.isRequired,
-    _timer: PropTypes.object
+    _timer: PropTypes.object,
+    _sapporo: PropTypes.object
 };
 
 export default createContainer(() => {
@@ -222,11 +223,13 @@ export default createContainer(() => {
     Meteor.subscribe('userData');
     Meteor.subscribe('timer');
     Meteor.subscribe('liveFeed');
+    Meteor.subscribe('sapporo');
     return {
         currentUser: Meteor.user(),
         _userData: userData.find({}).fetch(),
         _problem: problem.find({}).fetch(),
         _timer: timer.findOne({timeSync: true}),
-        _liveFeed: liveFeed.find({}, {sort: {date_created: -1}}).fetch()
+        _liveFeed: liveFeed.find({}, {sort: {date_created: -1}}).fetch(),
+        _sapporo: sapporo.findOne({sapporo:true})
     };
 }, Main);

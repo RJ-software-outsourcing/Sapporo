@@ -7,6 +7,7 @@ const docker  = new Mongo.Collection('docker');
 const testCases  = new Mongo.Collection('testCases');
 const userData  = new Mongo.Collection('userData');
 const liveFeed  = new Mongo.Collection('liveFeed');
+const sapporo  = new Mongo.Collection('sapporo');
 
 if (Meteor.isServer) {
     Meteor.publish('timer', function timerPublication() {
@@ -24,6 +25,9 @@ if (Meteor.isServer) {
     Meteor.publish('testCases', function testCasesPublication() {
         return testCases.find();
     });
+    Meteor.publish('sapporo', function sapporoPublication() {
+        return sapporo.find();
+    });
 }
 
-export {timer, problem, docker, userData, liveFeed, testCases};
+export {timer, problem, docker, userData, liveFeed, testCases, sapporo};

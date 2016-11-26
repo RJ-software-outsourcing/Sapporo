@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
+import { createContainer } from 'meteor/react-meteor-data';
 import ReactDOM from 'react-dom';
-import { userData } from '../api/db.js';
+import { sapporo } from '../api/db.js';
 
 import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';
@@ -100,24 +101,42 @@ export default class Login extends Component {
         const staffLoginAction = [
             <FlatButton label="cancel" secondary={true}   onTouchTap={this.closeStaffLogin.bind(this)}/>
         ];
+        // Hide following login method for now
+        //<RaisedButton style={loginButton} label="CodeWars Passport" primary={true} onTouchTap={this.loginOauth.bind(this)}/>
+        //<RaisedButton style={loginButton} label="Facebook"          secondary={true} onTouchTap={this.loginFacebook.bind(this)}/>
         return (
             <div style={loginStyle}>
                 <div>
-                    <RaisedButton style={loginButton} label="CodeWars Passport" primary={true} onTouchTap={this.loginOauth.bind(this)}/>
-                    <RaisedButton style={loginButton} label="Administrator"     secondary={true} onTouchTap={this.openStaffLogin.bind(this)}/>
-                    <RaisedButton style={loginButton} label="Facebook"          secondary={true} onTouchTap={this.loginFacebook.bind(this)}/>
+
+                    <RaisedButton style={loginButton} label="Login"     primary={true} onTouchTap={this.openStaffLogin.bind(this)}/>
                 </div>
-                <Dialog title="Login as Staff" modal={false} open={this.state.stafflogin} actions={staffLoginAction}>
+                <Dialog modal={false} open={this.state.stafflogin} actions={staffLoginAction}>
                     <div>
                         <TextField  style={textFieldStyle} floatingLabelText="User Name" onChange={this.updateUsername.bind(this)}/>
                         <TextField  style={textFieldStyle} type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)}/>
                     </div>
                     <div>
                         <RaisedButton style={loginButton} label="Login"  primary={true} onTouchTap={this.loginStaff.bind(this)}/>
-                        <RaisedButton style={loginButton} label="Create" secondary={true} onTouchTap={this.createStaff.bind(this)}/>
+                        {
+                            this.props._sapporo?
+                            (this.props._sapporo.createAccount? <RaisedButton style={loginButton} label="Create" secondary={true} onTouchTap={this.createStaff.bind(this)}/>:'')
+                            :''
+                        }
+
                     </div>
                 </Dialog>
             </div>
         );
     }
 }
+
+Login.propTypes = {
+    _sapporo: PropTypes.object
+};
+
+export default createContainer(() => {
+    Meteor.subscribe('sapporo');
+    return {
+        _sapporo: sapporo.findOne({sapporo:true})
+    };
+}, Login);

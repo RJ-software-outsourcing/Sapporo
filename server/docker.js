@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
-import {docker, problem} from '../imports/api/db.js';
+import {docker, problem, sapporo} from '../imports/api/db.js';
 import {resultCompare, allInOneCommand} from '../imports/library/docker.js';
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
@@ -162,27 +162,44 @@ Meteor.startup(() => {
     });
 });
 
+const getTimeOutValue = function (isMSecond) {
+    let timeout = (sapporo.findOne({sapporo:true})).timeout;
+    if (isNaN(timeout) || (timeout <= 0)) {
+        timeout = 60;
+    }
+    if (isMSecond) {
+        timeout = timeout*1000;
+    }
+    return timeout;
+};
+
 const getDockerInstance = function() {
     let dockerGlobalConfig = docker.findOne({global: true});
     if (!dockerGlobalConfig.ip || dockerGlobalConfig.ip === '') {
-        return new Dockerode();
+        let dockerSocket = process.env.DOCKER_SOCKET || '/var/run/docker.sock';
+        return new Dockerode({
+            socketPath: dockerSocket,
+            timeout: getTimeOutValue(true) + 3000 //3 seconds as a buffer time for container to stop itself
+        });
     } else {
         return new Dockerode({
             host: dockerGlobalConfig.ip,
-            port: dockerGlobalConfig.port
+            port: dockerGlobalConfig.port,
+            timeout: getTimeOutValue(true) + 3000
         });
     }
 };
 
 const dockerTest = function (dockerObj, lang) {
     //let localTestFolder = createTestingFile(lang);
-    let test = allInOneCommand(lang, lang.helloworld, lang.testInput);
+
+    let test = allInOneCommand(lang, lang.helloworld, lang.testInput, getTimeOutValue(false));
     let result = dockerRun(dockerObj, lang.image, test);
     return result;
 };
 const userSubmit = function (_docker, data, langObj, testInput) {
     //let localTestFolder = createUserFile(data, langObj, testInput);
-    let command = allInOneCommand(langObj, data.code, testInput);
+    let command = allInOneCommand(langObj, data.code, testInput, getTimeOutValue(false));
     let result = dockerRun(_docker, langObj.image, command);
     return result;
 };
@@ -207,8 +224,8 @@ const dockerRun = function (dockerObj, image, command) {
         if (key!==0) space = ' ';
         inputCommand = inputCommand + space + command[key];
     }
-
-    dockerObj.run(image, ['timeout', '5s', '/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, containerID) => {
+    console.log(inputCommand);
+    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, containerID) => {
         var container = dockerObj.getContainer(containerID.id);
         container.remove(function (removeError) { //Container should be removed on exit
             if (removeError) {

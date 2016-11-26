@@ -17,7 +17,7 @@ import MenuItem from 'material-ui/lib/menus/menu-item';
 import DeleteIcon from 'material-ui/lib/svg-icons/action/delete';
 import IconButton from 'material-ui/lib/icon-button';
 
-import { docker } from '../../api/db.js';
+import { docker, sapporo } from '../../api/db.js';
 import { commandForTest } from '../../library/docker.js';
 
 import brace from 'brace';
@@ -120,7 +120,11 @@ class DockerConfig extends Component {
         });
     }
     showCommandLine (lang) {
-        let strArray = commandForTest(lang);
+        if (!this.props._sapporo) {
+            return 'Command line preview not available yet';
+        }
+        let timeout = this.props._sapporo.timeout;
+        let strArray = commandForTest(lang, timeout);
         return '/bin/bash -c "' + strArray.join(' ') + '"';
     }
     startTesting () {
@@ -193,7 +197,7 @@ class DockerConfig extends Component {
                                value={this.state._dockerGlobal.ip} onChange={this.updateGlobal.bind(this, 'ip')}/>
                     <TextField type="text" id="port" floatingLabelText="Port number"
                                value={this.state._dockerGlobal.port} onChange={this.updateGlobal.bind(this, 'port')}/>
-                           <RaisedButton label="Check Connection" primary={true} onTouchTap={this.checkDockerHost.bind(this)}/>
+                           <RaisedButton label="Update and Check Docker Connection" primary={true} onTouchTap={this.checkDockerHost.bind(this)}/>
                 </div>
                 <div>
                     <Toolbar style={{marginTop:'30px'}}>
@@ -248,13 +252,16 @@ class DockerConfig extends Component {
 
 DockerConfig.propTypes = {
     _dockerGlobal: PropTypes.object,
+    _sapporo: PropTypes.object,
     _dockerLangs:  PropTypes.array.isRequired
 };
 
 export default createContainer(() => {
     Meteor.subscribe('docker');
+    Meteor.subscribe('sapporo');
     return {
         _dockerGlobal: docker.findOne({global: true}),
+        _sapporo: sapporo.findOne({sapporo: true}),
         _dockerLangs:  docker.find({languages: true}).fetch()
     };
 }, DockerConfig);

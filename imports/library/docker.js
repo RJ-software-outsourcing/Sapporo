@@ -2,8 +2,12 @@
     Common Library for Docker
 */
 
-const commandForImage = function (lang) {
+const commandForImage = function (lang, timeout) {
     let stringArray = [];
+    if (!isNaN(timeout)&&(timeout > 0)) {
+        stringArray.push('timeout');
+        stringArray.push(timeout);
+    }
     let preArg = [];
     let middleArg = [];
     let postArg = [];
@@ -27,8 +31,8 @@ const commandForImage = function (lang) {
     return stringArray;
 };
 
-const commandForTest = function (lang) {
-    return commandForImage(lang);
+const commandForTest = function (lang, timeout) {
+    return commandForImage(lang, timeout);
 };
 
 const resultCompare = function (output, expectedOutput) {
@@ -48,8 +52,9 @@ const resultCompare = function (output, expectedOutput) {
     }
 };
 
-const allInOneCommand = function (lang, code, input) {
+const allInOneCommand = function (lang, code, input, timeout) {
     let strArray = [];
+
     code = code.replace(/"/g, '\\"');
     input = input.replace(/"/g, '\\"');
     let saveCodeFile  = ['echo', '"'+code+'"', '>', './'+lang.file];
@@ -70,6 +75,10 @@ const allInOneCommand = function (lang, code, input) {
     strArray.push('&&');
     strArray = strArray.concat(saveInputFile);
     strArray.push('&&');
+    if (!isNaN(timeout)&&(timeout > 0)) {
+        strArray.push('timeout');
+        strArray.push(timeout);
+    }
     strArray.push(lang.executable);
     strArray = strArray.concat(preArg);
     strArray.push(lang.file);

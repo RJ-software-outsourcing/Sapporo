@@ -10,12 +10,12 @@ import ListItem from 'material-ui/lib/lists/list-item';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import AccountIcon from 'material-ui/lib/svg-icons/action/account-circle';
-import HelpIcon from 'material-ui/lib/svg-icons/action/help-outline';
+//import HelpIcon from 'material-ui/lib/svg-icons/action/help-outline';
 import MessageIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
 import ClockIcon from 'material-ui/lib/svg-icons/device/access-time';
 import TotalIcon from 'material-ui/lib/svg-icons/toggle/star-half';
 import PassIcon from 'material-ui/lib/svg-icons/navigation/check';
-import OnlineIcon from 'material-ui/lib/svg-icons/action/question-answer';
+//import OnlineIcon from 'material-ui/lib/svg-icons/action/question-answer';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import IconButton from 'material-ui/lib/icon-button';
 
@@ -34,7 +34,7 @@ const cellHeight = function () {
     if (window.innerWidth > 1600) {
         return 400;
     } else {
-        return 200;
+        return 300;
     }
 };
 const customTileStyle = {
@@ -84,7 +84,7 @@ class Dashboard extends Component {
     }
     liveFeedLogs () {
         return this.props._liveFeed.map((item, key) => (
-            <ListItem key={key} style={{borderBottom:'1px solid #AAA'}}
+            <ListItem key={key} style={{borderBottom:'1px solid #AAA', backgroundColor:'rgba(255,255,255,0.5)'}}
                       primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
                       onTouchTap={this.openFeed.bind(this, item)}/>
         ));
@@ -140,12 +140,14 @@ class Dashboard extends Component {
             backgroundColor: 'rgba(0,40,80,0.3)',
             icon: <IconButton><AccountIcon color="white" /></IconButton>
         }, {
-            title: 'Q&A',
+            title: 'Inbox Preview',
             cols: 2,
-            image: '/images/6.jpg',
-            backgroundColor: 'rgba(0,165,165,1)',
-            icon: <IconButton><HelpIcon color="white" /></IconButton>
-        }, {
+            backgroundColor: 'rgba(0,165,165,0.6)',
+            titleBG: 'rgba(0,0,0,0.8)',
+            image: '/images/5.jpg',
+            icon: <IconButton><MessageIcon color="white" /></IconButton>,
+            content: this.getLiveFeedTile()
+        },  {
             title: 'Time',
             cols: 2,
             image: '/images/6.jpg',
@@ -155,54 +157,36 @@ class Dashboard extends Component {
         }, {
             title: 'Total Score',
             featured: true,
-            cols: 1.5,
+            cols: 3,
             image: '/images/4.jpg',
             backgroundColor: 'rgba(120,30,30,0.6)',
             content: this.getScoreTile(),
             icon: <IconButton><TotalIcon color="white" /></IconButton>
         }, {
             title: 'Passed Problems',
-            cols: 1.5,
+            cols: 3,
             image: '/images/3.jpg',
             backgroundColor: 'rgba(80,40,0,0.6)',
             content: this.getPassProblemTile(),
             icon: <IconButton><PassIcon color="white" /></IconButton>
         }, {
-            title: 'Online Help',
-            featured: true,
-            cols: 1.5,
-            image: '/images/3.jpg',
-            backgroundColor: 'rgba(0,165,200,1)',
-            icon: <IconButton><OnlineIcon color="white" /></IconButton>
-        }, {
-            title: 'About Us',
-            cols: 1.5,
-            image: '/images/5.jpg',
-            backgroundColor: 'rgba(0,80,100,0.6)',
+            title: 'Top 5',
+            cols: 2,
+            backgroundColor: 'rgba(0,165,165,0.6)',
+            image: '/images/7.png',
             icon: <IconButton><AboutIcon color="white" /></IconButton>
         }, {
-            title: 'Inbox Preview',
-            cols: 3,
-            backgroundColor: 'rgba(255,255,255,0.8)',
-            titleBG: 'rgba(0,0,0,0.8)',
-            image: '/images/2.jpg',
-            icon: <IconButton><MessageIcon color="white" /></IconButton>,
-            content: this.getLiveFeedTile(),
-            rows: 2
-        }, {
-            title: 'Top 5',
-            cols: 1.5,
-            backgroundColor: 'rgba(212,106,106,0.6)',
-            image: '/images/7.png',
+            title: 'Codewars Worldwide',
+            cols: 2,
+            backgroundColor: 'rgba(0,80,160, 0.6)',
             icon: <IconButton><AboutIcon color="white" /></IconButton>,
-            rows: 2
+            image: '/images/8.jpg'
         }, {
-            title: 'Codewars Everywhere',
-            cols: 1.5,
+            title: 'About Us',
+            cols: 2,
             backgroundColor: 'rgba(0,165,165,0.6)',
             icon: <IconButton><AboutIcon color="white" /></IconButton>,
-            image: '/images/8.jpg',
-            rows: 2
+            image: '/images/2.jpg'
         }];
         const actions = [
             <FlatButton label="exit" primary={true} onTouchTap={this.closeFeed.bind(this)} />

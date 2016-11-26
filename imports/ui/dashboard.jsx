@@ -1,6 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
+import { render } from 'react-dom';
+
+import About from './about.jsx';
+
 import Timer from './Timer.jsx';
 
 import GridList from 'material-ui/lib/grid-list/grid-list';
@@ -84,7 +88,7 @@ class Dashboard extends Component {
     }
     liveFeedLogs () {
         return this.props._liveFeed.map((item, key) => (
-            <ListItem key={key} style={{borderBottom:'1px solid #AAA', backgroundColor:'rgba(255,255,255,0.7)'}}
+            <ListItem key={key} style={{borderBottom:'1px solid #AAA', backgroundColor:'rgba(255,255,255,0.5)', width:'99%', margin:'0.5%'}}
                       primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
                       onTouchTap={this.openFeed.bind(this, item)}/>
         ));
@@ -125,11 +129,19 @@ class Dashboard extends Component {
         });
         setMailAsRead(item);
     }
+    textContent (text) {
+        return (
+            <div style={customTileStyle}><span>{text}</span></div>
+        );
+    }
     closeFeed () {
         this.setState({
             dialogOpen: false,
             clickFeed: null
         });
+    }
+    renderAbout(){
+        render(<About />, document.getElementById('section'));
     }
     render () {
         const tilesData = [{
@@ -144,7 +156,7 @@ class Dashboard extends Component {
             cols: 2,
             backgroundColor: 'rgba(0,165,165,0.6)',
             titleBG: 'rgba(0,0,0,0.8)',
-            image: '/images/5.jpg',
+            image: '/images/2.jpg',
             icon: <IconButton><MessageIcon color="white" /></IconButton>,
             content: this.getLiveFeedTile()
         },  {
@@ -176,17 +188,22 @@ class Dashboard extends Component {
             image: '/images/7.png',
             icon: <IconButton><AboutIcon color="white" /></IconButton>
         }, {
-            title: 'Codewars Worldwide',
+            title: 'Codewars World Wide',
             cols: 2,
             backgroundColor: 'rgba(0,80,160, 0.6)',
             icon: <IconButton><AboutIcon color="white" /></IconButton>,
-            image: '/images/8.jpg'
+            image: '/images/8.jpg',
+            class:'hoverItem',
+            content: this.textContent('Everywhere')
         }, {
-            title: 'About Us',
+            title: 'About This System',
             cols: 2,
             backgroundColor: 'rgba(0,165,165,0.6)',
             icon: <IconButton><AboutIcon color="white" /></IconButton>,
-            image: '/images/2.jpg'
+            image: '/images/5.jpg',
+            class: 'hoverItem',
+            content: this.textContent('Oh?'),
+            click: this.renderAbout
         }];
         const actions = [
             <FlatButton label="exit" primary={true} onTouchTap={this.closeFeed.bind(this)} />
@@ -196,6 +213,8 @@ class Dashboard extends Component {
                 <GridList cols={6} cellHeight={cellHeight()} padding={5} style={styles.gridList}>
                           {tilesData.map((tile, key) => (
                     <GridTile key={key} title={tile.title}
+                              onTouchTap={tile.click}
+                              className={tile.class?tile.class:''}
                               actionIcon={tile.icon}
                               actionPosition="left" titlePosition="bottom"
                               titleBackground={tile.titleBG?tile.titleBG:'rgba(0, 0, 0, 0.6)'} children={this.getContent(tile)}

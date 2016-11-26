@@ -55,7 +55,9 @@ class Main extends Component {
         };
     }
     navOpen () {
-        this.setState({open:true});
+        if (Meteor.user()) {
+            this.setState({open:true});
+        }
     }
     navClose () {
         this.setState({open:false});

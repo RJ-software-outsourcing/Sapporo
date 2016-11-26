@@ -6,22 +6,26 @@ import ReactDOM from 'react-dom';
 import { sapporo } from '../api/db.js';
 
 import TextField from 'material-ui/lib/text-field';
-import RaisedButton from 'material-ui/lib/raised-button';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 
-const loginStyle = {
-    width: '60%',
-    marginLeft: '20%',
+const mainImageStyle = {
+    marginTop:'10px',
+    height: '500px',
+    backgroundImage: 'url(/images/1.jpg)',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    lineHeight: '500px',
     textAlign: 'center'
 };
-const textFieldStyle = {
-    width: '100%'
-};
-const loginButton = {
-    margin: '10px'
-};
 
+const readyStyle = {
+    fontSize: '100px',
+    border: '10px solid #00BCD4',
+    color: ' #00BCD4',
+    padding: '25px 50px'
+};
 
 class Login extends Component {
     constructor(props) {
@@ -98,28 +102,26 @@ class Login extends Component {
     componentDidMount() {
     }
     render () {
-        const staffLoginAction = [
-            <FlatButton label="cancel" secondary={true}   onTouchTap={this.closeStaffLogin.bind(this)}/>
-        ];
         // Hide following login method for now
         //<RaisedButton style={loginButton} label="CodeWars Passport" primary={true} onTouchTap={this.loginOauth.bind(this)}/>
         //<RaisedButton style={loginButton} label="Facebook"          secondary={true} onTouchTap={this.loginFacebook.bind(this)}/>
         return (
-            <div style={loginStyle}>
-                <div>
-
-                    <RaisedButton style={loginButton} label="Login"     primary={true} onTouchTap={this.openStaffLogin.bind(this)}/>
-                </div>
-                <Dialog modal={false} open={this.state.stafflogin} actions={staffLoginAction}>
-                    <div>
-                        <TextField  style={textFieldStyle} floatingLabelText="User Name" onChange={this.updateUsername.bind(this)}/>
-                        <TextField  style={textFieldStyle} type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)}/>
+            <div>
+                <div style={mainImageStyle}>
+                    <div style={{width:'100%', height:'500px', backgroundColor:'rgba(0,0,0,0.6)'}}>
+                            <span className="hoverItem" style={readyStyle} onTouchTap={this.openStaffLogin.bind(this)}>Ready?</span>
                     </div>
-                    <div>
-                        <RaisedButton style={loginButton} label="Login"  primary={true} onTouchTap={this.loginStaff.bind(this)}/>
+                </div>
+                <Dialog modal={false} open={this.state.stafflogin} onRequestClose={this.closeStaffLogin.bind(this)}>
+                    <div style={{width:'90%', marginLeft:'5%'}}>
+                        <TextField floatingLabelText="User Name" onChange={this.updateUsername.bind(this)} style={{width:'50%'}}/>
+                        <TextField type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)} style={{width:'50%'}}/>
+                    </div>
+                    <div style={{textAlign:'center'}}>
+                        <FlatButton  label="Login"  primary={true} onTouchTap={this.loginStaff.bind(this)} style={{margin:'20px'}}/>
                         {
                             this.props._sapporo?
-                            (this.props._sapporo.createAccount? <RaisedButton style={loginButton} label="Create" secondary={true} onTouchTap={this.createStaff.bind(this)}/>:'')
+                            (this.props._sapporo.createAccount? <FlatButton  label="Create" secondary={true} onTouchTap={this.createStaff.bind(this)}/>:'')
                             :''
                         }
 

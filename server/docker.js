@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
-import {docker, problem, sapporo} from '../imports/api/db.js';
+import {docker, problem, timer, sapporo} from '../imports/api/db.js';
 import {resultCompare, allInOneCommand} from '../imports/library/docker.js';
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
@@ -130,6 +130,9 @@ Meteor.startup(() => {
                 output.expected = problemData.testOutput;
                 output.testInput = problemData.testInput;
             } else {
+                if (!((timer.findOne({timeSync: true})).coding)) {
+                    throw new Meteor.Error(500, 'Game has stopped');
+                }
                 let success = true;
                 for (key in problemData.verfication) {
                     let output = userSubmit(_docker, data, langObj, problemData.verfication[key].input);

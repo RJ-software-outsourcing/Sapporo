@@ -159,14 +159,14 @@ class Dashboard extends Component {
             featured: true,
             cols: 3,
             image: '/images/4.jpg',
-            backgroundColor: 'rgba(120,30,30,0.6)',
+            backgroundColor: 'rgba(150,50,50,0.6)',
             content: this.getScoreTile(),
             icon: <IconButton><TotalIcon color="white" /></IconButton>
         }, {
             title: 'Passed Problems',
             cols: 3,
             image: '/images/3.jpg',
-            backgroundColor: 'rgba(80,40,0,0.6)',
+            backgroundColor: 'rgba(100,20,60,0.6)',
             content: this.getPassProblemTile(),
             icon: <IconButton><PassIcon color="white" /></IconButton>
         }, {

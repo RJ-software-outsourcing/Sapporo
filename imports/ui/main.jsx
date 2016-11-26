@@ -49,7 +49,8 @@ class Main extends Component {
             open : false,
             sectionState: 'login',
             prompt: false,
-            mailCount: 0
+            mailCount: 0,
+            gameEnd: false
         };
     }
     navOpen () {
@@ -61,6 +62,7 @@ class Main extends Component {
     logout () {
         Meteor.logout((err)=>{
             this.navClose();
+            this.renderPage('dashboard');
             if (err) {
                 alert(err);
             }
@@ -160,6 +162,16 @@ class Main extends Component {
                 prompt: showPrompt
             });
         }
+        // Switch to Dashboard when time's up
+        if (this.props._timer) {
+            if (!(this.props._timer.coding) && !(this.state.gameEnd)) {
+                this.setState({
+                    gameEnd: true
+                });
+                this.renderPage('dashboard');
+            }
+        }
+
         this.renderSection();
     }
     closePrompt () {

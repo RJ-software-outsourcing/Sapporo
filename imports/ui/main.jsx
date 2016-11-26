@@ -26,6 +26,7 @@ import MailIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
 import PowerIcon from 'material-ui/lib/svg-icons/notification/power';
 
 import Login from './login.jsx';
+import About from './about.jsx';
 import Dashboard from './dashboard.jsx';
 import ProblemEditor from './problemEditor.jsx';
 import System from './admin/system.jsx';
@@ -78,6 +79,9 @@ class Main extends Component {
                 break;
             case 'mailbox':
                 render(<Mailbox />, sectionDOM);
+                break;
+            case 'about':
+                render(<About />, sectionDOM);
                 break;
             case 'problemEditor':
                 render(<ProblemEditor data={this.state.problem}/>, sectionDOM);
@@ -169,6 +173,10 @@ class Main extends Component {
                     gameEnd: true
                 });
                 this.renderPage('dashboard');
+            } else if ((this.props._timer.coding) && (this.state.gameEnd)) {
+                this.setState({
+                    gameEnd: false
+                });
             }
         }
 
@@ -206,7 +214,7 @@ class Main extends Component {
                           onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.renderPage.bind(this, 'dashboard')}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<MailIcon />} onTouchTap={this.renderPage.bind(this, 'mailbox')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>
-                    <MenuItem leftIcon={<AboutIcon />}>About</MenuItem>
+                    <MenuItem leftIcon={<AboutIcon />} onTouchTap={this.renderPage.bind(this, 'about')} >About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>
                     <Divider />

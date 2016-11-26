@@ -84,7 +84,7 @@ class Dashboard extends Component {
     }
     liveFeedLogs () {
         return this.props._liveFeed.map((item, key) => (
-            <ListItem key={key} style={{borderBottom:'1px solid #AAA', backgroundColor:'rgba(255,255,255,0.5)'}}
+            <ListItem key={key} style={{borderBottom:'1px solid #AAA', backgroundColor:'rgba(255,255,255,0.7)'}}
                       primaryText={item.title} secondaryText={item.date_created.toLocaleTimeString()}
                       onTouchTap={this.openFeed.bind(this, item)}/>
         ));

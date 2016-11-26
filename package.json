@@ -6,6 +6,8 @@
     "build:css": "node-sass --include-path node_modules main.scss bundle.css"
   },
   "dependencies": {
+    "babel-runtime": "^6.18.0",
+    "bcrypt": "^0.8.7",
     "brace": "0.8.0",
     "dockerode": "^2.2.10",
     "fibers": "^1.0.10",

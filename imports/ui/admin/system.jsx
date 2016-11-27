@@ -42,6 +42,7 @@ const initState = {
     sapporo: {
         title: '',
         timeout: 10,
+        submitwait: 10,
         createAccount: true
     },
     facebookLoginDialog: false,
@@ -197,7 +198,10 @@ class System extends Component {
                     <div style={inlineDiv}>
                             <TextField type="text" id="projectName" value="Sapporo Project" floatingLabelText="Project Name"
                                        value={this.state.sapporo.title} onChange={this.updateSapporo.bind(this, 'title')}/>
-                            <TextField type="number" min="0" style={numberInput} value={this.state.sapporo.timeout} onChange={this.updateSapporo.bind(this, 'timeout')} id="timeout"/>
+                            <TextField type="number" min="0" floatingLabelText="timeout" style={numberInput}
+                                       value={this.state.sapporo.timeout} onChange={this.updateSapporo.bind(this, 'timeout')} id="timeout"/>
+                                   <TextField type="number" min="0" floatingLabelText="submit waiting time" style={numberInput}
+                                      value={this.state.sapporo.submitwait} onChange={this.updateSapporo.bind(this, 'submitwait')} id="submitwait"/>
                     </div>
                     <Toggle labelPosition="right" label="Allow Account Creation" onToggle={this.updateSapporo.bind(this, 'createAccount')} toggled={this.state.sapporo.createAccount}/>
                 </div>

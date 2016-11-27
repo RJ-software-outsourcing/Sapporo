@@ -104,8 +104,10 @@ class Login extends Component {
             }
         });
     }
-    componentDidMount() {
-        Meteor.user()? goPage('dashboard'):goPage('login');
+    componentDidUpdate() {
+        if (Meteor.user()) {
+            goPage('dashboard');
+        }
     }
     render () {
         // Hide following login method for now

@@ -64,4 +64,8 @@ const isCoding = function (now, timeSetting) {
     return (hadStarted < 0 && hadEnded >= 0)? true:false;
 };
 
-export {timeSchedule, isCoding};
+const timeDiffSecond = function (pre, now) {
+    return ((now.getTime() - pre.getTime())/1000);
+};
+
+export {timeSchedule, isCoding, timeDiffSecond};

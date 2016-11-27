@@ -11,11 +11,7 @@ Meteor.startup(() => {
             sapporo.update({
                 sapporo: true
             }, {
-                $set: {
-                    title: data.title,
-                    createAccount: data.createAccount,
-                    timeout: data.timeout
-                }
+                $set: data
             });
         },
         'sapporo.getTitle'() {
@@ -34,6 +30,7 @@ Meteor.startup(() => {
             sapporo:true,
             title: 'sapporo',
             timeout: 10,
+            submitwait: 10,
             createAccount: true
         });
     }

@@ -19,8 +19,9 @@ import AceEditor from 'react-ace';
 import * as langType from '../library/lang_import.js';
 import * as themeType from '../library/theme_import.js';
 import 'brace/theme/tomorrow_night_blue';
+import { timeDiffSecond } from '../library/timeLib.js';
 
-import { docker } from '../api/db.js';
+import { docker, sapporo } from '../api/db.js';
 
 const textDiv = {
     width: '96%',
@@ -35,7 +36,8 @@ class ProblemEditor extends Component {
             theme: 'vibrant_ink',
             code: '',
             runCode: false,
-            updateLock: true
+            updateLock: true,
+            lastSubmitTime: null
         };
     }
     updateCode(code) {
@@ -130,6 +132,15 @@ class ProblemEditor extends Component {
         }
     }
     submitCode (isTest) {
+        let now = new Date();
+        if (this.state.lastSubmitTime && (timeDiffSecond(this.state.lastSubmitTime, now) < this.props._sapporo.submitwait) ) {
+            alert(`Please wait at least ${this.props._sapporo.submitwait} seconds between each submission. ${timeDiffSecond(this.state.lastSubmitTime, now)} seconds left.`);
+            return;
+        } else {
+            this.setState({
+                lastSubmitTime: now
+            });
+        }
         this.setState({runCode: true});
         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
         let obj = {
@@ -268,13 +279,16 @@ class ProblemEditor extends Component {
 
 ProblemEditor.propTypes = {
     _docker: PropTypes.array.isRequired,
-    currentUser: PropTypes.object
+    currentUser: PropTypes.object,
+    _sapporo: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('docker');
+    Meteor.subscribe('sapporo');
     return {
         _docker: docker.find({languages: true}).fetch(),
+        _sapporo: sapporo.findOne({sapporo:true}),
         currentUser: Meteor.user()
     };
 }, ProblemEditor);

@@ -229,7 +229,7 @@ class ProblemEditor extends Component {
                             this.state.langType?
                             <AceEditor mode={this.state.langType} theme={this.state.theme} onChange={this.updateCode.bind(this)} value={this.state.code} width='100%'
                                        name="UNIQUE_ID_OF_DIV" editorProps={editorOption}></AceEditor>
-                                   :''
+                                   :<span>Choose a language to start</span>
                         }
 
                     </div>

@@ -53,7 +53,7 @@ class Main extends Component {
     logout () {
         Meteor.logout((err)=>{
             this.navClose();
-            this.renderPage('login');
+            this.goPageWrap('login');
             if (err) {
                 alert(err);
             }
@@ -104,7 +104,7 @@ class Main extends Component {
     }
     componentDidUpdate () {
         if (!Meteor.user()) {
-            this.goPageWrap('login');
+            //this.goPageWrap('login');
         }
         if (this.props._liveFeed.length !== this.state.mailCount) {
             let showPrompt = (this.props._liveFeed.length > this.state.mailCount)? true:false;

@@ -5,7 +5,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import { problem, userData, timer, liveFeed, sapporo } from '../api/db.js';
-import {goPage} from './goPage.js'
+import {goPage} from './goPage.js';
 
 import AppBar from 'material-ui/lib/app-bar';
 import LeftNav from 'material-ui/lib/left-nav';
@@ -13,6 +13,7 @@ import MenuItem from 'material-ui/lib/menus/menu-item';
 import Divider from 'material-ui/lib/divider';
 import DashboardIcon from 'material-ui/lib/svg-icons/action/dashboard';
 import Snackbar from 'material-ui/lib/snackbar';
+import Subheader from 'material-ui/lib/Subheader';
 
 import AdminIcon from 'material-ui/lib/svg-icons/action/settings';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
@@ -36,7 +37,6 @@ class Main extends Component {
         super(props);
         this.state = {
             open : false,
-            sectionState: 'login',
             prompt: false,
             mailCount: 0,
             gameEnd: false
@@ -119,7 +119,7 @@ class Main extends Component {
                 this.setState({
                     gameEnd: true
                 });
-                goPage('dashboard');
+                Meteor.user()? this.goPageWrap('dashboard'):this.goPageWrap('login');
             } else if ((this.props._timer.coding) && (this.state.gameEnd)) {
                 this.setState({
                     gameEnd: false
@@ -136,7 +136,7 @@ class Main extends Component {
         if (Meteor.user() && Meteor.user().username === 'admin') {
             return (
                 <div>
-                    <MenuItem>Administrator</MenuItem>
+                    <Subheader>Administrator</Subheader>
                     <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.goPageWrap.bind(this, 'system')}>System Settings</MenuItem>
                     <MenuItem leftIcon={<ProblemIcon />} onTouchTap={this.goPageWrap.bind(this, 'problemConfig')}>Problem Configuration</MenuItem>
                     <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.goPageWrap.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
@@ -164,7 +164,7 @@ class Main extends Component {
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>
                     <Divider />
                     {this.renderAdmin()}
-                    <MenuItem>problem</MenuItem>
+                    <Subheader>Problems</Subheader>
                     {this.renderProblems()}
                 </LeftNav>
                 <div id="section"></div>

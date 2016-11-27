@@ -150,7 +150,8 @@ class Dashboard extends Component {
             cols: 2,
             image: '/images/1.jpg',
             backgroundColor: 'rgba(0,40,80,0.3)',
-            icon: <IconButton><AccountIcon color="white" /></IconButton>
+            icon: <IconButton><AccountIcon color="white" /></IconButton>,
+            content: this.textContent('Hello :)')
         }, {
             title: 'Inbox Preview',
             cols: 2,

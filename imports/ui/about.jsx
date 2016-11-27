@@ -73,7 +73,7 @@ export default  class Login extends Component {
     }
     render () {
         return (
-            <Paper>
+            <Paper style={{marginTop:'10px'}}>
                 <Subheader>About the system</Subheader>
                 <div style={{width:'96%', marginLeft:'2%', marginBottom:'10px'}}>
                     <span>

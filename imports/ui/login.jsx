@@ -106,6 +106,7 @@ class Login extends Component {
     }
     componentDidUpdate() {
         if (Meteor.user()) {
+            console.log('go dashboard');
             goPage('dashboard');
         }
     }
@@ -126,7 +127,7 @@ class Login extends Component {
                         <TextField type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)} style={{width:'50%'}}/>
                     </div>
                     <div style={{textAlign:'center'}}>
-                        <FlatButton  label="Login"  primary={true} onTouchTap={this.loginStaff.bind(this)} style={{margin:'20px'}}/>
+                        <FlatButton label="GO"  primary={true} onTouchTap={this.loginStaff.bind(this)} style={{margin:'20px'}}/>
                         {
                             this.props._sapporo?
                             (this.props._sapporo.createAccount? <FlatButton  label="Create" secondary={true} onTouchTap={this.createStaff.bind(this)}/>:'')

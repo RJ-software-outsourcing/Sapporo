@@ -21,7 +21,6 @@ import * as themeType from '../library/theme_import.js';
 import 'brace/theme/tomorrow_night_blue';
 
 import { docker } from '../api/db.js';
-import {setLock, freeLock, isLock} from '../library/updateControl.js';
 
 const textDiv = {
     width: '96%',
@@ -35,7 +34,8 @@ class ProblemEditor extends Component {
             langType: null,
             theme: 'vibrant_ink',
             code: '',
-            runCode: false
+            runCode: false,
+            updateLock: true
         };
     }
     updateCode(code) {
@@ -45,7 +45,6 @@ class ProblemEditor extends Component {
         }
         tmpObj.code = code;
         localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
-        freeLock();
     }
     updateLang(event, index, value) {
         for (var key in this.props._docker) {
@@ -87,22 +86,20 @@ class ProblemEditor extends Component {
         ));
     }
     updatePageData () {
-        if (!isLock()) {
-            let tmpObj = localStorage.getItem(this.props.data._id);
-            if (tmpObj) {
-                tmpObj = JSON.parse(tmpObj);
-                this.setState ({
-                    code: tmpObj.code? tmpObj.code:'',
-                    language: tmpObj.language? tmpObj.language: '',
-                    langType: tmpObj.langType? tmpObj.langType: null
-                });
-            } else {
-                this.setState({
-                    code: ''
-                });
-            }
-            setLock();
+        let tmpObj = localStorage.getItem(this.props.data._id);
+        if (tmpObj) {
+            tmpObj = JSON.parse(tmpObj);
+            this.setState ({
+                code: tmpObj.code? tmpObj.code:'',
+                language: tmpObj.language? tmpObj.language: '',
+                langType: tmpObj.langType? tmpObj.langType: null
+            });
+        } else {
+            this.setState({
+                code: ''
+            });
         }
+
         if (this.state.langType === null && this.props._docker) {
             if (this.props._docker.length > 0) {
                 this.setState({
@@ -111,16 +108,25 @@ class ProblemEditor extends Component {
                 });
             }
         }
+        this.setState({
+            updateLock: true
+        });
     }
     componentDidMount () {
-        this.updatePageData();
+        this.setState({
+            updateLock: false
+        });
     }
     componentDidUpdate () {
-        this.updatePageData();
+        if (!this.state.updateLock) {
+            this.updatePageData();
+        }
     }
     componentWillUpdate (nextProp) {
         if (nextProp.data._id !== this.props.data._id) {
-            freeLock();
+            this.setState({
+                updateLock: false
+            });
         }
     }
     submitCode (isTest) {
@@ -219,10 +225,11 @@ class ProblemEditor extends Component {
                                 <RaisedButton label="Submit"  secondary={true} onTouchTap={this.submitCode.bind(this, false)}/>
                             </div>
                         </div>
-                        {this.state.langType?
+                        {
+                            this.state.langType?
                             <AceEditor mode={this.state.langType} theme={this.state.theme} onChange={this.updateCode.bind(this)} value={this.state.code} width='100%'
-                                       name="UNIQUE_ID_OF_DIV" editorProps={editorOption} />
-                              :''
+                                       name="UNIQUE_ID_OF_DIV" editorProps={editorOption}></AceEditor>
+                                   :''
                         }
 
                     </div>

@@ -3,7 +3,9 @@ import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { createContainer } from 'meteor/react-meteor-data';
 import ReactDOM from 'react-dom';
+
 import { sapporo } from '../api/db.js';
+import {goPage} from './goPage.js'
 
 import TextField from 'material-ui/lib/text-field';
 import Dialog from 'material-ui/lib/dialog';
@@ -63,6 +65,9 @@ class Login extends Component {
                 alert(err);
             } else {
                 this.checkUser();
+                if (Meteor.user()) {
+                    goPage('dashboard');
+                }
             }
         });
     }
@@ -99,7 +104,8 @@ class Login extends Component {
             }
         });
     }
-    componentDidMount() {
+    componentDidUpdate() {
+        Meteor.user()? goPage('dashboard'):goPage('login');
     }
     render () {
         // Hide following login method for now

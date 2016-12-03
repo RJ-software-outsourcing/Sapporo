@@ -207,6 +207,19 @@ const userSubmit = function (_docker, data, langObj, testInput) {
     return result;
 };
 
+const cleanUpContainer = function (containerObj) {
+    if (containerObj && containerObj.remove) {
+        containerObj.remove(function (rmErr) {
+            if (rmErr) {
+                console.log('wait 1sec to clean up container again');
+                setTimeout(()=>{
+                    cleanUpContainer(containerObj);
+                }, 1000);
+            }
+        });
+    }
+};
+
 const dockerRun = function (dockerObj, image, command) {
     let future = new Future();
     let stdout = stream.Writable();
@@ -229,20 +242,26 @@ const dockerRun = function (dockerObj, image, command) {
     }
     //console.log(inputCommand);
     dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, containerID) => {
+        /* if (containerID && containerID.id) {
+            cleanUpContainer(dockerObj.getContainer(containerID.id));
+        }*/
+        if (err !== '') {
+            future.return(err);
+        } else if (error) {
+            console.log(error);
+            future.return(error);
+        } else {
+            future.return(output);
+        }
+        /*
         var container = dockerObj.getContainer(containerID.id);
         container.remove(function (removeError) { //Container should be removed on exit
             if (removeError) {
                 console.log(removeError); //Perhaps we should start a routine to make sure container is removed.
             }
-            if (err !== '') {
-                future.return(err);
-            } else if (error) {
-                future.return(error);
-            } else {
-                future.return(output);
-            }
-        });
 
+        });
+        */
     }).on('container', function () {
         //We don't bind volume from now on....
         //container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];

@@ -184,7 +184,7 @@ class ProblemEditor extends Component {
     }
     render () {
         const  editorOption = {
-            $blockScrolling: true
+            $blockScrolling: true,
         };
         const actions = [
             <FlatButton label="Exit" secondary={true} onTouchTap={this.closeDialog.bind(this)}/>
@@ -239,7 +239,7 @@ class ProblemEditor extends Component {
                         {
                             this.state.langType?
                             <AceEditor mode={this.state.langType} theme={this.state.theme} onChange={this.updateCode.bind(this)} value={this.state.code} width='100%'
-                                       name="UNIQUE_ID_OF_DIV" editorProps={editorOption}></AceEditor>
+                                       name="UNIQUE_ID_OF_DIV" editorProps={editorOption} height="700px"></AceEditor>
                                    :<span>Choose a language to start</span>
                         }
 

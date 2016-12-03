@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import Paper from 'material-ui/lib/paper';
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
-import Avatar from 'material-ui/lib/Avatar';
+import Avatar from 'material-ui/lib/avatar';
 import Subheader from 'material-ui/lib/Subheader';
 import Dialog from 'material-ui/lib/dialog';
 

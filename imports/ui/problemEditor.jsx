@@ -47,6 +47,9 @@ class ProblemEditor extends Component {
         }
         tmpObj.code = code;
         localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
+        this.setState({
+            code: tmpObj.code
+        });
     }
     updateLang(event, index, value) {
         for (var key in this.props._docker) {
@@ -134,7 +137,7 @@ class ProblemEditor extends Component {
     submitCode (isTest) {
         let now = new Date();
         if (this.state.lastSubmitTime && (timeDiffSecond(this.state.lastSubmitTime, now) < this.props._sapporo.submitwait) ) {
-            alert(`Please wait at least ${this.props._sapporo.submitwait} seconds between each submission. ${timeDiffSecond(this.state.lastSubmitTime, now)} seconds left.`);
+            alert(`Please wait at least ${this.props._sapporo.submitwait} seconds between each submission. Last submission was ${timeDiffSecond(this.state.lastSubmitTime, now)} seconds ago.`);
             return;
         } else {
             this.setState({

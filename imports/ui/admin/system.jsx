@@ -43,7 +43,8 @@ const initState = {
         title: '',
         timeout: 10,
         submitwait: 10,
-        createAccount: true
+        createAccount: true,
+        maxExe: 20
     },
     facebookLoginDialog: false,
     codewarsPassportDialog: false,
@@ -200,8 +201,10 @@ class System extends Component {
                                        value={this.state.sapporo.title} onChange={this.updateSapporo.bind(this, 'title')}/>
                             <TextField type="number" min="0" floatingLabelText="timeout" style={numberInput}
                                        value={this.state.sapporo.timeout} onChange={this.updateSapporo.bind(this, 'timeout')} id="timeout"/>
-                                   <TextField type="number" min="0" floatingLabelText="submit waiting time" style={numberInput}
-                                      value={this.state.sapporo.submitwait} onChange={this.updateSapporo.bind(this, 'submitwait')} id="submitwait"/>
+                            <TextField type="number" min="0" floatingLabelText="submit waiting time" style={numberInput}
+                                       value={this.state.sapporo.submitwait} onChange={this.updateSapporo.bind(this, 'submitwait')} id="submitwait"/>
+                                   <TextField type="number" min="1" floatingLabelText="Max Execution count" style={numberInput}
+                                       value={this.state.sapporo.maxExe} onChange={this.updateSapporo.bind(this, 'maxExe')} id="maxExe"/>
                     </div>
                     <Toggle labelPosition="right" label="Allow Account Creation" onToggle={this.updateSapporo.bind(this, 'createAccount')} toggled={this.state.sapporo.createAccount}/>
                 </div>

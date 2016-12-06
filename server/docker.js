@@ -201,9 +201,28 @@ const dockerTest = function (dockerObj, lang) {
     return result;
 };
 const userSubmit = function (_docker, data, langObj, testInput) {
-    //let localTestFolder = createUserFile(data, langObj, testInput);
+    let sapporoObj = (sapporo.findOne({sapporo:true}));
+    if (sapporoObj.current < sapporoObj.maxExe) {
+        sapporo.update({
+            sapporo:true
+        }, {
+            $set: {
+                current: sapporoObj.current + 1
+            }
+        });
+    } else {
+        throw new Meteor.Error(500, 'Server Busy. Reached maximum execution');
+    }
     let command = allInOneCommand(langObj, data.code, testInput, getTimeOutValue(false));
     let result = dockerRun(_docker, langObj.image, command);
+    sapporoObj = (sapporo.findOne({sapporo:true}));
+    sapporo.update({
+        sapporo:true
+    }, {
+        $set: {
+            current: sapporoObj.current - 1
+        }
+    });
     return result;
 };
 

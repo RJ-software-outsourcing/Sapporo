@@ -32,10 +32,12 @@ class PerformanceTest extends Component {
             testCaseSent: 0,
             testCaseResolved: 0,
             repeat: 1,
-            period: 1,
+            period: 10,
             repeatMyself: false,
             result: '',
-            keepTestingExeTIme: 0
+            keepTestingExeTIme: 0,
+            testResponse: null,
+            testErr: null
         };
     }
     renderLangOptions () {
@@ -202,7 +204,9 @@ class PerformanceTest extends Component {
             //console.log(result);
             ticks_end =  performance.now();
             this.setState({
-                keepTestingExeTIme: (ticks_end - ticks_start)/1000
+                keepTestingExeTIme: (ticks_end - ticks_start)/1000,
+                testErr: err,
+                testResponse: result
             });
             if (this.state.repeatMyself) {
                 this.runSingleTest();
@@ -278,7 +282,9 @@ class PerformanceTest extends Component {
                 {this.state.keepTestingDialog?
                     <Dialog modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%'}}
                             open={this.state.keepTestingDialog} onRequestClose={this.keepTestingDialogOpen.bind(this, false)} autoDetectWindowHeight={true}>
-                            {this.state.keepTestingExeTIme}
+                            <div>Result: <span style={{color:'green'}}>{this.state.testResponse}</span></div>
+                            <div>time: {this.state.keepTestingExeTIme}</div>
+                            <div style={{color:'red'}}><h3>{this.state.testErr}</h3></div>
                     </Dialog>
                 : ''}
 

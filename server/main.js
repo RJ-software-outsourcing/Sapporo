@@ -31,7 +31,16 @@ Meteor.startup(() => {
             title: 'sapporo',
             timeout: 10,
             submitwait: 10,
-            createAccount: true
+            createAccount: true,
+            maxExe: 20,
+            current: 0
         });
     }
+    sapporo.update({
+        sapporo:true
+    }, {
+        $set: {
+            current:0
+        }
+    });
 });

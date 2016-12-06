@@ -7,7 +7,7 @@ import ListItem from 'material-ui/lib/lists/list-item';
 import LinearProgress from 'material-ui/lib/linear-progress';
 import Divider from 'material-ui/lib/divider';
 
-import { problem, userData } from '../../api/db.js';
+import { problem, userData, sapporo } from '../../api/db.js';
 import { getUserTotalScore, problemSolvedCount, getTotalScore } from '../../library/score_lib.js';
 
 class Rank extends Component {
@@ -60,6 +60,9 @@ class Rank extends Component {
     render () {
         return (
             <div>
+                <h3>Current Execution Count</h3>
+                {this.props._sapporo.current}
+                <Divider />
                 <h3>Problem Solving Count</h3>
                 <List>
                     {this.renderProblemAnswerRate()}
@@ -77,14 +80,17 @@ class Rank extends Component {
 
 Rank.propTypes = {
     _userData: PropTypes.array.isRequired,
-    _problem: PropTypes.array.isRequired
+    _problem: PropTypes.array.isRequired,
+    _sapporo: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('userData');
     Meteor.subscribe('problem');
+    Meteor.subscribe('sapporo');
     return {
         _userData: userData.find({}).fetch(),
-        _problem: problem.find({}).fetch()
+        _problem: problem.find({}).fetch(),
+        _sapporo: sapporo.findOne({sapporo: true})
     };
 }, Rank);

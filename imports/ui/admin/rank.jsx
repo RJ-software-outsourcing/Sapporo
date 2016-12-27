@@ -60,9 +60,6 @@ class Rank extends Component {
     render () {
         return (
             <div>
-                <h3>Current Execution Count</h3>
-                {this.props._sapporo.current}
-                <Divider />
                 <h3>Problem Solving Count</h3>
                 <List>
                     {this.renderProblemAnswerRate()}

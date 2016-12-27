@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Random } from 'meteor/random'
 
 import {docker, problem, timer, sapporo} from '../imports/api/db.js';
 import {resultCompare, allInOneCommand} from '../imports/library/docker.js';
@@ -7,6 +8,8 @@ import Future from 'fibers/future';
 import stream from 'stream';
 
 import {updateProblem} from './userData.js';
+
+let concurrentCount = [];
 
 Meteor.startup(() => {
     Meteor.methods({
@@ -193,36 +196,45 @@ const getDockerInstance = function() {
     }
 };
 
-const dockerTest = function (dockerObj, lang) {
-    //let localTestFolder = createTestingFile(lang);
+const reachMax = function (id) {
+    let sapporoObj = (sapporo.findOne({sapporo:true}));
+    if (concurrentCount.length > sapporoObj.maxExe) {
+        //console.log('reach MAX');
+        return true;
+    } else {
+        concurrentCount.push(id);
+        //console.log(concurrentCount.length);
+        return false;
+    }
+};
+const releaseConcurrent = function (id) {
+    for (let key in concurrentCount) {
+        if (concurrentCount[key] === id) {
+            concurrentCount = concurrentCount.splice(key, 1);
+            //console.log('Removed: ' + id);
+            break;
+        }
+    }
+};
 
+const dockerTest = function (dockerObj, lang) {
+    let uniqueID = Random.id();
+    if (reachMax(uniqueID)) {
+        throw new Meteor.Error(500, 'Server Busy. Reached maximum execution');
+    }
     let test = allInOneCommand(lang, lang.helloworld, lang.testInput, getTimeOutValue(false));
     let result = dockerRun(dockerObj, lang.image, test);
+    releaseConcurrent(uniqueID);
     return result;
 };
 const userSubmit = function (_docker, data, langObj, testInput) {
-    let sapporoObj = (sapporo.findOne({sapporo:true}));
-    if (sapporoObj.current < sapporoObj.maxExe) {
-        sapporo.update({
-            sapporo:true
-        }, {
-            $set: {
-                current: sapporoObj.current + 1
-            }
-        });
-    } else {
+    let uniqueID = Random.id();
+    if (reachMax(uniqueID)) {
         throw new Meteor.Error(500, 'Server Busy. Reached maximum execution');
     }
     let command = allInOneCommand(langObj, data.code, testInput, getTimeOutValue(false));
     let result = dockerRun(_docker, langObj.image, command);
-    sapporoObj = (sapporo.findOne({sapporo:true}));
-    sapporo.update({
-        sapporo:true
-    }, {
-        $set: {
-            current: sapporoObj.current - 1
-        }
-    });
+    releaseConcurrent(uniqueID);
     return result;
 };
 
@@ -247,12 +259,11 @@ const dockerRun = function (dockerObj, image, command) {
         inputCommand = inputCommand + space + command[key];
     }
     //console.log(inputCommand);
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, containerID) => {
-
+    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error) => {
         if (err !== '') {
             future.return(err);
         } else if (error) {
-            console.log(error);
+            //console.log(error);
             future.return(error);
         } else {
             future.return(output);

@@ -6,11 +6,12 @@ import {userData} from '../imports/api/db.js';
 
 Meteor.startup(() => {
     Meteor.methods({
-        'user.check'(id) {
+        'user.check'(id, username) {
             let user = userData.findOne({userID: id});
             if (!user) {
                 userData.insert({
-                    userID: id
+                    userID: id,
+                    username: username
                 });
             }
         }

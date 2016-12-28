@@ -45,7 +45,7 @@ class Login extends Component {
         this.setState({password: event.target.value});
     }
     checkUser () {
-        Meteor.call('user.check', Meteor.user()._id, function (err) {
+        Meteor.call('user.check', Meteor.user()._id, Meteor.user().username, function (err) {
             if (err) alert('User Check failed');
         });
     }

@@ -198,13 +198,9 @@ class PerformanceTest extends Component {
             input: choosenCase.testInput,
             langType: choosenCase.langType
         }, (err, result) => {
-            if (err) {
-                console.log(err);
-            }
-            //console.log(result);
             ticks_end =  performance.now();
             this.setState({
-                keepTestingExeTIme: (ticks_end - ticks_start)/1000,
+                keepTestingExeTIme: ((ticks_end - ticks_start)/1000).toFixed(4),
                 testErr: err,
                 testResponse: result
             });
@@ -282,9 +278,12 @@ class PerformanceTest extends Component {
                 {this.state.keepTestingDialog?
                     <Dialog modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%'}}
                             open={this.state.keepTestingDialog} onRequestClose={this.keepTestingDialogOpen.bind(this, false)} autoDetectWindowHeight={true}>
-                            <div>Result: <span style={{color:'green'}}>{this.state.testResponse}</span></div>
                             <div>time: {this.state.keepTestingExeTIme}</div>
-                            <div style={{color:'red'}}><h3>{this.state.testErr}</h3></div>
+                            {this.state.testErr?
+                                <div style={{color:'red'}}><h3>{this.state.testErr.reason}</h3></div>
+                                :
+                                <div>Result: <span style={{color:'green'}}>{this.state.testResponse}</span></div>
+                            }
                     </Dialog>
                 : ''}
 

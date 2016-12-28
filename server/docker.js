@@ -220,7 +220,7 @@ const releaseConcurrent = function (id) {
 const dockerTest = function (dockerObj, lang) {
     let uniqueID = Random.id();
     if (reachMax(uniqueID)) {
-        throw new Meteor.Error(500, 'Server Busy. Reached maximum execution');
+        throw new Meteor.Error(503, 'Server reached maximum executions. Please try again later.');
     }
     let test = allInOneCommand(lang, lang.helloworld, lang.testInput, getTimeOutValue(false));
     let result = dockerRun(dockerObj, lang.image, test);
@@ -230,7 +230,7 @@ const dockerTest = function (dockerObj, lang) {
 const userSubmit = function (_docker, data, langObj, testInput) {
     let uniqueID = Random.id();
     if (reachMax(uniqueID)) {
-        throw new Meteor.Error(500, 'Server Busy. Reached maximum execution');
+        throw new Meteor.Error(503, 'Server reached maximum executions. Please try again later.');
     }
     let command = allInOneCommand(langObj, data.code, testInput, getTimeOutValue(false));
     let result = dockerRun(_docker, langObj.image, command);

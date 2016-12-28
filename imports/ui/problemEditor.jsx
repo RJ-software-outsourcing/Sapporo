@@ -157,18 +157,21 @@ class ProblemEditor extends Component {
             if (!err) {
                 if (result.pass) {
                     alert('Success :D');
-                    this.closeDialog();
                 } else {
                     if (isTest) {
                         this.setState({testResult:result});
                     } else {
                         alert('Failed');
-                        this.closeDialog();
                     }
                 }
             } else {
-                alert(err);
+                if (err.error && (err.error === 503)) {
+                    alert(err.reason);
+                } else {
+                    alert(err);
+                }
             }
+            this.closeDialog();
         });
     }
     closeDialog() {
@@ -249,7 +252,7 @@ class ProblemEditor extends Component {
                     </div>
                 </div>
 
-                <Dialog title="Verifying..." actions={actions} modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%', height: '95vh'}}
+                <Dialog title=" "actions={actions} modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%', height: '95vh'}}
                         open={this.state.runCode} autoDetectWindowHeight={false}>
                     {this.state.testResult?
                         <div>

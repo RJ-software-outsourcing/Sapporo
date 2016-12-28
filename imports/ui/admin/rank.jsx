@@ -50,7 +50,7 @@ class Rank extends Component {
         return this.props._userData.map((item, key) => {
             let userTotalScore = getUserTotalScore(item, this.props._problem);
             return (
-                <ListItem key={key} primaryText={item.userID} secondaryText={String(userTotalScore)}>
+                <ListItem key={key} primaryText={item.username} secondaryText={String(userTotalScore)}>
                     <LinearProgress mode="determinate" max={getTotalScore(this.props._problem)} value={userTotalScore}
                                     color="coral" style={{height:'15px'}}/>
                 </ListItem>

@@ -15,8 +15,8 @@ class Timer extends Component {
                 return 'End';
             } else {
                 let hr = Math.floor(schedule.time.min/60);
-                let min = schedule.time.min%60;
-                return hr + ':'+ min + ':' + schedule.time.sec;
+                let min = schedule.time.min % 60;
+                return hr + 'h'+ min + 'm' + schedule.time.sec + 's';
             }
         }
     }

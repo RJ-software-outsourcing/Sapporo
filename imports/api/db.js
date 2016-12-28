@@ -8,6 +8,7 @@ const testCases  = new Mongo.Collection('testCases');
 const userData  = new Mongo.Collection('userData');
 const liveFeed  = new Mongo.Collection('liveFeed');
 const sapporo  = new Mongo.Collection('sapporo');
+const batchAccount = new Mongo.Collection('batchAccount');
 
 if (Meteor.isServer) {
     Meteor.publish('timer', function timerPublication() {
@@ -28,6 +29,12 @@ if (Meteor.isServer) {
     Meteor.publish('sapporo', function sapporoPublication() {
         return sapporo.find();
     });
+    Meteor.publish('batchAccount', function batchAccountPublication() {
+        var user = Meteor.users.findOne(this.userId);
+        if (user.username && (user.username === 'admin')) {
+            return batchAccount.find();
+        }
+    });
 }
 
-export {timer, problem, docker, userData, liveFeed, testCases, sapporo};
+export {timer, problem, docker, userData, liveFeed, testCases, sapporo, batchAccount};

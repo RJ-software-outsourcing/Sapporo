@@ -197,7 +197,7 @@ class System extends Component {
             <div>
                 <div style={style}>
                     <div style={inlineDiv}>
-                            <TextField type="text" id="projectName" value="Sapporo Project" floatingLabelText="Project Name"
+                            <TextField type="text" id="projectName" floatingLabelText="Project Name"
                                        value={this.state.sapporo.title} onChange={this.updateSapporo.bind(this, 'title')}/>
                             <TextField type="number" min="0" floatingLabelText="timeout" style={numberInput}
                                        value={this.state.sapporo.timeout} onChange={this.updateSapporo.bind(this, 'timeout')} id="timeout"/>

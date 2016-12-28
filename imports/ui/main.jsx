@@ -26,6 +26,7 @@ import ExtensionIcon from 'material-ui/lib/svg-icons/action/extension';
 import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
 import MailIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
 import PowerIcon from 'material-ui/lib/svg-icons/notification/power';
+import AccountIcon from 'material-ui/lib/svg-icons/action/supervisor-account';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
@@ -142,6 +143,7 @@ class Main extends Component {
                     <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.goPageWrap.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
                     <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.goPageWrap.bind(this, 'analyse')}>Data Analyse</MenuItem>
                     <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.goPageWrap.bind(this, 'liveFeed')}>Send Mail</MenuItem>
+                    <MenuItem leftIcon={<AccountIcon />} onTouchTap={this.goPageWrap.bind(this, 'batch')}>Manage Users</MenuItem>
                     <MenuItem leftIcon={<PowerIcon />} onTouchTap={this.goPageWrap.bind(this, 'performance')}>Performance Test</MenuItem>
                     <Divider />
                 </div>

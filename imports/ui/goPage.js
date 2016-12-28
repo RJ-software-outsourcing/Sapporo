@@ -12,6 +12,7 @@ import Rank from './admin/rank.jsx';
 import Mailbox from './mailbox.jsx';
 import LiveFeed from './admin/liveFeed.jsx';
 import PerformanceTest from './admin/performanceTest.jsx';
+import BatchAccount from './admin/batchAccount.jsx';
 
 const goPage = function (page, data) {
     const sectionDOM = document.getElementById('section');
@@ -48,6 +49,9 @@ const goPage = function (page, data) {
         break;
     case 'login':
         render(<Login />, sectionDOM);
+        break;
+    case 'batch':
+        render(<BatchAccount />, sectionDOM);
         break;
     default:
         break;

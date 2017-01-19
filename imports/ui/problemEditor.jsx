@@ -259,9 +259,10 @@ class ProblemEditor extends Component {
                         open={this.state.runCode} autoDetectWindowHeight={false}>
                     {this.state.testResult?
                         <div>
+                            <span style={{color:'red'}}>Not correct</span>
                             <TextField floatingLabelText="Test Input" type="text" style={{width:'100%'}} multiLine={true}
                                        value={this.state.testResult.testInput}/>
-                                   <div style={{width: '100%', color:'red'}}>
+                            <div style={{width: '100%', color:'red'}}>
                                 {(!(this.state.testResult.stdout))? <span>No test result. Maybe execution time exceeds the limitation?</span>:''}
                             </div>
                             <div style={{width:'100%'}}>

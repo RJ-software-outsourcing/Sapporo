@@ -244,8 +244,13 @@ const dockerRun = function (dockerObj, image, command) {
     let stderr = stream.Writable();
     let output = '';
     let err    = '';
+    let tooLong = false;
     stdout._write = function (chunk, encoding, done) {
-        output = output + chunk.toString();
+        if (output.length < 100000) {
+            output = output + chunk.toString();
+        } else {
+            tooLong = true;
+        }
         done();
     };
     stderr._write = function (chunk, encoding, done) {
@@ -265,6 +270,8 @@ const dockerRun = function (dockerObj, image, command) {
         } else if (error) {
             //console.log(error);
             future.return(error);
+        } else if (tooLong) {
+            future.return('Reject: Output exceeds maximum length');
         } else {
             future.return(output);
         }

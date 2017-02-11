@@ -10,13 +10,17 @@ class Timer extends Component {
 
     display () {
         if (this.props._timer) {
-            let schedule = timeSchedule(this.props._timer.systemTime, this.props._timer.gameTime);
+            let schedule = timeSchedule(this.props._timer.systemTime, this.props._timer.start, this.props._timer.end);
             if (schedule.start && schedule.end) {
                 return 'End';
             } else {
                 let hr = Math.floor(schedule.time.min/60);
                 let min = schedule.time.min % 60;
-                return hr + 'h'+ min + 'm' + schedule.time.sec + 's';
+                if (schedule.start) {
+                    return hr + 'h'+ min + 'm' + schedule.time.sec + 's';
+                } else {
+                    return hr + 'h'+ min + 'm' + schedule.time.sec + 's'; // Will come up with something later
+                }
             }
         }
     }

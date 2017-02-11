@@ -5,22 +5,12 @@ import {timer} from '../imports/api/db.js';
 import {problem} from '../imports/api/db.js';
 import { isCoding } from '../imports/library/timeLib.js';
 
-let initGameTime = {
-    start: {
-        hr: 0,
-        min: 0
-    },
-    end: {
-        hr: 0,
-        min: 0
-    }
-};
 let problemPublished = false;
 
 function updateTime () {
     let _time = new Date;
     let db_time = timer.findOne({timeSync: true});
-    let coding = isCoding(_time, db_time.gameTime);
+    let coding = isCoding(_time, db_time.start, db_time.end);
     timer.update({
         timeSync: true
     }, {
@@ -59,21 +49,25 @@ function updateTime () {
 Meteor.startup(() => {
 
     Meteor.methods({
-        'time.update'(time) {
+        'time.updateGameTime'(start, end) {
             if (Meteor.user().username !== 'admin') return;
             timer.update({
                 timeSync: true
             }, {
-                $set: {gameTime: time}
+                $set: {
+                    start: start,
+                    end: end
+                }
             });
         }
     });
 
-    if ( (timer.find({timeSync: true}).fetch()).length === 0 ) {
+    if ((timer.find({timeSync: true}).fetch()).length === 0 ) {
         timer.insert({
             timeSync: true,
             coding: false,
-            gameTime: initGameTime
+            start: null,
+            end: null
         });
     }
     updateTime();

@@ -155,10 +155,8 @@ class Main extends Component {
             <div>
                 <AppBar title={this.props._sapporo? this.props._sapporo.title:''} onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
-                <Snackbar open={this.state.prompt} message="You've Got New Mail"
-                          autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
-                <LeftNav  docked={false} open={this.state.open}
-                          onRequestChange={this.navClose.bind(this)}>
+                <Snackbar open={this.state.prompt} message="You've Got New Mail" autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
+                <LeftNav  docked={false} open={this.state.open} width={350} onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.goPageWrap.bind(this, 'dashboard')}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<MailIcon />} onTouchTap={this.goPageWrap.bind(this, 'mailbox')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />} onTouchTap={this.goPageWrap.bind(this, 'about')} >About</MenuItem>

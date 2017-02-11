@@ -49,7 +49,11 @@ Meteor.startup(() => {
             if (Meteor.user().username !== 'admin') return false;
             userData.remove({});
             batchAccount.remove({});
-            Meteor.users.remove({});
+            Meteor.users.remove({
+                username: {
+                    $ne: 'admin'
+                }
+            });
         }
     });
 });

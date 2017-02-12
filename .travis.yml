@@ -8,10 +8,12 @@
 sudo: required,
 language: node_js
 node_js:
-  - "0.10"
+  - "4.4"
 before_install:
   - curl https://install.meteor.com/ | sh
   #- meteor npm install #This is not needed. We only need Meteor build
+install:
+  - node --version
 services:
   - docker
 env:

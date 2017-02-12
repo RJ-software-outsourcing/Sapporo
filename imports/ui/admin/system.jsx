@@ -265,17 +265,21 @@ class System extends Component {
                     <Toggle labelPosition="right" label="Allow Account Creation" onToggle={this.updateSapporo.bind(this, 'createAccount')} toggled={this.state.sapporo.createAccount}/>
                 </div>
                 <div style={style}>
-                    <div style={inlineDiv}>
+                    <div>
                         <span>{this.displayConfiguredTime('systemTime')} - Server Time</span><br/>
                         <span>{this.displayConfiguredTime('start')} - Configured Start Time</span><br/>
                         <span>{this.displayConfiguredTime('end')} - Configured End Time</span><br/>
                     </div>
+                </div>
+                <div style={style}>
                     <div style={inlineDiv}>
                         <span>Start Time     :</span>
                         <DatePicker style={{display: 'inline-block'}} hintText="Start Date" onChange={this.updateStartDate.bind(this)} value={this.state.gameTime.startDate}/>
                         <TextField id="startHr" type="number" min="0" max="23" placeholder="Start Hour" style={numberInput} value={this.state.gameTime.startHour} onChange={this.updateGameTime.bind(this, 'startHour')}/>
                         <TextField id="startMin" type="number" min="0" max="59" placeholder="Start Minute" style={numberInput} value={this.state.gameTime.startMinute} onChange={this.updateGameTime.bind(this, 'startMinute')}/>
                     </div>
+                </div>
+                <div style={style}>
                     <div style={inlineDiv}>
                         <span>End Time       :</span>
                         <DatePicker style={{display: 'inline-block'}} hintText="End Date" onChange={this.updateEndDate.bind(this)} value={this.state.gameTime.endDate}/>

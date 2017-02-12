@@ -76,7 +76,7 @@ class Monitor extends Component {
     }
     renderAreaChart () {
         return (
-            <AreaChart width={600} height={400} data={this.refactorLogsForAreaChart()} margin={{top: 10, right: 30, left: 0, bottom: 0}} >
+            <AreaChart width={window.innerWidth} height={400} data={this.refactorLogsForAreaChart()} margin={{top: 50, right: 30, left: 0, bottom: 30}} >
                 <XAxis dataKey="minutes"/>
                 <YAxis/>
                 <CartesianGrid strokeDasharray="3 3"/>

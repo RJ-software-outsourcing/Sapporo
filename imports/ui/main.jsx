@@ -144,7 +144,6 @@ class Main extends Component {
                     <MenuItem leftIcon={<ProblemIcon />} onTouchTap={this.goPageWrap.bind(this, 'problemConfig')}>Problem Configuration</MenuItem>
                     <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.goPageWrap.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
                     <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.goPageWrap.bind(this, 'statistics')}>Data Statistics</MenuItem>
-                    <MenuItem leftIcon={<MonitorIcon />} onTouchTap={this.goPageWrap.bind(this, 'monitor')}>Server Monitor</MenuItem>
                     <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.goPageWrap.bind(this, 'liveFeed')}>Send Mail</MenuItem>
                     <MenuItem leftIcon={<AccountIcon />} onTouchTap={this.goPageWrap.bind(this, 'batch')}>Manage Users</MenuItem>
                     <MenuItem leftIcon={<PowerIcon />} onTouchTap={this.goPageWrap.bind(this, 'performance')}>Performance Test</MenuItem>

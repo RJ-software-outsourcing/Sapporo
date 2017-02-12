@@ -80,7 +80,7 @@ class Monitor extends Component {
                 <XAxis dataKey="minutes"/>
                 <YAxis/>
                 <CartesianGrid strokeDasharray="3 3"/>
-                <Tooltip />
+                <Tooltip isAnimationActive={false} />
                 <Area isAnimationActive={false} type='monotone' dataKey='reachMaxmimum' stackId="1" stroke='#8884d8' fill='#8884d8' />
                 <Area isAnimationActive={false} type='monotone' dataKey='success' stackId="1" stroke='#82ca9d' fill='#82ca9d' />
             </AreaChart>

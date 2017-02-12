@@ -9,6 +9,7 @@ import System from './admin/system.jsx';
 import ProblemConfig from './admin/problemConfig.jsx';
 import DockerConfig from './admin/dockerConfig.jsx';
 import Rank from './admin/rank.jsx';
+import Monitor from './admin/monitor.jsx';
 import Mailbox from './mailbox.jsx';
 import LiveFeed from './admin/liveFeed.jsx';
 import PerformanceTest from './admin/performanceTest.jsx';
@@ -38,8 +39,11 @@ const goPage = function (page, data) {
     case 'dockerConfig':
         render(<DockerConfig />, sectionDOM);
         break;
-    case 'analyse':
+    case 'statistics':
         render(<Rank />, sectionDOM);
+        break;
+    case 'monitor':
+        render(<Monitor />, sectionDOM);
         break;
     case 'liveFeed':
         render(<LiveFeed />, sectionDOM);

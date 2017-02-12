@@ -64,4 +64,19 @@ const timeDiffSecond = function (pre, now) {
     return ((now.getTime() - pre.getTime())/1000);
 };
 
-export {timeSchedule, isCoding, timeDiffSecond, generateDate};
+/*
+    Returns null if 'now' is not in between start and end, otherwise returns integer.
+*/
+const minutesAfterGameStart = function (start, end, now) {
+    if (!start || !end || !now) {
+        return null;
+    }
+    let nowTime = now.getTime(), startTime = start.getTime(), endTime = end.getTime();
+    if ((nowTime >= startTime) && (nowTime <= endTime)) {
+        return Math.ceil(((nowTime - startTime)/1000)/60);
+    } else {
+        return null;
+    }
+};
+
+export {timeSchedule, isCoding, timeDiffSecond, generateDate, minutesAfterGameStart};

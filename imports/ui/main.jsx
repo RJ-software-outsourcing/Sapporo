@@ -121,6 +121,7 @@ class Main extends Component {
                     gameEnd: true
                 });
                 Meteor.user()? this.goPageWrap('dashboard'):this.goPageWrap('login');
+                alert('Time\'s up!');
             } else if ((this.props._timer.coding) && (this.state.gameEnd)) {
                 this.setState({
                     gameEnd: false

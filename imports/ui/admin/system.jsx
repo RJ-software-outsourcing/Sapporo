@@ -5,7 +5,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 
 import { timer } from '../../api/db.js';
 import { sapporo } from '../../api/db.js';
-import { generateDate } from '../../library/timeLib.js'
+import { generateDate } from '../../library/timeLib.js';
 
 import TextField from 'material-ui/lib/text-field';
 import RaisedButton from 'material-ui/lib/raised-button';

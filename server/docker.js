@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random'
+import { Random } from 'meteor/random';
 
 import {docker, problem, timer, sapporo} from '../imports/api/db.js';
 import {resultCompare, allInOneCommand} from '../imports/library/docker.js';
@@ -152,17 +152,8 @@ Meteor.startup(() => {
         },
         'docker.performanceTest'(data) {
             let lang = docker.findOne({_id:data.langType});
-            //console.log(lang);
             let _docker = getDockerInstance();
             let test_result = userSubmit(_docker, data, lang, data.input);
-
-            //let test_result = data;
-            // let sleep = function (ms) {
-            //     return new Promise(resolve => setTimeout(resolve, ms));
-            // }
-            //var sleepMS = (Math.random() * 5000);
-            //console.log("Sleep for " + String(sleepMS));
-            //await sleep(sleepMS);
             return test_result;
         }
     });
@@ -264,20 +255,41 @@ const dockerRun = function (dockerObj, image, command) {
         inputCommand = inputCommand + space + command[key];
     }
     //console.log(inputCommand);
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error) => {
+    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, container) => {
         if (err !== '') {
             future.return(err);
         } else if (error) {
-            //console.log(error);
             future.return(error);
         } else if (tooLong) {
             future.return('Reject: Output exceeds maximum length');
         } else {
             future.return(output);
         }
-    }).on('container', function () {
-        //We don't bind volume from now on....
-        //container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];
+        //let container = dockerObj.getContainer(containerID);
+
+        //docker rm `docker ps --no-trunc -aq`
+        containerCleanUp(container);
     });
     return future.wait();
+};
+
+const containerCleanUp = function (container) {
+    container.inspect((err, data)=> {
+        if (err) {
+            console.log(err);
+        } else if (data && data.State) {
+            let state = data.State;
+            if (state.Status && (state.Status === 'exited')) {
+                container.remove((err)=> {
+                    if (err) {
+                        containerCleanUp(container);
+                    }
+                });
+            } else {
+                setTimeout(()=> {
+                    containerCleanUp(container);
+                }, 500);
+            }
+        }
+    });
 };

@@ -27,6 +27,7 @@ import MessageIcon from 'material-ui/lib/svg-icons/communication/message';
 import MailIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
 import PowerIcon from 'material-ui/lib/svg-icons/notification/power';
 import AccountIcon from 'material-ui/lib/svg-icons/action/supervisor-account';
+import MonitorIcon from 'material-ui/lib/svg-icons/action/trending-up';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
@@ -121,6 +122,7 @@ class Main extends Component {
                     gameEnd: true
                 });
                 Meteor.user()? this.goPageWrap('dashboard'):this.goPageWrap('login');
+                alert('Time\'s up!');
             } else if ((this.props._timer.coding) && (this.state.gameEnd)) {
                 this.setState({
                     gameEnd: false
@@ -141,7 +143,8 @@ class Main extends Component {
                     <MenuItem leftIcon={<AdminIcon />} onTouchTap={this.goPageWrap.bind(this, 'system')}>System Settings</MenuItem>
                     <MenuItem leftIcon={<ProblemIcon />} onTouchTap={this.goPageWrap.bind(this, 'problemConfig')}>Problem Configuration</MenuItem>
                     <MenuItem leftIcon={<ExtensionIcon />} onTouchTap={this.goPageWrap.bind(this, 'dockerConfig')}>Docker Settings</MenuItem>
-                    <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.goPageWrap.bind(this, 'analyse')}>Data Analyse</MenuItem>
+                    <MenuItem leftIcon={<ChartIcon />} onTouchTap={this.goPageWrap.bind(this, 'statistics')}>Data Statistics</MenuItem>
+                    <MenuItem leftIcon={<MonitorIcon />} onTouchTap={this.goPageWrap.bind(this, 'monitor')}>Server Monitor</MenuItem>
                     <MenuItem leftIcon={<MessageIcon />} onTouchTap={this.goPageWrap.bind(this, 'liveFeed')}>Send Mail</MenuItem>
                     <MenuItem leftIcon={<AccountIcon />} onTouchTap={this.goPageWrap.bind(this, 'batch')}>Manage Users</MenuItem>
                     <MenuItem leftIcon={<PowerIcon />} onTouchTap={this.goPageWrap.bind(this, 'performance')}>Performance Test</MenuItem>
@@ -155,10 +158,8 @@ class Main extends Component {
             <div>
                 <AppBar title={this.props._sapporo? this.props._sapporo.title:''} onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
-                <Snackbar open={this.state.prompt} message="You've Got New Mail"
-                          autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
-                <LeftNav  docked={false} open={this.state.open}
-                          onRequestChange={this.navClose.bind(this)}>
+                <Snackbar open={this.state.prompt} message="You've Got New Mail" autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
+                <LeftNav  docked={false} open={this.state.open} width={350} onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.goPageWrap.bind(this, 'dashboard')}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<MailIcon />} onTouchTap={this.goPageWrap.bind(this, 'mailbox')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />} onTouchTap={this.goPageWrap.bind(this, 'about')} >About</MenuItem>

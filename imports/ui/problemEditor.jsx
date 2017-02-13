@@ -144,6 +144,13 @@ class ProblemEditor extends Component {
                 lastSubmitTime: now
             });
         }
+        if (!isTest) {
+            let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+            if (!tmpObj.passTest) {
+                alert('You must pass test before subit');
+                return;
+            }
+        }
         this.setState({runCode: true});
         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
         let obj = {
@@ -156,13 +163,20 @@ class ProblemEditor extends Component {
             this.setState({testResult:null});
             if (!err) {
                 if (result.pass) {
-                    alert('Success :D');
+                    if (isTest) {
+                        let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+                        tmpObj.passTest = true;
+                        localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
+                        alert('You\'ve passed testing. You can now submit your code.');
+                    } else {
+                        alert('Your submission is correct! Congrats :D');
+                    }
                     this.closeDialog();
                 } else {
                     if (isTest) {
                         this.setState({testResult:result});
                     } else {
-                        alert('Failed');
+                        alert('Failed! Please verify your code.');
                         this.closeDialog();
                     }
                 }
@@ -231,18 +245,13 @@ class ProblemEditor extends Component {
                     <div style={{width: '49.5%', float:'right'}}>
                         <div>
                             <div style={{width:'50%', display:'inline-block'}}>
-                                <SelectField value={this.state.language} onChange={this.updateLang.bind(this)}
-                                             floatingLabelText="Language" style={{width:'50%'}} selectFieldRoot={{width:'100%'}}>
+                                <SelectField value={this.state.language} onChange={this.updateLang.bind(this)} floatingLabelText="Language" >
                                              {this.renderLangOptions()}
-                                </SelectField>
-                                <SelectField value={this.state.theme} onChange={this.updateTheme.bind(this)}
-                                             floatingLabelText="Theme" style={{width:'50%'}} selectFieldRoot={{width:'100%'}}>
-                                             {this.renderThemeOptions()}
                                 </SelectField>
                             </div>
                             <div style={{display:'inline-block', float:'right'}}>
-                                <RaisedButton label="Test"    primary={true} onTouchTap={this.submitCode.bind(this, true)}/>
-                                <RaisedButton label="Submit"  secondary={true} onTouchTap={this.submitCode.bind(this, false)}/>
+                                <RaisedButton label="Test before submit"    primary={true} onTouchTap={this.submitCode.bind(this, true)}/>
+                                <RaisedButton label="Submit"  secondary={true} onTouchTap={this.submitCode.bind(this, false)} style={{marginLeft: '5px'}}/>
                             </div>
                         </div>
                         {

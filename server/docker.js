@@ -1,8 +1,10 @@
 import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random'
+import { Random } from 'meteor/random';
 
 import {docker, problem, timer, sapporo} from '../imports/api/db.js';
 import {resultCompare, allInOneCommand} from '../imports/library/docker.js';
+import { logReason, logRequest } from '../imports/library/logger.js';
+
 import Dockerode from 'dockerode';
 import Future from 'fibers/future';
 import stream from 'stream';
@@ -120,6 +122,7 @@ Meteor.startup(() => {
                 }
             }
             if (!langObj) {
+                logRequest(logReason.noLang);
                 throw new Meteor.Error(500, 'No Programming Language Found');
             }
             let output = {
@@ -134,6 +137,7 @@ Meteor.startup(() => {
                 output.testInput = problemData.testInput;
             } else {
                 if (!((timer.findOne({timeSync: true})).coding)) {
+                    logRequest(logReason.gameStop);
                     throw new Meteor.Error(500, 'Game has stopped');
                 }
                 let success = true;
@@ -148,21 +152,15 @@ Meteor.startup(() => {
                 output.pass = success;
                 updateProblem(data.user._id, data.problemID, success, data.code);
             }
+
+            logRequest((typeof(output.stdout) === 'string')? logReason.success:logReason.resultNotStr, output.stdout);
             return output;
         },
         'docker.performanceTest'(data) {
             let lang = docker.findOne({_id:data.langType});
-            //console.log(lang);
             let _docker = getDockerInstance();
             let test_result = userSubmit(_docker, data, lang, data.input);
-
-            //let test_result = data;
-            // let sleep = function (ms) {
-            //     return new Promise(resolve => setTimeout(resolve, ms));
-            // }
-            //var sleepMS = (Math.random() * 5000);
-            //console.log("Sleep for " + String(sleepMS));
-            //await sleep(sleepMS);
+            logRequest((typeof(test_result) === 'string')? logReason.success:logReason.resultNotStr, test_result);
             return test_result;
         }
     });
@@ -230,6 +228,7 @@ const dockerTest = function (dockerObj, lang) {
 const userSubmit = function (_docker, data, langObj, testInput) {
     let uniqueID = Random.id();
     if (reachMax(uniqueID)) {
+        logRequest(logReason.reachMaxmimum);
         throw new Meteor.Error(503, 'Server reached maximum executions. Please try again later.');
     }
     let command = allInOneCommand(langObj, data.code, testInput, getTimeOutValue(false));
@@ -264,20 +263,41 @@ const dockerRun = function (dockerObj, image, command) {
         inputCommand = inputCommand + space + command[key];
     }
     //console.log(inputCommand);
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error) => {
+    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, container) => {
         if (err !== '') {
             future.return(err);
         } else if (error) {
-            //console.log(error);
             future.return(error);
         } else if (tooLong) {
             future.return('Reject: Output exceeds maximum length');
         } else {
             future.return(output);
         }
-    }).on('container', function () {
-        //We don't bind volume from now on....
-        //container.defaultOptions.start.Binds = [localFolder+':'+dockerFolder];
+        //let container = dockerObj.getContainer(containerID);
+
+        //docker rm `docker ps --no-trunc -aq`
+        containerCleanUp(container);
     });
     return future.wait();
+};
+
+const containerCleanUp = function (container) {
+    container.inspect((err, data)=> {
+        if (err) {
+            console.log(err);
+        } else if (data && data.State) {
+            let state = data.State;
+            if (state.Status && (state.Status === 'exited')) {
+                container.remove((err)=> {
+                    if (err) {
+                        containerCleanUp(container);
+                    }
+                });
+            } else {
+                setTimeout(()=> {
+                    containerCleanUp(container);
+                }, 500);
+            }
+        }
+    });
 };

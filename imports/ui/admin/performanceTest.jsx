@@ -204,8 +204,12 @@ class PerformanceTest extends Component {
                 testErr: err,
                 testResponse: result
             });
-            if (this.state.repeatMyself) {
+            if (this.state.repeatMyself && !err) {
                 this.runSingleTest();
+            } else if (this.state.repeatMyself && err && (err.error === 503)) {
+                setTimeout(()=> { //If we reach maximum concurrent user, stall for 0.5s otherwise it gets too brutal for logger
+                    this.runSingleTest();
+                }, 500);
             }
         });
     }

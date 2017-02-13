@@ -18,7 +18,8 @@
     "react-ace": "3.2.0",
     "react-addons-pure-render-mixin": "0.14.6",
     "react-dom": "0.14.8",
-    "react-tap-event-plugin": "0.2.2"
+    "react-tap-event-plugin": "0.2.2",
+    "recharts": "^0.20.6"
   },
   "devDependencies": {
     "eslint": "^2.7.0",

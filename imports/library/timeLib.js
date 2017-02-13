@@ -20,8 +20,9 @@ const generateDate = function (baseDate, year, month, day=1, hour=0, minute=0, s
 
 const timeSchedule = function (now, start, end) {
 
-    let hadStarted = Math.ceil((start.getTime() - now.getTime())/1000);
-    let hadEnded   = Math.ceil((end.getTime() - now.getTime())/1000);
+    if (!(now instanceof Date) || !(start instanceof Date) || !(end instanceof Date)) {
+        return null;
+    }
 
     let returnObj = {
         start:    false,
@@ -32,6 +33,10 @@ const timeSchedule = function (now, start, end) {
             sec: 0
         }
     };
+
+    let hadStarted = Math.ceil((start.getTime() - now.getTime())/1000);
+    let hadEnded   = Math.ceil((end.getTime() - now.getTime())/1000);
+
     if (hadStarted >= 0) { // Not started yet
         returnObj.time = {
             min: Math.floor(hadStarted/60),

@@ -287,7 +287,7 @@ const containerCleanUp = function (container) {
             console.log(err);
         } else if (data && data.State) {
             let state = data.State;
-            if (state.Status && (state.Status === 'exited')) {
+            if (!state.Running) {
                 container.remove((err)=> {
                     if (err) {
                         containerCleanUp(container);

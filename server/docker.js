@@ -267,7 +267,8 @@ const dockerRun = function (dockerObj, image, command) {
         if (err !== '') {
             future.return(err);
         } else if (error) {
-            future.return(error);
+            logRequest(logReason.error, error);
+            throw new Meteor.Error(500, 'Error: Failed when running container');
         } else if (tooLong) {
             future.return('Reject: Output exceeds maximum length');
         } else {

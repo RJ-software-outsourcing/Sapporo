@@ -3,6 +3,7 @@ import { requestLogs } from '../api/db.js';
 const logReason = {
     reachMaxmimum: 'reachMaxmimum',
     success: 'success',
+    error: 'error',
     resultNotStr: 'resultNotStr',
     gameStop: 'gameStop',
     noLang: 'noLang'

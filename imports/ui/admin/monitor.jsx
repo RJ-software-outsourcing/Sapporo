@@ -4,6 +4,9 @@ import { createContainer } from 'meteor/react-meteor-data';
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
+import List from 'material-ui/lib/lists/list';
+import ListItem from 'material-ui/lib/lists/list-item';
+
 import { timer, requestLogs } from '../../api/db.js';
 import { minutesAfterGameStart } from '../../library/timeLib.js';
 import { logReason } from '../../library/logger.js';
@@ -50,10 +53,14 @@ class Monitor extends Component {
         //console.log(result);
         return result;
     }
+    clickErrorLog (data) {
+        console.log(data);
+    }
     displayErrorLog () {
         return this.state.logs.map((log, key)=>{
             if ((log.type !== logReason.success && log.type !== logReason.reachMaxmimum)) {
-                return (<div key={key}>{log.minutes + ' - ' + log.data}</div>);
+                return (<ListItem key={key} primaryText={log.type} secondaryText={log.minutes}
+                                  onTouchTap={this.clickErrorLog.bind(this, log.data)}></ListItem>);
             }
         });
     }
@@ -105,7 +112,10 @@ class Monitor extends Component {
         return (
             <div>
                 {this.renderAreaChart()}
-                {this.displayErrorLog()}
+                <span>Issues (click to console.log() error object):</span>
+                <List>
+                    {this.displayErrorLog()}
+                </List>
             </div>
         );
     }

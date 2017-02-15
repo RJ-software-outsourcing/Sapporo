@@ -21,7 +21,9 @@ import * as themeType from '../library/theme_import.js';
 import 'brace/theme/tomorrow_night_blue';
 import { timeDiffSecond } from '../library/timeLib.js';
 
-import { docker, sapporo } from '../api/db.js';
+import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
+
+import { docker, userData, sapporo } from '../api/db.js';
 
 const textDiv = {
     width: '96%',
@@ -205,6 +207,14 @@ class ProblemEditor extends Component {
             </div>
         ));
     }
+    alreadyPass () {
+        let currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
+        if (isUserPassedProblem(currentUser, this.props.data._id)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     render () {
         const  editorOption = {
             $blockScrolling: true
@@ -214,6 +224,12 @@ class ProblemEditor extends Component {
         ];
         return (
             <div>
+                {this.alreadyPass()?
+                    <div style={{display:'inline-block', float:'right'}}>
+                        Already Pass!
+                    </div>
+                    :''
+                }
                 <div style={{display:'inline-block', width: '100%', padding:'10px 0'}} >
                     <Paper style={{width: '49.5%', float:'left'}} zDepth={1}>
                         <div style={textDiv}>
@@ -249,10 +265,13 @@ class ProblemEditor extends Component {
                                              {this.renderLangOptions()}
                                 </SelectField>
                             </div>
+
                             <div style={{display:'inline-block', float:'right'}}>
                                 <RaisedButton label="Test before submit"    primary={true} onTouchTap={this.submitCode.bind(this, true)}/>
                                 <RaisedButton label="Submit"  secondary={true} onTouchTap={this.submitCode.bind(this, false)} style={{marginLeft: '5px'}}/>
                             </div>
+
+
                         </div>
                         {
                             this.state.langType?
@@ -298,16 +317,19 @@ class ProblemEditor extends Component {
 
 ProblemEditor.propTypes = {
     _docker: PropTypes.array.isRequired,
+    _userData: PropTypes.array.isRequired,
     currentUser: PropTypes.object,
     _sapporo: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('docker');
+    Meteor.subscribe('userData');
     Meteor.subscribe('sapporo');
     return {
         _docker: docker.find({languages: true}).fetch(),
         _sapporo: sapporo.findOne({sapporo:true}),
+        _userData: userData.find({}).fetch(),
         currentUser: Meteor.user()
     };
 }, ProblemEditor);

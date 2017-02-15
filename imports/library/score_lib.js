@@ -63,11 +63,31 @@ const problemSolvedCount = function (item, user) {
     return count;
 };
 
+const getFinishTime = function (user) {
+    let finishTimes = [];
+    for (var key in user) {
+        if (user[key].log && Array.isArray(user[key].log) && (user[key].log.length > 0)) {
+            let length = user[key].log.length;
+            finishTimes.push(((user[key].log)[length-1]).time);
+        }
+    }
+    let latest = null;
+    for (var index in finishTimes) {
+        if (latest === null) {
+            latest = finishTimes[index];
+        } else if (finishTimes[index].getTime() > (latest).getTime()) {
+            latest = finishTimes[index];
+        }
+    }
+    return latest;
+};
+
 export {
     getTotalScore,
     getUserTotalScore,
     getUserPassedProblem,
     getCurrentUserData,
     isUserPassedProblem,
-    problemSolvedCount
+    problemSolvedCount,
+    getFinishTime
 };

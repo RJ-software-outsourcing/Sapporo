@@ -69,7 +69,7 @@ const updateProblem = function (userID, problemID, isCorrect, code) {
     }
     user[problemID].result = isCorrect;
     user[problemID].log.push({
-        time: new Date,
+        time: new Date(),
         code: code,
         result: isCorrect
     });

@@ -1,5 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 
 import {sapporo} from '../imports/api/db.js';
 
@@ -30,7 +29,7 @@ Meteor.startup(() => {
             sapporo:true,
             title: 'sapporo',
             timeout: 10,
-            submitwait: 10,
+            submitwait: 1,
             createAccount: true,
             maxExe: 20
         });

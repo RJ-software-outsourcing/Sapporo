@@ -8,7 +8,7 @@ import LinearProgress from 'material-ui/lib/linear-progress';
 import Divider from 'material-ui/lib/divider';
 
 import { problem, userData, sapporo } from '../../api/db.js';
-import { getUserTotalScore, problemSolvedCount, getTotalScore } from '../../library/score_lib.js';
+import { getUserTotalScore, problemSolvedCount, getTotalScore, getFinishTime } from '../../library/score_lib.js';
 
 class Rank extends Component {
     problemSolvedCounting (item) {
@@ -42,6 +42,10 @@ class Rank extends Component {
             }
         });
     }
+    userScoreTextFormat (user, score) {
+        let finishTime = getFinishTime(user);
+        return `Score: ${score}, Finish Time: ${finishTime}`;
+    }
     renderAllUser () {
         if (!this.props._userData || this.props._userData.length === 0) return;
         this.sortPropsArray('_userData', (item) => {
@@ -50,7 +54,7 @@ class Rank extends Component {
         return this.props._userData.map((item, key) => {
             let userTotalScore = getUserTotalScore(item, this.props._problem);
             return (
-                <ListItem key={key} primaryText={item.username} secondaryText={String(userTotalScore)}>
+                <ListItem key={key} primaryText={item.username} secondaryText={this.userScoreTextFormat(item, userTotalScore)}>
                     <LinearProgress mode="determinate" max={getTotalScore(this.props._problem)} value={userTotalScore}
                                     color="coral" style={{height:'15px'}}/>
                 </ListItem>

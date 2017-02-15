@@ -141,19 +141,23 @@ Meteor.startup(() => {
                     throw new Meteor.Error(500, 'Game has stopped');
                 }
                 let success = true;
+                let result = null;
                 for (key in problemData.verfication) {
-                    let output = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
-                    if (!resultCompare(output, problemData.verfication[key].output)) {
+                    result = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
+                    if (!resultCompare(result, problemData.verfication[key].output)) {
                         success = false;
                         break;
                     }
                 }
-                output.stdout = null;
+                output.stdout = result;
                 output.pass = success;
                 updateProblem(data.user._id, data.problemID, success, data.code);
             }
 
             logRequest((typeof(output.stdout) === 'string')? logReason.success:logReason.resultNotStr, output.stdout);
+            if (!isTest) { //Hide result for formal submission
+                output.stdout = null;
+            }
             return output;
         },
         'docker.performanceTest'(data) {

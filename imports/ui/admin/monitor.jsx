@@ -19,9 +19,9 @@ class Monitor extends Component {
             logs: []
         };
     }
-    refactorLogs () {
-        if (this.props._requestLogs && (this.props._requestLogs.length)) {
-            return this.props._requestLogs.filter((log)=>{
+    refactorLogs (logs) {
+        if (logs && (logs.length)) {
+            return logs.filter((log)=>{
                 let minutes = minutesAfterGameStart(this.props._timer.start, this.props._timer.end, log.createdAt);
                 if (minutes) {
                     log.minutes = minutes;
@@ -101,8 +101,8 @@ class Monitor extends Component {
 
     }
     componentWillUpdate (nextProp) {
-        if (nextProp._requestLogs.length !== this.state.logs.length) {
-            let log = this.refactorLogs(nextProp._requestLogs);
+        let log = this.refactorLogs(nextProp._requestLogs);
+        if (log.length !== this.state.logs.length) {
             this.setState({
                 logs: log
             });

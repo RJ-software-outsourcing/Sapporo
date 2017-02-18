@@ -13,6 +13,7 @@ import TextField from 'material-ui/lib/text-field';
 import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import AddIcon from 'material-ui/lib/svg-icons/action/note-add';
+import Divider from 'material-ui/lib/divider';
 
 const questionSelection = [{
     description: '非常不同意',
@@ -78,7 +79,9 @@ class Survey extends Component {
         this.state = {
             newSurveyOpen: false,
             survey: surveyForm,
-            editID: null
+            editID: null,
+            surveyFound: [],
+            findName: null
         };
     }
 
@@ -180,6 +183,29 @@ class Survey extends Component {
             });
         }
     }
+    updateFindUser (event) {
+        this.setState({
+            findName: event.target.value
+        });
+    }
+    findUserSurvey(){
+        Meteor.call('survey.search', this.state.findName, (err, data)=> {
+            if (err) {
+                alert(err);
+            }
+            this.setState({
+                surveyFound: data
+            });
+        });
+    }
+    renderFind(){
+        return this.state.surveyFound.map((item, key)=>{
+            return (
+                <ListItem key={key} primaryText={item.createdAt.toString()} onTouchTap={this.editSurvey.bind(this, item)}/>
+            );
+        });
+    }
+
     render () {
 
         const actions = [
@@ -189,6 +215,18 @@ class Survey extends Component {
 
         return (
             <Paper style={{marginTop:'10px', padding:'10px'}}>
+                {
+                    this.props.currentUser.username === 'admin'?
+                    <div>
+                        <TextField floatingLabelFixed={true} floatingLabelText="search user name" value={this.state.findname} onChange={this.updateFindUser.bind(this)} />
+                        <FlatButton label="Find" primary={true} onTouchTap={this.findUserSurvey.bind(this)} />
+                        <List>
+                            {this.renderFind()}
+                        </List>
+                        <Divider />
+                    </div>
+                    :''
+                }
                 <div>
                     <FlatButton label="New Survey" icon={<AddIcon />} onTouchTap={this.toggleNewSurveyDialog.bind(this, true)}/>
                 </div>
@@ -211,12 +249,14 @@ class Survey extends Component {
 }
 
 Survey.propTypes = {
-    _surveyData: PropTypes.array.isRequired
+    _surveyData: PropTypes.array.isRequired,
+    currentUser: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('survey');
     return {
+        currentUser: Meteor.user(),
         _surveyData: survey.find({user: Meteor.user().username}).fetch()
     };
 }, Survey);

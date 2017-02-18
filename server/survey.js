@@ -24,6 +24,9 @@ Meteor.startup(() => {
                     createdAt: new Date()
                 });
             }
+        },
+        'survey.search'(user){
+            return survey.find({user:user}).fetch();
         }
     });
 });

@@ -137,6 +137,11 @@ class ProblemEditor extends Component {
         }
     }
     submitCode (isTest) {
+
+        if (!isTest && this.alreadyPass() && !(confirm('You already solved this problem. Are you sure you want to submit again? Your current result will be overrided.'))) {
+            return;
+        }
+
         let now = new Date();
         if (this.state.lastSubmitTime && (timeDiffSecond(this.state.lastSubmitTime, now) < this.props._sapporo.submitwait) ) {
             alert(`Please wait at least ${this.props._sapporo.submitwait} seconds between each submission. Last submission was ${timeDiffSecond(this.state.lastSubmitTime, now)} seconds ago.`);
@@ -225,9 +230,9 @@ class ProblemEditor extends Component {
         return (
             <div>
                 {this.alreadyPass()?
-                    <div style={{display:'inline-block', float:'right'}}>
-                        Already Pass!
-                    </div>
+                    <Paper style={{width:'100%', textAlign:'center'}}>
+                        <b style={{color:'green'}}>You've Solved This Problem!</b>
+                    </Paper>
                     :''
                 }
                 <div style={{display:'inline-block', width: '100%', padding:'10px 0'}} >

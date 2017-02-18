@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 
 import Login from './login.jsx';
 import About from './about.jsx';
+import Survey from './survey.jsx';
 import Dashboard from './dashboard.jsx';
 import ProblemEditor from './problemEditor.jsx';
 import System from './admin/system.jsx';
@@ -26,6 +27,9 @@ const goPage = function (page, data) {
         break;
     case 'about':
         render(<About />, sectionDOM);
+        break;
+    case 'survey':
+        render(<Survey/>, sectionDOM);
         break;
     case 'problemEditor':
         render(<ProblemEditor data={data}/>, sectionDOM);

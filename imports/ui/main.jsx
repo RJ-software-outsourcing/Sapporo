@@ -28,6 +28,7 @@ import MailIcon from 'material-ui/lib/svg-icons/communication/mail-outline';
 import PowerIcon from 'material-ui/lib/svg-icons/notification/power';
 import AccountIcon from 'material-ui/lib/svg-icons/action/supervisor-account';
 import MonitorIcon from 'material-ui/lib/svg-icons/action/trending-up';
+import FeedbackIcon from 'material-ui/lib/svg-icons/action/feedback';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
@@ -162,6 +163,7 @@ class Main extends Component {
                 <LeftNav  docked={false} open={this.state.open} width={350} onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.goPageWrap.bind(this, 'dashboard')}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<MailIcon />} onTouchTap={this.goPageWrap.bind(this, 'mailbox')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>
+                    <MenuItem leftIcon={<FeedbackIcon />} onTouchTap={this.goPageWrap.bind(this, 'survey')} >Survey</MenuItem>
                     <MenuItem leftIcon={<AboutIcon />} onTouchTap={this.goPageWrap.bind(this, 'about')} >About</MenuItem>
                     <Divider />
                     <MenuItem leftIcon={<LogoutIcon />} onTouchTap={this.logout.bind(this)}>Log Out</MenuItem>

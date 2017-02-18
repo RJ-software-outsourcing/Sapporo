@@ -9,7 +9,7 @@ import Avatar from 'material-ui/lib/avatar';
 import Subheader from 'material-ui/lib/Subheader';
 import Dialog from 'material-ui/lib/dialog';
 
-export default  class Login extends Component {
+export default class About extends Component {
     constructor(props) {
         super(props);
         this.state = {

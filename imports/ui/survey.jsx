@@ -77,11 +77,18 @@ class Survey extends Component {
         super(props);
         this.state = {
             newSurveyOpen: false,
-            survey: surveyForm
+            survey: surveyForm,
+            editID: null
         };
     }
 
-    toggleNewSurveyDialog () {
+    toggleNewSurveyDialog (clearSurvey) {
+        if (clearSurvey) {
+            this.setState({
+                survey: surveyForm,
+                editID: null
+            });
+        }
         this.setState({
             newSurveyOpen: !(this.state.newSurveyOpen)
         });
@@ -148,23 +155,27 @@ class Survey extends Component {
     surveyAction (isSubmit) {
         if (isSubmit) {
             //console.log(this.state.survey);
-            Meteor.call('survey.submit', this.state.survey, (error)=>{
+            Meteor.call('survey.submit', this.state.survey, this.state.editID, (error)=>{
                 if (error) {
                     alert(error);
                 }
             });
         }
+        this.toggleNewSurveyDialog(true);
+
+    }
+    editSurvey (item) {
         this.setState({
-            survey: surveyForm
+            survey: item.survey,
+            editID: item._id
         });
         this.toggleNewSurveyDialog();
-
     }
     renderSurveys () {
         if (this.props._surveyData) {
             return this.props._surveyData.map((item, key)=> {
                 return (
-                    <ListItem key={key} primaryText={item.user} />
+                    <ListItem key={key} primaryText={item.createdAt.toString()} onTouchTap={this.editSurvey.bind(this, item)}/>
                 );
             });
         }
@@ -179,14 +190,14 @@ class Survey extends Component {
         return (
             <Paper style={{marginTop:'10px', padding:'10px'}}>
                 <div>
-                    <FlatButton label="New Survey" icon={<AddIcon />} onTouchTap={this.toggleNewSurveyDialog.bind(this)}/>
+                    <FlatButton label="New Survey" icon={<AddIcon />} onTouchTap={this.toggleNewSurveyDialog.bind(this, true)}/>
                 </div>
                 <List>
                     {this.renderSurveys()}
                 </List>
 
 
-                <Dialog title="" actions={actions} modal={false} open={this.state.newSurveyOpen} onRequestClose={this.toggleNewSurveyDialog.bind(this)}
+                <Dialog title="" actions={actions} modal={false} open={this.state.newSurveyOpen} onRequestClose={this.toggleNewSurveyDialog.bind(this, true)}
                         autoScrollBodyContent={true}>
                     {this.renderQuestions()}
                     {this.renderOtherQuestions()}

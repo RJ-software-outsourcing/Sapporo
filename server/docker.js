@@ -129,31 +129,36 @@ Meteor.startup(() => {
                 pass: false,
                 stdout: null
             };
-            if (isTest) {
-                let testInput = problemData.testInput;
-                output.stdout = userSubmit(_docker, data, langObj, testInput);
-                output.pass   = resultCompare(output.stdout, problemData.testOutput);
-                output.expected = problemData.testOutput;
-                output.testInput = problemData.testInput;
-            } else {
-                if (!((timer.findOne({timeSync: true})).coding)) {
-                    logRequest(logReason.gameStop);
-                    throw new Meteor.Error(500, 'Game has stopped');
-                }
-                let success = true;
-                let result = null;
-                for (key in problemData.verfication) {
-                    result = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
-                    if (!resultCompare(result, problemData.verfication[key].output)) {
-                        success = false;
-                        break;
+            try {
+                if (isTest) {
+                    let testInput = problemData.testInput;
+                    output.stdout = userSubmit(_docker, data, langObj, testInput);
+                    output.pass   = resultCompare(output.stdout, problemData.testOutput);
+                    output.expected = problemData.testOutput;
+                    output.testInput = problemData.testInput;
+                } else {
+                    if (!((timer.findOne({timeSync: true})).coding)) {
+                        logRequest(logReason.gameStop);
+                        throw new Meteor.Error(500, 'Game has stopped');
                     }
+                    let success = true;
+                    let result = null;
+                    for (key in problemData.verfication) {
+                        result = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
+                        if (!resultCompare(result, problemData.verfication[key].output)) {
+                            success = false;
+                            break;
+                        }
+                    }
+                    output.stdout = result;
+                    output.pass = success;
+                    updateProblem(data.user._id, data.problemID, success, data.code);
                 }
-                output.stdout = result;
-                output.pass = success;
-                updateProblem(data.user._id, data.problemID, success, data.code);
+            } catch (e) {
+                logRequest(logReason.error, e);
+                throw new Meteor.Error(500, 'Unexpected Error happened');
             }
-
+            
             logRequest((typeof(output.stdout) === 'string')? logReason.success:logReason.resultNotStr, output.stdout);
             if (!isTest) { //Hide result for formal submission
                 output.stdout = null;
@@ -266,8 +271,10 @@ const dockerRun = function (dockerObj, image, command) {
         if (key!==0) space = ' ';
         inputCommand = inputCommand + space + command[key];
     }
-    //console.log(inputCommand);
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, (error, data, container) => {
+
+    // Wrap callback with Meteor.bindEnvironment().
+    // This way the callback will be wrapped within a new fiber and Meteor will be happy with it.
+    let dockerCallback = Meteor.bindEnvironment((error, data, container)=>{
         if (err !== '') {
             future.return(err);
         } else if (error) {
@@ -279,10 +286,16 @@ const dockerRun = function (dockerObj, image, command) {
             future.return(output);
         }
         //let container = dockerObj.getContainer(containerID);
-
         //docker rm `docker ps --no-trunc -aq`
         containerCleanUp(container);
+    }, (e)=>{
+        logRequest(logReason.error, e);
+        throw new Meteor.Error(500, 'Error: Failed when running Docker callback');
     });
+
+    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, dockerCallback);
+
+    // We can't use wrapAsync because it only returns the second parameter. We need the third one as well.
     return future.wait();
 };
 

@@ -158,7 +158,7 @@ Meteor.startup(() => {
                 logRequest(logReason.error, e);
                 throw new Meteor.Error(500, 'Unexpected Error happened');
             }
-            
+
             logRequest((typeof(output.stdout) === 'string')? logReason.success:logReason.resultNotStr, output.stdout);
             if (!isTest) { //Hide result for formal submission
                 output.stdout = null;
@@ -300,17 +300,18 @@ const dockerRun = function (dockerObj, image, command) {
 };
 
 const containerCleanUp = function (container) {
-    container.inspect((err, data)=> {
+    let cleanUpCallback = Meteor.bindEnvironment((err)=>{
+        if (err) {
+            containerCleanUp(container);
+        }
+    });
+    let inspectCallback = Meteor.bindEnvironment((err, data)=>{
         if (err) {
             console.log(err);
         } else if (data && data.State) {
             let state = data.State;
             if (!state.Running) {
-                container.remove((err)=> {
-                    if (err) {
-                        containerCleanUp(container);
-                    }
-                });
+                container.remove(cleanUpCallback);
             } else {
                 setTimeout(()=> {
                     containerCleanUp(container);
@@ -318,4 +319,5 @@ const containerCleanUp = function (container) {
             }
         }
     });
+    container.inspect(inspectCallback);
 };

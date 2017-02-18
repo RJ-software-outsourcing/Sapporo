@@ -129,34 +129,30 @@ Meteor.startup(() => {
                 pass: false,
                 stdout: null
             };
-            try {
-                if (isTest) {
-                    let testInput = problemData.testInput;
-                    output.stdout = userSubmit(_docker, data, langObj, testInput);
-                    output.pass   = resultCompare(output.stdout, problemData.testOutput);
-                    output.expected = problemData.testOutput;
-                    output.testInput = problemData.testInput;
-                } else {
-                    if (!((timer.findOne({timeSync: true})).coding)) {
-                        logRequest(logReason.gameStop);
-                        throw new Meteor.Error(500, 'Game has stopped');
-                    }
-                    let success = true;
-                    let result = null;
-                    for (key in problemData.verfication) {
-                        result = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
-                        if (!resultCompare(result, problemData.verfication[key].output)) {
-                            success = false;
-                            break;
-                        }
-                    }
-                    output.stdout = result;
-                    output.pass = success;
-                    updateProblem(data.user._id, data.problemID, success, data.code);
+
+            if (isTest) {
+                let testInput = problemData.testInput;
+                output.stdout = userSubmit(_docker, data, langObj, testInput);
+                output.pass   = resultCompare(output.stdout, problemData.testOutput);
+                output.expected = problemData.testOutput;
+                output.testInput = problemData.testInput;
+            } else {
+                if (!((timer.findOne({timeSync: true})).coding)) {
+                    logRequest(logReason.gameStop);
+                    throw new Meteor.Error(500, 'Game has stopped');
                 }
-            } catch (e) {
-                logRequest(logReason.error, e);
-                throw new Meteor.Error(500, 'Unexpected Error happened');
+                let success = true;
+                let result = null;
+                for (key in problemData.verfication) {
+                    result = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
+                    if (!resultCompare(result, problemData.verfication[key].output)) {
+                        success = false;
+                        break;
+                    }
+                }
+                output.stdout = result;
+                output.pass = success;
+                updateProblem(data.user._id, data.problemID, success, data.code);
             }
 
             logRequest((typeof(output.stdout) === 'string')? logReason.success:logReason.resultNotStr, output.stdout);
@@ -292,6 +288,7 @@ const dockerRun = function (dockerObj, image, command) {
         logRequest(logReason.error, e);
         throw new Meteor.Error(500, 'Error: Failed when running Docker callback');
     });
+
 
     dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, dockerCallback);
 

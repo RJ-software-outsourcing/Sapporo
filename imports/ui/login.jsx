@@ -44,9 +44,13 @@ class Login extends Component {
     updatePassword(event) {
         this.setState({password: event.target.value});
     }
-    checkUser () {
-        Meteor.call('user.check', Meteor.user()._id, Meteor.user().username, function (err) {
-            if (err) alert('User Check failed');
+    checkUser (callback) {
+        Meteor.call('user.check', Meteor.user()._id, Meteor.user().username, (err) => {
+            if (err) {
+                alert('User Check failed');
+            } else if (callback) {
+                callback();
+            }
         });
     }
     openStaffLogin () {
@@ -64,10 +68,11 @@ class Login extends Component {
             if (err) {
                 alert(err);
             } else {
-                this.checkUser();
-                if (Meteor.user()) {
-                    goPage('dashboard');
-                }
+                this.checkUser(()=>{
+                    if (Meteor.user()) {
+                        goPage('dashboard');
+                    }
+                });
             }
         });
     }
@@ -79,7 +84,7 @@ class Login extends Component {
             if (err) {
                 alert(err);
             } else {
-                this.checkUser();
+                this.loginStaff();
             }
         });
     }

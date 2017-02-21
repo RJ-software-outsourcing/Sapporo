@@ -29,6 +29,7 @@ import PowerIcon from 'material-ui/lib/svg-icons/notification/power';
 import AccountIcon from 'material-ui/lib/svg-icons/action/supervisor-account';
 import MonitorIcon from 'material-ui/lib/svg-icons/action/trending-up';
 import FeedbackIcon from 'material-ui/lib/svg-icons/action/feedback';
+import Avatar from 'material-ui/lib/avatar';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
@@ -84,11 +85,13 @@ class Main extends Component {
                     currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
                 }
                 let icon = <NotpassIcon />;
+                let color = 'grey';
                 if (isUserPassedProblem(currentUser, problem._id)) {
                     icon = <DoneIcon />;
+                    color = 'green';
                 }
                 return (
-                    <MenuItem key={key} leftIcon={icon} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
+                    <MenuItem key={key} leftIcon={<Avatar icon={icon} color={color} size={30} style={{margin: '5'}}  backgroundColor='transparent'/>} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
                               primaryText={problem.title} secondaryText={problem.score}/>
                 );
             }

@@ -151,15 +151,18 @@ class ProblemEditor extends Component {
                 lastSubmitTime: now
             });
         }
+        let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+        if (tmpObj.code.length > 10000) {
+            alert('Your submission is rejected because your code size is too large');
+            return;
+        }
         if (!isTest) {
-            let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
             if (!tmpObj.passTest) {
                 alert('You must pass test before subit');
                 return;
             }
         }
         this.setState({runCode: true});
-        let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
         let obj = {
             problemID: this.props.data._id,
             language: this.state.language,
@@ -231,7 +234,7 @@ class ProblemEditor extends Component {
             <div>
                 {this.alreadyPass()?
                     <Paper style={{width:'100%', textAlign:'center'}}>
-                        <b style={{color:'green'}}>You've Solved This Problem!</b>
+                        <h3 style={{color:'green'}}>You've Solved This Problem!</h3>
                     </Paper>
                     :''
                 }
@@ -270,12 +273,14 @@ class ProblemEditor extends Component {
                                              {this.renderLangOptions()}
                                 </SelectField>
                             </div>
-
-                            <div style={{display:'inline-block', float:'right'}}>
-                                <RaisedButton label="Test before submit"    primary={true} onTouchTap={this.submitCode.bind(this, true)}/>
-                                <RaisedButton label="Submit"  secondary={true} onTouchTap={this.submitCode.bind(this, false)} style={{marginLeft: '5px'}}/>
-                            </div>
-
+                            {
+                                this.alreadyPass()?
+                                '':
+                                <div style={{display:'inline-block', float:'right'}}>
+                                    <RaisedButton label="Test before submit"    primary={true} onTouchTap={this.submitCode.bind(this, true)}/>
+                                    <RaisedButton label="Submit"  secondary={true} onTouchTap={this.submitCode.bind(this, false)} style={{marginLeft: '5px'}}/>
+                                </div>
+                            }
 
                         </div>
                         {

@@ -14,7 +14,7 @@ import {updateProblem} from './userData.js';
 let concurrentCount = [];
 const maximumInput = 10000;
 const maximumOutput = 10000;
-const maxMemory = 100; //MB
+const maxMemory = 50; //MB
 
 Meteor.startup(() => {
     Meteor.methods({
@@ -297,6 +297,8 @@ const dockerRun = function (dockerObj, image, command) {
     // Wrap callback with Meteor.bindEnvironment().
     // This way the callback will be wrapped within a new fiber and Meteor will be happy with it.
     let dockerCallback = Meteor.bindEnvironment((error, data, container)=>{
+
+        containerCleanUp(container);
         if (err !== '') {
             future.return(err);
         } else if (error) {
@@ -313,7 +315,7 @@ const dockerRun = function (dockerObj, image, command) {
         }
         //let container = dockerObj.getContainer(containerID);
         //docker rm `docker ps --no-trunc -aq`
-        containerCleanUp(container);
+
     }, (e)=>{
         console.log(e);
         logRequest(logReason.error, e);
@@ -321,14 +323,18 @@ const dockerRun = function (dockerObj, image, command) {
             throw new Meteor.Error(500, 'Error: Failed when running Docker callback');
         });
     });
+    try {
+        dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false, Memory: maxMemory * 1024 * 1024}, {}, dockerCallback);
+    } catch (e) {
+        console.log(e);
+    }
 
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false, Memory: maxMemory * 1024 * 1024}, {}, dockerCallback);
 
     // We can't use wrapAsync because it only returns the second parameter. We need the third one as well.
     return future.wait();
 };
 
-const containerCleanUp = function (container) {
+const containerCleanUp = Meteor.bindEnvironment(function (container) {
     let cleanUpCallback = Meteor.bindEnvironment((err)=>{
         if (err) {
             containerCleanUp(container);
@@ -342,9 +348,15 @@ const containerCleanUp = function (container) {
             if (!state.Running) {
                 container.remove(cleanUpCallback);
             } else {
-                setTimeout(()=> {
-                    containerCleanUp(container);
-                }, 500);
+                if (container.stop) {
+                    container.stop(Meteor.bindEnvironment(()=>{
+                        containerCleanUp(container);
+                    }));
+                } else {
+                    setTimeout(()=> {
+                        containerCleanUp(container);
+                    }, 500);
+                }
             }
         }
     });
@@ -352,4 +364,4 @@ const containerCleanUp = function (container) {
         container.inspect(inspectCallback);
     }
 
-};
+});

@@ -14,6 +14,7 @@ import {updateProblem} from './userData.js';
 let concurrentCount = [];
 const maximumInput = 10000;
 const maximumOutput = 10000;
+const maxMemory = 100; //MB
 
 Meteor.startup(() => {
     Meteor.methods({
@@ -185,7 +186,12 @@ Meteor.startup(() => {
             let lang = docker.findOne({_id:data.langType});
             let _docker = getDockerInstance();
             let test_result = userSubmit(_docker, data, lang, data.input);
-            logRequest((typeof(test_result) === 'string')? logReason.success:logReason.resultNotStr, test_result);
+            if (test_result instanceof Function) {
+                test_result();
+            } else {
+                logRequest((typeof(test_result) === 'string')? logReason.success:logReason.resultNotStr, test_result);
+            }
+
             return test_result;
         }
     });
@@ -316,8 +322,7 @@ const dockerRun = function (dockerObj, image, command) {
         });
     });
 
-
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, {}, dockerCallback);
+    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false, Memory: maxMemory * 1024 * 1024}, {}, dockerCallback);
 
     // We can't use wrapAsync because it only returns the second parameter. We need the third one as well.
     return future.wait();

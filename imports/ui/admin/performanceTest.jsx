@@ -159,7 +159,7 @@ class PerformanceTest extends Component {
                     if (err) {
                         console.log(err);
                     }
-                    console.log(result);
+                    //console.log(result);
                     resolveCount += 1;
                     this.setState({testCaseResolved: resolveCount});
                     if (resolveCount === sentCount) {
@@ -202,14 +202,14 @@ class PerformanceTest extends Component {
             this.setState({
                 keepTestingExeTIme: ((ticks_end - ticks_start)/1000).toFixed(4),
                 testErr: err,
-                testResponse: result
+                testResponse: err? err:result
             });
             if (this.state.repeatMyself && !err) {
                 this.runSingleTest();
-            } else if (this.state.repeatMyself && err && (err.error === 503)) {
+            } else if (this.state.repeatMyself && err) {
                 setTimeout(()=> { //If we reach maximum concurrent user, stall for 0.5s otherwise it gets too brutal for logger
                     this.runSingleTest();
-                }, 500);
+                }, 1000);
             }
         });
     }

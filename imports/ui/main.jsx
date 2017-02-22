@@ -42,6 +42,7 @@ class Main extends Component {
         this.state = {
             open : false,
             prompt: false,
+            promptMessage: '',
             mailCount: 0,
             gameEnd: false
         };
@@ -101,6 +102,12 @@ class Main extends Component {
         let count = getNumberOfUnread(this.props._liveFeed);
         return (count === 0)? '':String(count);
     }
+    firePrompt (message) {
+        this.setState({
+            promptMessage: message,
+            prompt: true
+        });
+    }
     goPageWrap (page, data) {
         goPage(page, data);
         this.navClose();
@@ -113,11 +120,13 @@ class Main extends Component {
             //this.goPageWrap('login');
         }
         if (this.props._liveFeed.length !== this.state.mailCount) {
-            let showPrompt = (this.props._liveFeed.length > this.state.mailCount)? true:false;
+            let newMail = (this.props._liveFeed.length > this.state.mailCount)? true:false;
             this.setState({
-                mailCount: this.props._liveFeed.length,
-                prompt: showPrompt
+                mailCount: this.props._liveFeed.length
             });
+            if (newMail) {
+                this.firePrompt('You\'ve Got New Mail');
+            }
         }
         // Switch to Dashboard when time's up
         if (this.props._timer) {
@@ -126,7 +135,7 @@ class Main extends Component {
                     gameEnd: true
                 });
                 Meteor.user()? this.goPageWrap('dashboard'):this.goPageWrap('login');
-                //alert('Time\'s up!');
+                this.firePrompt('Time\'s Up!');
             } else if ((this.props._timer.coding) && (this.state.gameEnd)) {
                 this.setState({
                     gameEnd: false
@@ -134,10 +143,15 @@ class Main extends Component {
             }
         }
     }
-    closePrompt () {
-        this.setState({
-            prompt: false
-        });
+    closePrompt (reason) {
+        if (reason === 'clickaway') {
+            return;
+        } else {
+            this.setState({
+                prompt: false,
+                promptMessage: ''
+            });
+        }
     }
     renderAdmin () {
         if (Meteor.user() && Meteor.user().username === 'admin') {
@@ -162,7 +176,7 @@ class Main extends Component {
             <div>
                 <AppBar title={this.props._sapporo? this.props._sapporo.title:''} onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
-                <Snackbar open={this.state.prompt} message="You've Got New Mail" autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
+                <Snackbar open={this.state.prompt} message={this.state.promptMessage} onRequestClose={this.closePrompt.bind(this)} onActionTouchTap={this.closePrompt.bind(this)} action='OK'/>
                 <LeftNav  docked={false} open={this.state.open} width={350} onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.goPageWrap.bind(this, 'dashboard')}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<MailIcon />} onTouchTap={this.goPageWrap.bind(this, 'mailbox')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>

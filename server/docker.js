@@ -304,11 +304,11 @@ const dockerRun = function (dockerObj, image, command) {
         } else if (error) {
             logRequest(logReason.error, error);
             future.return(()=>{
-                throw new Meteor.Error(500, 'Error: Failed when running container');
+                throw new Meteor.Error(500, 'Failed when running container, could be timeout or internal error');
             });
         } else if (tooLong) {
             future.return(()=>{
-                throw new Meteor.Error(500, 'Reject: Output too long');
+                throw new Meteor.Error(500, `Rejected by server: Output is too long (Maximum Output is ${maximumOutput} characters)`);
             });
         } else {
             future.return(output);

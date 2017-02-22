@@ -238,7 +238,7 @@ class DockerConfig extends Component {
                             <TextField type="text" value={this.state.selectLang.testInput} floatingLabelText="STD input for test" onChange={this.updateLangState.bind(this, 'testInput')} multiLine={true} style={{width:'100%'}}/>
                             <TextField type="text" value={this.state.selectLang.helloworld} floatingLabelText="Testing Script" onChange={this.updateLangState.bind(this, 'helloworld')} multiLine={true} style={{width:'100%'}}/>
                         </div>
-
+                        <div>{this.state.selectLang._id}</div>
                     </Dialog>
                 :''
                 }

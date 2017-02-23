@@ -18,7 +18,7 @@ const maxMemory = 50; //MB
 
 Meteor.startup(() => {
     Meteor.methods({
-        'docker.add'(data) {
+        'docker.add' (data) {
             if (Meteor.user().username !== 'admin') return;
             if (data._id) {
                 docker.update({
@@ -27,6 +27,29 @@ Meteor.startup(() => {
                     $set: data
                 });
             } else {
+                docker.insert(data);
+            }
+        },
+        'docker.useMachine'(data) {
+            if (Meteor.user().username !== 'admin') return;
+            let dockerGlobal = docker.findOne({global:true});
+            if (dockerGlobal) {
+                dockerGlobal.ip = data.ip;
+                dockerGlobal.port = data.port;
+                docker.update({
+                    _id: dockerGlobal._id
+                }, {
+                    $set: dockerGlobal
+                });
+            } else {
+                docker.insert(data);
+            }
+        },
+        'docker.addMachine'(data) {
+            if (Meteor.user().username !== 'admin') return;
+
+            if (data && data.address && data.port) {
+                data.machine = true;
                 docker.insert(data);
             }
         },
@@ -45,14 +68,26 @@ Meteor.startup(() => {
     if ( (docker.find({global: true}).fetch()).length === 0 ) {
         docker.insert({
             global: true,
-            ip: 'localhost',
-            timeout: 3,
+            ip: '',
             port: ''
         });
     }
 
     //Checking Docker
     Meteor.methods({
+        'docker.info'() {
+            let future = new Future();
+            let testDocker = getDockerInstance();
+            testDocker.info((err, data) => {
+                if (err) {
+                    future.throw('cannot connect to Docker');
+                    return;
+                } else {
+                    future.return(data);
+                }
+            });
+            return future.wait();
+        },
         'docker.listImage'() {
             let future = new Future();
             let testDocker = getDockerInstance();

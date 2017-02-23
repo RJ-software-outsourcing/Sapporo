@@ -15,9 +15,34 @@ let concurrentCount = [];
 const maximumInput = 10000;
 const maximumOutput = 10000;
 const maxMemory = 50; //MB
+const checkDockerInterval = 10000;
 
 Meteor.startup(() => {
     Meteor.methods({
+        'docker.checkAllMachines' () {
+            let machines = docker.find({machine: true}).fetch();
+            for (let index=0; index < machines.length; index++) {
+                let machine = machines[index];
+                machine.available = false;
+                docker.update({_id: machine._id}, {$set: machine});
+                let testDocker = new Dockerode({
+                    host: machine.address,
+                    port: machine.port
+                });
+                testDocker.info(Meteor.bindEnvironment((err, data) => {
+                    if (err) {
+                        machine.available = false;
+                    } else if (data) {
+                        machine.available = true;
+                    }
+                    docker.update({
+                        _id: machine._id
+                    }, {
+                        $set: machine
+                    });
+                }));
+            }
+        },
         'docker.add' (data) {
             if (Meteor.user().username !== 'admin') return;
             if (data._id) {
@@ -72,6 +97,8 @@ Meteor.startup(() => {
             port: ''
         });
     }
+    Meteor.call('docker.checkAllMachines');
+    Meteor.setInterval(Meteor.call.bind(this, 'docker.checkAllMachines'), checkDockerInterval);
 
     //Checking Docker
     Meteor.methods({

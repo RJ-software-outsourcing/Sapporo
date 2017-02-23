@@ -16,6 +16,8 @@ import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import DeleteIcon from 'material-ui/lib/svg-icons/action/delete';
 import IconButton from 'material-ui/lib/icon-button';
+import NotpassIcon from 'material-ui/lib/svg-icons/image/panorama-fish-eye';
+import DoneIcon from 'material-ui/lib/svg-icons/action/check-circle';
 
 import { docker, sapporo } from '../../api/db.js';
 import { commandForTest } from '../../library/docker.js';
@@ -178,7 +180,10 @@ class DockerConfig extends Component {
     renderDockerMachines () {
         return this.props._dockerMachines.map((machine, key) => (
             <ListItem key={key} primaryText={machine.address} secondaryText={machine.port} style={{borderBottom: '1px solid #DDD'}}
-                      onTouchTap={this.useDockerMachine.bind(this, machine)}  rightIconButton={this.deleteIcon(machine)} />
+                      onTouchTap={this.useDockerMachine.bind(this, machine)}  rightIconButton={this.deleteIcon(machine)}
+                      leftIcon={
+                          machine.available? <DoneIcon />: <NotpassIcon />
+                      } />
         ));
     }
     addDockerMachine () {
@@ -201,16 +206,37 @@ class DockerConfig extends Component {
             if (err) {
                 alert(err);
             } else {
-                Meteor.call('docker.info', (err, result) => {
+                Meteor.call('docker.info', (err) => {
                     if (err) {
                         alert(err);
                         alert('This docker machine is not working properly');
                     }  else {
-                        console.log(result);
-                        alert(`Good! Got response from ${machine.address}:${machine.port}`);
+                        //console.log(result);
+                        //alert(`Good! Got response from ${machine.address}:${machine.port}`);
+                        Meteor.call('docker.checkImage', (err, result)=>{
+                            if (err) {
+                                alert(err);
+                            } else {
+                                let notFound = false;
+                                for (var key in result) {
+                                    if (!result[key].find) {
+                                        notFound = true;
+                                        alert(`Image (${result[key].image}) is needed but not found on this Docker host`);
+                                    }
+                                }
+                                if (!notFound) {
+                                    alert(`Success! ${machine.address}:${machine.port} is reachable and has all images needed`);
+                                }
+                            }
+                        });
                     }
                 });
             }
+        });
+    }
+    checkAllMachines(){
+        Meteor.call('docker.checkAllMachines', ()=>{
+            return;
         });
     }
     render () {
@@ -230,7 +256,7 @@ class DockerConfig extends Component {
                         <ToolbarGroup float="left">
                             <ToolbarTitle text="Docker API Configuration" />
                             <RaisedButton label="Add" onTouchTap={this.addDockerMachine.bind(this)}/>
-                            <RaisedButton label="Check" secondary={true} />
+                            <RaisedButton label="Check" secondary={true} onTouchTap={this.checkAllMachines.bind()}/>
                         </ToolbarGroup >
                     </Toolbar>
                     <List>

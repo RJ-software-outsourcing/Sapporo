@@ -293,7 +293,7 @@ class ProblemEditor extends Component {
                     </div>
                 </div>
 
-                <Dialog title=" " actions={actions} modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%', height: '95vh'}}
+                <Dialog title=" " modal={false} autoScrollBodyContent={true} contentStyle={{width:'90%', maxWidth:'100%', height: '95vh'}}
                         open={this.state.runCode} autoDetectWindowHeight={false}>
                     {this.state.testResult?
                         <div>
@@ -312,6 +312,9 @@ class ProblemEditor extends Component {
                                     <TextField  floatingLabelText="Expected Output" type="text" style={{width: '100%'}}
                                                 value={this.state.testResult.expected} multiLine={true} />
                                 </div>
+                            </div>
+                            <div style={{width:'100%', float:'left'}}>
+                                <FlatButton label="Exit" secondary={true} onTouchTap={this.closeDialog.bind(this)} style={{left:'50%', marginLeft:'-50px'}}/>
                             </div>
                         </div>
                         :  <LinearProgress mode="indeterminate"/>

@@ -4,10 +4,12 @@
 
 const commandForImage = function (lang, timeout) {
     let stringArray = [];
+    /*
     if (!isNaN(timeout)&&(timeout > 0)) {
         stringArray.push('timeout');
         stringArray.push(timeout);
     }
+    */
     let preArg = [];
     let middleArg = [];
     let postArg = [];
@@ -75,10 +77,12 @@ const allInOneCommand = function (lang, code, input, timeout) {
     strArray.push('&&');
     strArray = strArray.concat(saveInputFile);
     strArray.push('&&');
+    /*
     if (!isNaN(timeout)&&(timeout > 0)) {
         strArray.push('timeout');
         strArray.push(timeout);
     }
+    */
     strArray.push(lang.executable);
     strArray = strArray.concat(preArg);
     strArray.push(lang.file);

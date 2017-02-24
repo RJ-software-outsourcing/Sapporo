@@ -58,7 +58,7 @@ Meteor.startup(() => {
     });
 });
 
-const updateProblem = function (userID, problemID, isCorrect, code) {
+const updateProblem = function (userID, problemID, isCorrect, code, submitTime) {
     let user = userData.findOne({userID: userID});
     if (!user) return null;
     if (!user[problemID]) {
@@ -69,7 +69,7 @@ const updateProblem = function (userID, problemID, isCorrect, code) {
     }
     user[problemID].result = isCorrect;
     user[problemID].log.push({
-        time: new Date(),
+        time: submitTime,
         code: code,
         result: isCorrect
     });

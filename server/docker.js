@@ -199,7 +199,7 @@ Meteor.startup(() => {
                 pass: false,
                 stdout: null
             };
-
+            let submitTime = new Date();
             const checkResult = (result)=>{
                 if (typeof(result) === 'string') {
                     return result;
@@ -235,7 +235,7 @@ Meteor.startup(() => {
                 }
                 output.stdout = result;
                 output.pass = success;
-                updateProblem(data.user._id, data.problemID, success, data.code);
+                updateProblem(data.user._id, data.problemID, success, data.code, submitTime);
             }
 
             logRequest((typeof(output.stdout) === 'string')? logReason.success:logReason.resultNotStr, output.stdout);
@@ -314,6 +314,7 @@ const dockerTest = function (dockerObj, lang) {
         throw new Meteor.Error(503, 'Server reached maximum executions. Please try again later.');
     }
     let test = allInOneCommand(lang, lang.helloworld, lang.testInput, getTimeOutValue(false));
+
     let result = dockerRun(dockerObj, lang.image, test);
     releaseConcurrent(uniqueID);
     return result;

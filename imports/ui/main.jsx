@@ -44,7 +44,7 @@ class Main extends Component {
             prompt: false,
             promptMessage: '',
             mailCount: 0,
-            gameEnd: false
+            gameEnd: true
         };
     }
     navOpen () {
@@ -137,6 +137,7 @@ class Main extends Component {
                 Meteor.user()? this.goPageWrap('dashboard'):this.goPageWrap('login');
                 this.firePrompt('Time\'s Up!');
             } else if ((this.props._timer.coding) && (this.state.gameEnd)) {
+                this.firePrompt('Game On!');
                 this.setState({
                     gameEnd: false
                 });

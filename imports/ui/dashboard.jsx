@@ -52,7 +52,13 @@ const customTileStyle = {
 const getTimerTile = function (timer) {
 
     return(
-        <div style={customTileStyle}>
+        <div style={{
+                fontSize: '30px',
+                height: 'inherit',
+                textAlign:'center',
+                fontWeight: 'bold',
+                color: 'white',
+            }}>
             {timer}
         </div>
     );

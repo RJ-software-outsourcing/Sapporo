@@ -5,6 +5,12 @@ import { createContainer } from 'meteor/react-meteor-data';
 import { timer } from '../api/db.js';
 import { timeSchedule } from '../library/timeLib.js';
 
+const timerStyle = {
+    height: '60px',
+    position: 'relative',
+    top: '50%',
+    marginTop: '-30px'
+};
 
 class Timer extends Component {
 
@@ -18,9 +24,23 @@ class Timer extends Component {
                     let hr = Math.floor(schedule.time.min/60);
                     let min = schedule.time.min % 60;
                     if (schedule.start) {
-                        return hr + 'h'+ min + 'm' + schedule.time.sec + 's';
+                        return (
+                            <div style={timerStyle}>
+                                <span>
+                                    Game On! Time Left:<br/>
+                                    {`${hr}hr ${min}m ${schedule.time.sec}s`}
+                                </span>
+                            </div>
+                        );
                     } else {
-                        return hr + 'h'+ min + 'm' + schedule.time.sec + 's'; // Will come up with something later
+                        return (
+                            <div style={timerStyle}>
+                                <span>
+                                    Game Will Start in<br/>
+                                    {`${hr}hr ${min}m ${schedule.time.sec}s`}
+                                </span>
+                            </div>
+                        );
                     }
                 }
             } else {
@@ -29,9 +49,7 @@ class Timer extends Component {
         }
     }
     render () {
-        return (
-            <span>{this.display()}</span>
-        );
+        return this.display();
     }
 }
 

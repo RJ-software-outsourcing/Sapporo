@@ -3,7 +3,7 @@ All output redirects to dev/null
 
 
 cmd Example
-                    simu_helper.sh <user number> <url> <lanTpye> <time>
+                    simu_helper.sh \<user number\> \<url\> \<lanTpye\> \<time\>
 
-  meteor-down simu_sapporo_user.js <user name>   <url> <lanTpye> <time>
+  meteor-down simu_sapporo_user.js \<user name\>   \<url\> \<lanTpye\> \<time\>
 

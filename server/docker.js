@@ -12,10 +12,38 @@ import stream from 'stream';
 import {updateProblem} from './userData.js';
 
 let concurrentCount = [];
+const maximumInput = 10000;
+const maximumOutput = 10000;
+const maxMemory = 50; //MB
+const checkDockerInterval = 10000;
 
 Meteor.startup(() => {
     Meteor.methods({
-        'docker.add'(data) {
+        'docker.checkAllMachines' () {
+            let machines = docker.find({machine: true}).fetch();
+            for (let index=0; index < machines.length; index++) {
+                let machine = machines[index];
+                machine.available = false;
+                docker.update({_id: machine._id}, {$set: machine});
+                let testDocker = new Dockerode({
+                    host: machine.address,
+                    port: machine.port
+                });
+                testDocker.info(Meteor.bindEnvironment((err, data) => {
+                    if (err) {
+                        machine.available = false;
+                    } else if (data) {
+                        machine.available = true;
+                    }
+                    docker.update({
+                        _id: machine._id
+                    }, {
+                        $set: machine
+                    });
+                }));
+            }
+        },
+        'docker.add' (data) {
             if (Meteor.user().username !== 'admin') return;
             if (data._id) {
                 docker.update({
@@ -24,6 +52,29 @@ Meteor.startup(() => {
                     $set: data
                 });
             } else {
+                docker.insert(data);
+            }
+        },
+        'docker.useMachine'(data) {
+            if (Meteor.user().username !== 'admin') return;
+            let dockerGlobal = docker.findOne({global:true});
+            if (dockerGlobal) {
+                dockerGlobal.ip = data.ip;
+                dockerGlobal.port = data.port;
+                docker.update({
+                    _id: dockerGlobal._id
+                }, {
+                    $set: dockerGlobal
+                });
+            } else {
+                docker.insert(data);
+            }
+        },
+        'docker.addMachine'(data) {
+            if (Meteor.user().username !== 'admin') return;
+
+            if (data && data.address && data.port) {
+                data.machine = true;
                 docker.insert(data);
             }
         },
@@ -42,14 +93,28 @@ Meteor.startup(() => {
     if ( (docker.find({global: true}).fetch()).length === 0 ) {
         docker.insert({
             global: true,
-            ip: 'localhost',
-            timeout: 3,
+            ip: '',
             port: ''
         });
     }
+    Meteor.call('docker.checkAllMachines');
+    Meteor.setInterval(Meteor.call.bind(this, 'docker.checkAllMachines'), checkDockerInterval);
 
     //Checking Docker
     Meteor.methods({
+        'docker.info'() {
+            let future = new Future();
+            let testDocker = getDockerInstance();
+            testDocker.info((err, data) => {
+                if (err) {
+                    future.throw('cannot connect to Docker');
+                    return;
+                } else {
+                    future.return(data);
+                }
+            });
+            return future.wait();
+        },
         'docker.listImage'() {
             let future = new Future();
             let testDocker = getDockerInstance();
@@ -111,6 +176,11 @@ Meteor.startup(() => {
             return result;
         },
         'docker.submitCode'(data, isTest){
+            //console.log(data.code.length);
+            if (!data.code || data.code.length > maximumInput) {
+                logRequest(logReason.error, 'Input too large');
+                throw new Meteor.Error(500, 'Input too large');
+            }
             //let dockerConfig = docker.findOne({docker: true});
             let dockerLangs = docker.find({languages: true}).fetch();
             let problemData = problem.findOne({_id:data.problemID});
@@ -130,12 +200,25 @@ Meteor.startup(() => {
                 stdout: null
             };
 
+            const checkResult = (result)=>{
+                if (typeof(result) === 'string') {
+                    return result;
+                } else {
+                    if (result instanceof Function) {
+                        result();
+                    } else {
+                        throw new Meteor.Error(500, 'Unexpected execution result');
+                    }
+                }
+            };
+
             if (isTest) {
                 let testInput = problemData.testInput;
-                output.stdout = userSubmit(_docker, data, langObj, testInput);
+                output.stdout = checkResult(userSubmit(_docker, data, langObj, testInput));
                 output.pass   = resultCompare(output.stdout, problemData.testOutput);
                 output.expected = problemData.testOutput;
                 output.testInput = problemData.testInput;
+
             } else {
                 if (!((timer.findOne({timeSync: true})).coding)) {
                     logRequest(logReason.gameStop);
@@ -144,7 +227,7 @@ Meteor.startup(() => {
                 let success = true;
                 let result = null;
                 for (key in problemData.verfication) {
-                    result = userSubmit(_docker, data, langObj, problemData.verfication[key].input);
+                    result = checkResult(userSubmit(_docker, data, langObj, problemData.verfication[key].input));
                     if (!resultCompare(result, problemData.verfication[key].output)) {
                         success = false;
                         break;
@@ -165,7 +248,12 @@ Meteor.startup(() => {
             let lang = docker.findOne({_id:data.langType});
             let _docker = getDockerInstance();
             let test_result = userSubmit(_docker, data, lang, data.input);
-            logRequest((typeof(test_result) === 'string')? logReason.success:logReason.resultNotStr, test_result);
+            if (test_result instanceof Function) {
+                test_result();
+            } else {
+                logRequest((typeof(test_result) === 'string')? logReason.success:logReason.resultNotStr, test_result);
+            }
+
             return test_result;
         }
     });
@@ -249,18 +337,18 @@ const dockerRun = function (dockerObj, image, command) {
     let output = '';
     let err    = '';
     let tooLong = false;
-    stdout._write = function (chunk, encoding, done) {
-        if (output.length < 100000) {
+    stdout._write = Meteor.bindEnvironment((chunk, encoding, done) => {
+        if (output.length < maximumOutput) {
             output = output + chunk.toString();
         } else {
             tooLong = true;
         }
         done();
-    };
-    stderr._write = function (chunk, encoding, done) {
+    });
+    stderr._write = Meteor.bindEnvironment((chunk, encoding, done) => {
         err = err + chunk.toString();
         done();
-    };
+    });
     let inputCommand = '';
     for (var key in command) {
         var space = '';
@@ -271,32 +359,44 @@ const dockerRun = function (dockerObj, image, command) {
     // Wrap callback with Meteor.bindEnvironment().
     // This way the callback will be wrapped within a new fiber and Meteor will be happy with it.
     let dockerCallback = Meteor.bindEnvironment((error, data, container)=>{
+
+        containerCleanUp(container);
         if (err !== '') {
             future.return(err);
         } else if (error) {
             logRequest(logReason.error, error);
-            throw new Meteor.Error(500, 'Error: Failed when running container');
+            future.return(()=>{
+                throw new Meteor.Error(500, 'Failed when running container, could be timeout or internal error');
+            });
         } else if (tooLong) {
-            future.return('Reject: Output exceeds maximum length');
+            future.return(()=>{
+                throw new Meteor.Error(500, `Rejected by server: Output is too long (Maximum Output is ${maximumOutput} characters)`);
+            });
         } else {
             future.return(output);
         }
         //let container = dockerObj.getContainer(containerID);
         //docker rm `docker ps --no-trunc -aq`
-        containerCleanUp(container);
+
     }, (e)=>{
+        console.log(e);
         logRequest(logReason.error, e);
-        throw new Meteor.Error(500, 'Error: Failed when running Docker callback');
+        future.return(()=>{
+            throw new Meteor.Error(500, 'Error: Failed when running Docker callback');
+        });
     });
+    try {
+        dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false, Memory: maxMemory * 1024 * 1024}, {}, dockerCallback);
+    } catch (e) {
+        console.log(e);
+    }
 
-
-    dockerObj.run(image, ['/bin/bash', '-c', inputCommand], [stdout, stderr], {Tty:false}, dockerCallback);
 
     // We can't use wrapAsync because it only returns the second parameter. We need the third one as well.
     return future.wait();
 };
 
-const containerCleanUp = function (container) {
+const containerCleanUp = Meteor.bindEnvironment(function (container) {
     let cleanUpCallback = Meteor.bindEnvironment((err)=>{
         if (err) {
             containerCleanUp(container);
@@ -310,11 +410,20 @@ const containerCleanUp = function (container) {
             if (!state.Running) {
                 container.remove(cleanUpCallback);
             } else {
-                setTimeout(()=> {
-                    containerCleanUp(container);
-                }, 500);
+                if (container.stop) {
+                    container.stop(Meteor.bindEnvironment(()=>{
+                        containerCleanUp(container);
+                    }));
+                } else {
+                    setTimeout(()=> {
+                        containerCleanUp(container);
+                    }, 500);
+                }
             }
         }
     });
-    container.inspect(inspectCallback);
-};
+    if (container && container.inspect) {
+        container.inspect(inspectCallback);
+    }
+
+});

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random'
+import { Random } from 'meteor/random';
 import { createContainer } from 'meteor/react-meteor-data';
 import { batchAccount } from '../../api/db.js';
 import {goPage} from '../goPage.js';

@@ -29,6 +29,7 @@ import PowerIcon from 'material-ui/lib/svg-icons/notification/power';
 import AccountIcon from 'material-ui/lib/svg-icons/action/supervisor-account';
 import MonitorIcon from 'material-ui/lib/svg-icons/action/trending-up';
 import FeedbackIcon from 'material-ui/lib/svg-icons/action/feedback';
+import Avatar from 'material-ui/lib/avatar';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
@@ -41,6 +42,7 @@ class Main extends Component {
         this.state = {
             open : false,
             prompt: false,
+            promptMessage: '',
             mailCount: 0,
             gameEnd: false
         };
@@ -84,11 +86,13 @@ class Main extends Component {
                     currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
                 }
                 let icon = <NotpassIcon />;
+                let color = 'grey';
                 if (isUserPassedProblem(currentUser, problem._id)) {
                     icon = <DoneIcon />;
+                    color = 'green';
                 }
                 return (
-                    <MenuItem key={key} leftIcon={icon} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
+                    <MenuItem key={key} leftIcon={<Avatar icon={icon} color={color} size={30} style={{margin: '5'}}  backgroundColor='transparent'/>} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
                               primaryText={problem.title} secondaryText={problem.score}/>
                 );
             }
@@ -97,6 +101,12 @@ class Main extends Component {
     unreadMailCount () {
         let count = getNumberOfUnread(this.props._liveFeed);
         return (count === 0)? '':String(count);
+    }
+    firePrompt (message) {
+        this.setState({
+            promptMessage: message,
+            prompt: true
+        });
     }
     goPageWrap (page, data) {
         goPage(page, data);
@@ -110,11 +120,13 @@ class Main extends Component {
             //this.goPageWrap('login');
         }
         if (this.props._liveFeed.length !== this.state.mailCount) {
-            let showPrompt = (this.props._liveFeed.length > this.state.mailCount)? true:false;
+            let newMail = (this.props._liveFeed.length > this.state.mailCount)? true:false;
             this.setState({
-                mailCount: this.props._liveFeed.length,
-                prompt: showPrompt
+                mailCount: this.props._liveFeed.length
             });
+            if (newMail) {
+                this.firePrompt('You\'ve Got New Mail');
+            }
         }
         // Switch to Dashboard when time's up
         if (this.props._timer) {
@@ -123,7 +135,7 @@ class Main extends Component {
                     gameEnd: true
                 });
                 Meteor.user()? this.goPageWrap('dashboard'):this.goPageWrap('login');
-                //alert('Time\'s up!');
+                this.firePrompt('Time\'s Up!');
             } else if ((this.props._timer.coding) && (this.state.gameEnd)) {
                 this.setState({
                     gameEnd: false
@@ -131,10 +143,15 @@ class Main extends Component {
             }
         }
     }
-    closePrompt () {
-        this.setState({
-            prompt: false
-        });
+    closePrompt (reason) {
+        if (reason === 'clickaway') {
+            return;
+        } else {
+            this.setState({
+                prompt: false,
+                promptMessage: ''
+            });
+        }
     }
     renderAdmin () {
         if (Meteor.user() && Meteor.user().username === 'admin') {
@@ -159,7 +176,7 @@ class Main extends Component {
             <div>
                 <AppBar title={this.props._sapporo? this.props._sapporo.title:''} onLeftIconButtonTouchTap={this.navOpen.bind(this)}>
                 </AppBar>
-                <Snackbar open={this.state.prompt} message="You've Got New Mail" autoHideDuration={4000} onRequestClose={this.closePrompt.bind(this)}/>
+                <Snackbar open={this.state.prompt} message={this.state.promptMessage} onRequestClose={this.closePrompt.bind(this)} onActionTouchTap={this.closePrompt.bind(this)} action='OK'/>
                 <LeftNav  docked={false} open={this.state.open} width={350} onRequestChange={this.navClose.bind(this)}>
                     <MenuItem leftIcon={<DashboardIcon />} onTouchTap={this.goPageWrap.bind(this, 'dashboard')}>Dashboard</MenuItem>
                     <MenuItem leftIcon={<MailIcon />} onTouchTap={this.goPageWrap.bind(this, 'mailbox')} secondaryText={this.unreadMailCount()}>Inbox</MenuItem>

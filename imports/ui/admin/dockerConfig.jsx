@@ -16,6 +16,8 @@ import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import DeleteIcon from 'material-ui/lib/svg-icons/action/delete';
 import IconButton from 'material-ui/lib/icon-button';
+import NotpassIcon from 'material-ui/lib/svg-icons/image/panorama-fish-eye';
+import DoneIcon from 'material-ui/lib/svg-icons/action/check-circle';
 
 import { docker, sapporo } from '../../api/db.js';
 import { commandForTest } from '../../library/docker.js';
@@ -34,12 +36,7 @@ class DockerConfig extends Component {
         this.state = {
             dialogOpen: false,
             selectLang: null,
-            runningTest: false,
-            _dockerGlobal: {
-                ip:'',
-                port:'',
-                global: true
-            }
+            runningTest: false
         };
     }
     closeAddDialog () {
@@ -74,7 +71,7 @@ class DockerConfig extends Component {
             });
         }
     }
-    removeLang (lang) {
+    remove (lang) {
         Meteor.call('docker.remove', lang, (err) => {
             if (err) {
                 alert(err);
@@ -92,9 +89,9 @@ class DockerConfig extends Component {
             <MenuItem key={key} value={lang} primaryText={lang}></MenuItem>
         ));
     }
-    deleteIcon (lang) {
+    deleteIcon (item) {
         return (
-            <IconButton touch={true} tooltip="delete" tooltipPosition="bottom-left" onTouchTap={this.removeLang.bind(this, lang)}>
+            <IconButton touch={true} tooltip="delete" tooltipPosition="bottom-left" onTouchTap={this.remove.bind(this, item)}>
                 <DeleteIcon />
             </IconButton>
         );
@@ -163,7 +160,7 @@ class DockerConfig extends Component {
     }
     checkDockerHost () {
         let obj = this.state._dockerGlobal;
-        Meteor.call('docker.add', obj, (err) => {
+        Meteor.call('docker.useMachine', obj, (err) => {
             if (err) {
                 alert(err);
             } else {
@@ -177,13 +174,70 @@ class DockerConfig extends Component {
             }
         });
     }
-    componentWillUpdate (nextProp) {
-        if ((nextProp._dockerGlobal.ip !== this.state._dockerGlobal.ip) ||
-            (nextProp._dockerGlobal.port !== this.state._dockerGlobal.port)) {
-            this.setState({
-                _dockerGlobal: nextProp._dockerGlobal
-            });
-        }
+    componentWillUpdate () {
+
+    }
+    renderDockerMachines () {
+        return this.props._dockerMachines.map((machine, key) => (
+            <ListItem key={key} primaryText={machine.address} secondaryText={machine.port} style={{borderBottom: '1px solid #DDD'}}
+                      onTouchTap={this.useDockerMachine.bind(this, machine)}  rightIconButton={this.deleteIcon(machine)}
+                      leftIcon={
+                          machine.available? <DoneIcon />: <NotpassIcon />
+                      } />
+        ));
+    }
+    addDockerMachine () {
+        let address = prompt('Please enter Docker API address (without port)', '');
+        let port = prompt(`Please enter port for ${address}`);
+        Meteor.call('docker.addMachine', {
+            address: address,
+            port: port
+        }, (err)=>{
+            if (err) {
+                alert(err);
+            }
+        });
+    }
+    useDockerMachine (machine) {
+        Meteor.call('docker.useMachine', {
+            ip: machine.address,
+            port: machine.port
+        }, (err) => {
+            if (err) {
+                alert(err);
+            } else {
+                Meteor.call('docker.info', (err) => {
+                    if (err) {
+                        alert(err);
+                        alert('This docker machine is not working properly');
+                    }  else {
+                        //console.log(result);
+                        //alert(`Good! Got response from ${machine.address}:${machine.port}`);
+                        Meteor.call('docker.checkImage', (err, result)=>{
+                            if (err) {
+                                alert(err);
+                            } else {
+                                let notFound = false;
+                                for (var key in result) {
+                                    if (!result[key].find) {
+                                        notFound = true;
+                                        alert(`Image (${result[key].image}) is needed but not found on this Docker host`);
+                                    }
+                                }
+                                if (!notFound) {
+                                    alert(`Success! ${machine.address}:${machine.port} is reachable and has all images needed`);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    checkAllMachines(){
+        Meteor.call('docker.checkAllMachines', ()=>{
+            return;
+        });
     }
     render () {
         const actions = [
@@ -193,12 +247,23 @@ class DockerConfig extends Component {
         return (
             <div>
                 <div>
-                    <TextField type="text" id="IP address"  floatingLabelText="IP address"
-                               value={this.state._dockerGlobal.ip} onChange={this.updateGlobal.bind(this, 'ip')}/>
-                    <TextField type="text" id="port" floatingLabelText="Port number"
-                               value={this.state._dockerGlobal.port} onChange={this.updateGlobal.bind(this, 'port')}/>
-                           <RaisedButton label="Update and Check Docker Connection" primary={true} onTouchTap={this.checkDockerHost.bind(this)}/>
+                    {this.props._dockerGlobal?
+                        <span>Using: {this.props._dockerGlobal.ip}:{this.props._dockerGlobal.port}</span>
+                        :''
+                    }
+
+                    <Toolbar style={{marginTop:'30px'}}>
+                        <ToolbarGroup float="left">
+                            <ToolbarTitle text="Docker API Configuration" />
+                            <RaisedButton label="Add" onTouchTap={this.addDockerMachine.bind(this)}/>
+                            <RaisedButton label="Check" secondary={true} onTouchTap={this.checkAllMachines.bind()}/>
+                        </ToolbarGroup >
+                    </Toolbar>
+                    <List>
+                        {this.renderDockerMachines()}
+                    </List>
                 </div>
+
                 <div>
                     <Toolbar style={{marginTop:'30px'}}>
                         <ToolbarGroup float="left">
@@ -238,7 +303,7 @@ class DockerConfig extends Component {
                             <TextField type="text" value={this.state.selectLang.testInput} floatingLabelText="STD input for test" onChange={this.updateLangState.bind(this, 'testInput')} multiLine={true} style={{width:'100%'}}/>
                             <TextField type="text" value={this.state.selectLang.helloworld} floatingLabelText="Testing Script" onChange={this.updateLangState.bind(this, 'helloworld')} multiLine={true} style={{width:'100%'}}/>
                         </div>
-
+                        <div>{this.state.selectLang._id}</div>
                     </Dialog>
                 :''
                 }
@@ -253,7 +318,8 @@ class DockerConfig extends Component {
 DockerConfig.propTypes = {
     _dockerGlobal: PropTypes.object,
     _sapporo: PropTypes.object,
-    _dockerLangs:  PropTypes.array.isRequired
+    _dockerLangs:  PropTypes.array.isRequired,
+    _dockerMachines:  PropTypes.array.isRequired
 };
 
 export default createContainer(() => {
@@ -262,6 +328,7 @@ export default createContainer(() => {
     return {
         _dockerGlobal: docker.findOne({global: true}),
         _sapporo: sapporo.findOne({sapporo: true}),
-        _dockerLangs:  docker.find({languages: true}).fetch()
+        _dockerLangs:  docker.find({languages: true}).fetch(),
+        _dockerMachines: docker.find({machine: true}).fetch()
     };
 }, DockerConfig);

@@ -7,14 +7,12 @@ if (!delaytime) {
   delaytime=3000
 }
 
-
-console.log(user)
-console.log(url)
-console.log(lantype)
-console.log(delaytime)
+function logMessage(msg){
+  var fs = require('fs');
+  fs.appendFileSync( "./" + user, msg, 'utf8'  ); 
+}
 
 meteorDown.init(function (Meteor) {
-  console.log( user +  " submit ***********")
 
   Meteor.call('docker.performanceTest',
     { 
@@ -24,18 +22,15 @@ meteorDown.init(function (Meteor) {
     }, 
     function (error, result) {
 
-      if(!error){
-        console.log("\trequest succeful");
-      }else{
-        console.log("\t" + error)
+      if(error){
+        logMessage("Error with Meteor\n");
       }
-      console.log("\t"+result);
-
-      console.log(new Date());
       
+      if(  result.indexOf("submit") < 0 ){
+        logMessage("Error " + result);
+      }     
+
       setTimeout(function(){
-        console.log(new Date());
-        console.log("User leave")
         Meteor.kill();
       }, delaytime);
     });

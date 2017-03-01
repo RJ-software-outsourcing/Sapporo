@@ -19,37 +19,37 @@ class Timer extends Component {
             let schedule = timeSchedule(this.props._timer.systemTime, this.props._timer.start, this.props._timer.end);
             if (schedule) {
                 if (schedule.start && schedule.end) {
-                    return 'End';
+                    return <span>End</span>;
                 } else {
                     let hr = Math.floor(schedule.time.min/60);
                     let min = schedule.time.min % 60;
                     if (schedule.start) {
                         return (
-                            <div style={timerStyle}>
                                 <span>
                                     Game On! Time Left:<br/>
                                     {`${hr}hr ${min}m ${schedule.time.sec}s`}
                                 </span>
-                            </div>
                         );
                     } else {
                         return (
-                            <div style={timerStyle}>
                                 <span>
                                     Game Will Start in<br/>
                                     {`${hr}hr ${min}m ${schedule.time.sec}s`}
                                 </span>
-                            </div>
                         );
                     }
                 }
             } else {
-                return 'No Config';
+                return <span>No Config</span>;
             }
         }
     }
     render () {
-        return this.display();
+        return (
+            <div style={timerStyle}>
+                {this.display()}
+            </div>
+        );
     }
 }
 

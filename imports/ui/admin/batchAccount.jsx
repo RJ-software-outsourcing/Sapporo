@@ -26,7 +26,7 @@ class BatchAccount extends Component {
     batchCreate () {
         for (var key =0; key < this.state.batchTotal; key++) {
             let username = this.state.accountPrefix + '_' + key.toString();
-            let password =  Random.id();
+            let password =  Random.id(6);
             Meteor.call('user.batchCreate', username, password ,function (err) {
                 if (err) {
                     alert(username + ': ' + err.reason);

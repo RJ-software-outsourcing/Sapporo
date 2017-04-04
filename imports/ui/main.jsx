@@ -206,12 +206,18 @@ Main.propTypes = {
     _sapporo: PropTypes.object
 };
 
-export default createContainer(() => {
-    Meteor.subscribe('problem');
+export default createContainer(() => { 
+    
     Meteor.subscribe('userData');
     Meteor.subscribe('timer');
     Meteor.subscribe('liveFeed');
     Meteor.subscribe('sapporo');
+    
+    // Pass coding to force resubscribing if coding
+    // status changed.
+    var db_time = timer.findOne({timeSync: true});
+    Meteor.subscribe('problem', (db_time && db_time.coding));
+
     return {
         currentUser: Meteor.user(),
         _userData: userData.find({}).fetch(),

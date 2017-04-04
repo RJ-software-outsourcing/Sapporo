@@ -23,7 +23,7 @@ import PassIcon from 'material-ui/lib/svg-icons/navigation/check';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import IconButton from 'material-ui/lib/icon-button';
 
-import { problem, userData, liveFeed} from '../api/db.js';
+import { problem, userData, liveFeed, timer} from '../api/db.js';
 import { getTotalScore, getUserTotalScore, getCurrentUserData, getUserPassedProblem } from '../library/score_lib.js';
 import { setMailAsRead } from '../library/mail.js';
 
@@ -250,9 +250,15 @@ Dashboard.propTypes = {
 };
 
 export default createContainer(() => {
+    Meteor.subscribe('timer');
     Meteor.subscribe('userData');
-    Meteor.subscribe('problem');
     Meteor.subscribe('liveFeed');
+    
+    // Pass coding to force resubscribing if coding
+    // status changed.
+    var db_time = timer.findOne({timeSync: true});
+    Meteor.subscribe('problem', (db_time && db_time.coding));
+
     return {
         currentUser: Meteor.user(),
         _userData: userData.find({}).fetch(),

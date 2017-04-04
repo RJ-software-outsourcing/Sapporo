@@ -5,10 +5,8 @@ import {timer} from '../imports/api/db.js';
 import {problem} from '../imports/api/db.js';
 import { isCoding } from '../imports/library/timeLib.js';
 
-let problemPublished = false;
-
 function updateTime () {
-    let _time = new Date;
+    let _time = new Date();
     let db_time = timer.findOne({timeSync: true});
     let coding = isCoding(_time, db_time.start, db_time.end);
     timer.update({
@@ -19,30 +17,6 @@ function updateTime () {
             coding: coding
         }
     });
-    if (!problemPublished && coding) {
-        Meteor.publish('problem', function dockerPublication() {
-            var user = Meteor.users.findOne(this.userId);
-            if (!user) {
-                return;
-            } else if (user.username && (user.username === 'admin')) {
-                return problem.find();
-            } else {
-                return problem.find({}, {
-                    fields: {
-                        description: 1,
-                        exampleInput: 1,
-                        exampleOutput: 1,
-                        images: 1,
-                        score: 1,
-                        testInput: 1,
-                        testOutput: 1,
-                        title: 1
-                    }
-                });
-            }
-        });
-        problemPublished = true;
-    }
     Meteor.setTimeout(updateTime, 1000);
 }
 

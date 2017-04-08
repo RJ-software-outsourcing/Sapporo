@@ -237,6 +237,21 @@ class System extends Component {
             this.toggleLoginConfigDialog('codewarsPassportDialog');
         });
     }
+    clearSurveyAndContest () {
+        if (confirm('Are you sure?')) {
+            Meteor.call('survey.clear', (err) => {
+                if (err) {
+                    alert(err);
+                }
+                Meteor.call('clearUserData', (err) => {
+                    if (err) {
+                        alert(err);
+                    }
+                });
+            });
+
+        }
+    }
     componentDidUpdate () {
         if (!updateLock) this.updateSystemData();
     }
@@ -293,6 +308,10 @@ class System extends Component {
                 </div>
                 <div style={style}>
                     <RaisedButton label="Submit"  primary={true} onTouchTap={this.submit.bind(this)}/>
+                </div>
+
+                <div style={style}>
+                    <RaisedButton label="Clear Survey and Contest Data"  secondary={true} onTouchTap={this.clearSurveyAndContest.bind(this)}/>
                 </div>
 
                 <Dialog title="Facebook Login Configuration" modal={false} open={this.state.facebookLoginDialog} actions={facebookLoginAction}>

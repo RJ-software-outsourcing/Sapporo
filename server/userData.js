@@ -54,6 +54,11 @@ Meteor.startup(() => {
                     $ne: 'admin'
                 }
             });
+        },
+        'clearUserData'() {
+            userData.remove({});
+            // Force logout everybody. A clean userdata will be created when they login again
+            Meteor.users.update({}, {$set : { 'services.resume.loginTokens' : [] }}, {multi:true});
         }
     });
 });

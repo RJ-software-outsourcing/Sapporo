@@ -1,4 +1,3 @@
-import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 
 import { survey } from '../imports/api/db.js';
@@ -25,8 +24,11 @@ Meteor.startup(() => {
                 });
             }
         },
-        'survey.search'(user){
+        'survey.search'(user) {
             return survey.find({user:user}).fetch();
+        },
+        'survey.clear'() {
+            return survey.remove({});
         }
     });
 });

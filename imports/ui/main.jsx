@@ -44,7 +44,8 @@ class Main extends Component {
             prompt: false,
             promptMessage: '',
             mailCount: 0,
-            gameEnd: true
+            gameEnd: true,
+            inLogin: false
         };
     }
     navOpen () {
@@ -109,15 +110,19 @@ class Main extends Component {
         });
     }
     goPageWrap (page, data) {
-        goPage(page, data);
-        this.navClose();
+        this.setState({
+            inLogin: (page === 'login')? true : false
+        }, () => {
+            goPage(page, data);
+            this.navClose();
+        });
     }
     componentDidMount () {
-        goPage('login');
+        this.goPageWrap('login');
     }
     componentDidUpdate () {
-        if (!Meteor.user()) {
-            //this.goPageWrap('login');
+        if (!Meteor.user() && !this.state.inLogin) {
+            this.logout();
         }
         if (this.props._liveFeed.length !== this.state.mailCount) {
             let newMail = (this.props._liveFeed.length > this.state.mailCount)? true:false;
@@ -206,13 +211,13 @@ Main.propTypes = {
     _sapporo: PropTypes.object
 };
 
-export default createContainer(() => { 
-    
+export default createContainer(() => {
+
     Meteor.subscribe('userData');
     Meteor.subscribe('timer');
     Meteor.subscribe('liveFeed');
     Meteor.subscribe('sapporo');
-    
+
     // Pass coding to force resubscribing if coding
     // status changed.
     var db_time = timer.findOne({timeSync: true});

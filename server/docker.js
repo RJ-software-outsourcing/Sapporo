@@ -11,6 +11,7 @@ import stream from 'stream';
 
 import {updateProblem} from './userData.js';
 
+let currentDockerIdx = 0;
 let concurrentCount = [];
 const maximumInput = 10000;
 const maximumOutput = 10000;
@@ -23,8 +24,11 @@ Meteor.startup(() => {
             let machines = docker.find({machine: true}).fetch();
             for (let index=0; index < machines.length; index++) {
                 let machine = machines[index];
-                machine.available = false;
-                docker.update({_id: machine._id}, {$set: machine});
+
+                // Might get nothing from DB if we set them to false. 
+                //
+                // machine.available = false;
+                // docker.update({_id: machine._id}, {$set: machine});
                 let testDocker = new Dockerode({
                     host: machine.address,
                     port: machine.port
@@ -55,21 +59,22 @@ Meteor.startup(() => {
                 docker.insert(data);
             }
         },
-        'docker.useMachine'(data) {
-            if (Meteor.user().username !== 'admin') return;
-            let dockerGlobal = docker.findOne({global:true});
-            if (dockerGlobal) {
-                dockerGlobal.ip = data.ip;
-                dockerGlobal.port = data.port;
-                docker.update({
-                    _id: dockerGlobal._id
-                }, {
-                    $set: dockerGlobal
-                });
-            } else {
-                docker.insert(data);
-            }
-        },
+        // We don't use this now.
+        // 'docker.useMachine'(data) {
+        //     if (Meteor.user().username !== 'admin') return;
+        //     let dockerGlobal = docker.findOne({global:true});
+        //     if (dockerGlobal) {
+        //         dockerGlobal.ip = data.ip;
+        //         dockerGlobal.port = data.port;
+        //         docker.update({
+        //             _id: dockerGlobal._id
+        //         }, {
+        //             $set: dockerGlobal
+        //         });
+        //     } else {
+        //         docker.insert(data);
+        //     }
+        // },
         'docker.addMachine'(data) {
             if (Meteor.user().username !== 'admin') return;
 
@@ -90,21 +95,17 @@ Meteor.startup(() => {
         }
     });
 
-    if ( (docker.find({global: true}).fetch()).length === 0 ) {
-        docker.insert({
-            global: true,
-            ip: '',
-            port: ''
-        });
-    }
     Meteor.call('docker.checkAllMachines');
     Meteor.setInterval(Meteor.call.bind(this, 'docker.checkAllMachines'), checkDockerInterval);
 
     //Checking Docker
     Meteor.methods({
-        'docker.info'() {
+        'docker.info'(dockerConfig) {
             let future = new Future();
-            let testDocker = getDockerInstance();
+            let testDocker = new Dockerode({
+                host: dockerConfig.address,
+                port: dockerConfig.port
+            });
             testDocker.info((err, data) => {
                 if (err) {
                     future.throw('cannot connect to Docker');
@@ -115,27 +116,35 @@ Meteor.startup(() => {
             });
             return future.wait();
         },
-        'docker.listImage'() {
+        // 'docker.listImage'() {
+        //     let future = new Future();
+        //     let testDocker = getDockerInstance();
+        //     testDocker.listImages({}, (err, data) => {
+        //         if (err) {
+        //             future.throw('cannot connect to Docker');
+        //             return;
+        //         } else {
+        //             future.return(data);
+        //         }
+        //     });
+        //     return future.wait();
+        // },
+        'docker.checkImage'(dockerConfig) {
             let future = new Future();
-            let testDocker = getDockerInstance();
-            testDocker.listImages({}, (err, data) => {
-                if (err) {
-                    future.throw('cannot connect to Docker');
-                    return;
-                } else {
-                    future.return(data);
-                }
-            });
-            return future.wait();
-        },
-        'docker.checkImage'() {
-            let future = new Future();
-            //let dockerConfig = docker.findOne({global: true});
+            let dockerMachine = docker.findOne({_id: dockerConfig._id});
             let dockerLangs = docker.find({languages: true}).fetch();
             if (dockerLangs.length === 0) {
                 throw new Meteor.Error(500, 'No Programming Language Configuration');
             }
-            let testDocker = getDockerInstance();
+            if (!dockerMachine) {
+                throw new Meteor.Error(500, 'Docker machine not found');
+            }
+            let testDocker = new Dockerode({
+                host: dockerConfig.address,
+                port: dockerConfig.port,
+                timeout: getTimeOutValue(true) + 3000
+            });
+
             testDocker.listImages({}, (err, data) => {
                 if (err) {
                     future.throw('cannot connect to Docker');
@@ -162,8 +171,7 @@ Meteor.startup(() => {
             });
             return future.wait();
         },
-        'docker.testImage'(){
-            //let dockerConfig = docker.findOne({global: true});
+        'docker.testLang'(){
             let dockerLangs = docker.find({languages: true}).fetch();
             let testDocker = getDockerInstance();
             let result = [];
@@ -181,7 +189,6 @@ Meteor.startup(() => {
                 logRequest(logReason.error, 'Input too large');
                 throw new Meteor.Error(500, 'Input too large');
             }
-            //let dockerConfig = docker.findOne({docker: true});
             let dockerLangs = docker.find({languages: true}).fetch();
             let problemData = problem.findOne({_id:data.problemID});
             let _docker = getDockerInstance();
@@ -271,17 +278,25 @@ const getTimeOutValue = function (isMSecond) {
 };
 
 const getDockerInstance = function() {
-    let dockerGlobalConfig = docker.findOne({global: true});
-    if (!dockerGlobalConfig.ip || dockerGlobalConfig.ip === '') {
+    let dockerConfig,
+        dockerConfigArray = docker.find({available: true}).fetch();
+    
+    // No docker target, use localhost.
+    if (!dockerConfigArray || dockerConfigArray.length === 0) {
         let dockerSocket = process.env.DOCKER_SOCKET || '/var/run/docker.sock';
         return new Dockerode({
             socketPath: dockerSocket,
             timeout: getTimeOutValue(true) + 3000 //3 seconds as a buffer time for container to stop itself
         });
     } else {
+        currentDockerIdx %= dockerConfigArray.length;
+        dockerConfig = dockerConfigArray[currentDockerIdx];
+        currentDockerIdx += 1;
+        // console.log(currentDockerIdx);
+        // console.log(dockerConfigArray);
         return new Dockerode({
-            host: dockerGlobalConfig.ip,
-            port: dockerGlobalConfig.port,
+            host: dockerConfig.address,
+            port: dockerConfig.port,
             timeout: getTimeOutValue(true) + 3000
         });
     }

@@ -126,61 +126,71 @@ class DockerConfig extends Component {
     }
     startTesting () {
         this.setState({runningTest: true});
-        Meteor.call('docker.checkImage', (err, result) => {
+        Meteor.call('docker.testLang', (err, result) => {
             if (err) {
                 alert(err);
             } else {
                 for (var key in result) {
-                    if (!result[key].find) {
-                        alert(result[key].image + ' not found, abort.');
-                        this.setState({runningTest: false});
-                        return;
-                    }
+                    alert(result[key].title + ' : ' + result[key].output);
                 }
-                alert('All images found! Ready to run them');
-                Meteor.call('docker.testImage', (err, result) => {
-                    if (err) {
-                        alert(err);
-                    } else {
-                        for (var key in result) {
-                            alert(result[key].title + ' : ' + result[key].output);
-                        }
-                    }
-                    this.setState({runningTest: false});
-                });
             }
+            this.setState({runningTest: false});
         });
+        // Meteor.call('docker.checkImage', (err, result) => {
+        //     if (err) {
+        //         alert(err);
+        //     } else {
+        //         for (var key in result) {
+        //             if (!result[key].find) {
+        //                 alert(result[key].image + ' not found, abort.');
+        //                 this.setState({runningTest: false});
+        //                 return;
+        //             }
+        //         }
+        //         alert('All images found! Ready to run them');
+        //         Meteor.call('docker.testImage', (err, result) => {
+        //             if (err) {
+        //                 alert(err);
+        //             } else {
+        //                 for (var key in result) {
+        //                     alert(result[key].title + ' : ' + result[key].output);
+        //                 }
+        //             }
+        //             this.setState({runningTest: false});
+        //         });
+        //     }
+        // });
     }
-    updateGlobal (field, event) {
-        let tmp = this.state._dockerGlobal;
-        tmp[field] = event.target.value;
-        this.setState({
-            _dockerGlobal : tmp
-        });
-    }
-    checkDockerHost () {
-        let obj = this.state._dockerGlobal;
-        Meteor.call('docker.useMachine', obj, (err) => {
-            if (err) {
-                alert(err);
-            } else {
-                Meteor.call('docker.listImage', (err, result) => {
-                    if (err) {
-                        alert(err);
-                    }  else {
-                        alert(result);
-                    }
-                });
-            }
-        });
-    }
+    // updateGlobal (field, event) {
+    //     let tmp = this.state._dockerGlobal;
+    //     tmp[field] = event.target.value;
+    //     this.setState({
+    //         _dockerGlobal : tmp
+    //     });
+    // }
+    // checkDockerHost () {
+    //     let obj = this.state._dockerGlobal;
+    //     Meteor.call('docker.useMachine', obj, (err) => {
+    //         if (err) {
+    //             alert(err);
+    //         } else {
+    //             Meteor.call('docker.listImage', (err, result) => {
+    //                 if (err) {
+    //                     alert(err);
+    //                 }  else {
+    //                     alert(result);
+    //                 }
+    //             });
+    //         }
+    //     });
+    // }
     componentWillUpdate () {
 
     }
     renderDockerMachines () {
         return this.props._dockerMachines.map((machine, key) => (
             <ListItem key={key} primaryText={machine.address} secondaryText={machine.port} style={{borderBottom: '1px solid #DDD'}}
-                      onTouchTap={this.useDockerMachine.bind(this, machine)}  rightIconButton={this.deleteIcon(machine)}
+                      onTouchTap={this.checkDockerMachine.bind(this, machine)}  rightIconButton={this.deleteIcon(machine)}
                       leftIcon={
                           machine.available? <DoneIcon />: <NotpassIcon />
                       } />
@@ -198,40 +208,31 @@ class DockerConfig extends Component {
             }
         });
     }
-    useDockerMachine (machine) {
-        Meteor.call('docker.useMachine', {
-            ip: machine.address,
-            port: machine.port
-        }, (err) => {
-            if (err) {
-                alert(err);
-            } else {
-                Meteor.call('docker.info', (err) => {
-                    if (err) {
-                        alert(err);
-                        alert('This docker machine is not working properly');
-                    }  else {
-                        //console.log(result);
-                        //alert(`Good! Got response from ${machine.address}:${machine.port}`);
-                        Meteor.call('docker.checkImage', (err, result)=>{
-                            if (err) {
-                                alert(err);
-                            } else {
-                                let notFound = false;
-                                for (var key in result) {
-                                    if (!result[key].find) {
-                                        notFound = true;
-                                        alert(`Image (${result[key].image}) is needed but not found on this Docker host`);
-                                    }
-                                }
-                                if (!notFound) {
-                                    alert(`Success! ${machine.address}:${machine.port} is reachable and has all images needed`);
-                                }
-                            }
-                        });
-                    }
-                });
-            }
+    checkDockerMachine (machine) {
+        Meteor.call('docker.info', machine, (err) => {
+             if (err) {
+                 alert(err);
+                 alert('This docker machine is not working properly');
+             }  else {
+                 //console.log(result);
+                 //alert(`Good! Got response from ${machine.address}:${machine.port}`);
+                 Meteor.call('docker.checkImage', machine, (err, result)=>{
+                     if (err) {
+                         alert(err);
+                     } else {
+                         let notFound = false;
+                         for (var key in result) {
+                             if (!result[key].find) {
+                                 notFound = true;
+                                 alert(`Image (${result[key].image}) is needed but not found on this Docker host`);
+                             }
+                         }
+                         if (!notFound) {
+                             alert(`Success! ${machine.address}:${machine.port} is reachable and has all images needed`);
+                         }
+                     }
+                 });
+             }
         });
     }
     checkAllMachines(){
@@ -247,11 +248,6 @@ class DockerConfig extends Component {
         return (
             <div>
                 <div>
-                    {this.props._dockerGlobal?
-                        <span>Using: {this.props._dockerGlobal.ip}:{this.props._dockerGlobal.port}</span>
-                        :''
-                    }
-
                     <Toolbar style={{marginTop:'30px'}}>
                         <ToolbarGroup float="left">
                             <ToolbarTitle text="Docker API Configuration" />

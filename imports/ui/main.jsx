@@ -94,7 +94,7 @@ class Main extends Component {
                 }
                 return (
                     <MenuItem key={key} leftIcon={<Avatar icon={icon} color={color} size={30} style={{margin: '5'}}  backgroundColor='transparent'/>} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
-                              primaryText={problem.title} secondaryText={problem.score}/>
+                              primaryText={problem.title} secondaryText={problem.score + ' Points'}/>
                 );
             }
         });

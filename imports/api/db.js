@@ -46,7 +46,7 @@ if (Meteor.isServer) {
     Meteor.publish('survey', function () {
         return survey.find();
     });
-    Meteor.publish('problem', function problemPublication(coding_fake) {
+    Meteor.publish('problem', function problemPublication() {
         // Not using the argument passed from front-end to prevent hacking.
         
         var db_time = timer.findOne({timeSync: true});

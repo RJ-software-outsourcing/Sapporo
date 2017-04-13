@@ -137,13 +137,25 @@ class ProblemEditor extends Component {
         }
     }
     submitCode (isTest) {
+        // Already hide from UI.
+        // if (!isTest && this.alreadyPass() && !(confirm('You already solved this problem. Are you sure you want to submit again? Your current result will be overrided.'))) {
+        //     return;
+        // }
+        let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+        if (!isTest) {
+            if (!tmpObj.passTest) {
+                alert('You must pass test before submit');
+                return;
+            }
+        }
 
-        if (!isTest && this.alreadyPass() && !(confirm('You already solved this problem. Are you sure you want to submit again? Your current result will be overrided.'))) {
+        if (tmpObj.code.length > 10000) {
+            alert('Your submission is rejected because your code size is too large');
             return;
         }
 
         let now = new Date();
-        if (this.state.lastSubmitTime && (timeDiffSecond(this.state.lastSubmitTime, now) < this.props._sapporo.submitwait) ) {
+        if ((isTest || !tmpObj.passTest) && this.state.lastSubmitTime && (timeDiffSecond(this.state.lastSubmitTime, now) < this.props._sapporo.submitwait) ) {
             alert(`Please wait at least ${this.props._sapporo.submitwait} seconds between each submission. Last submission was ${timeDiffSecond(this.state.lastSubmitTime, now)} seconds ago.`);
             return;
         } else {
@@ -151,17 +163,7 @@ class ProblemEditor extends Component {
                 lastSubmitTime: now
             });
         }
-        let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
-        if (tmpObj.code.length > 10000) {
-            alert('Your submission is rejected because your code size is too large');
-            return;
-        }
-        if (!isTest) {
-            if (!tmpObj.passTest) {
-                alert('You must pass test before subit');
-                return;
-            }
-        }
+
         this.setState({runCode: true});
         let obj = {
             problemID: this.props.data._id,
@@ -183,6 +185,11 @@ class ProblemEditor extends Component {
                     }
                     this.closeDialog();
                 } else {
+                    // No matter it's a test or a submission, always set the
+                    // pass fail.
+                    let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
+                    tmpObj.passTest = false;
+                    localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
                     if (isTest) {
                         this.setState({testResult:result});
                     } else {

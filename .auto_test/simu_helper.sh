@@ -12,8 +12,9 @@ fi
 
 users=$1
 url=$2
-lantype=$3
-delaytime=$4
+delaytime=$3
+clang=$4
+p2lang=$5
 cnt=0
 
 saporro_users=()
@@ -29,7 +30,7 @@ done
 
 for saporro_user in $saporro_users; do
   echo "create $saporro_user"
-  sapporo_pid=`meteor-down simu_sapporo_user.js  $saporro_user $url $lantype $delaytime > /dev/null 2>&1  &`
+  sapporo_pid=`meteor-down simu_sapporo_user.js  $saporro_user $url -t $delaytime -lc $clang -lp2 $p2lang  > /dev/null 2>&1  &`
   pids+=($sapporo_pid)
 done 
 

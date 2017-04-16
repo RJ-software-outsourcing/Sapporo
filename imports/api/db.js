@@ -11,6 +11,7 @@ const sapporo  = new Mongo.Collection('sapporo');
 const batchAccount = new Mongo.Collection('batchAccount');
 const requestLogs = new Mongo.Collection('requestLogs');
 const survey = new Mongo.Collection('survey');
+const language = new Mongo.Collection('language');
 
 if (Meteor.isServer) {
     Meteor.publish('timer', function timerPublication() {
@@ -72,6 +73,9 @@ if (Meteor.isServer) {
             return this.ready();
         }
     });
+    Meteor.publish('language', function languagePublication() {
+        return language.find();
+    });
 }
 
-export {timer, problem, docker, userData, liveFeed, testCases, sapporo, batchAccount, requestLogs, survey};
+export {timer, problem, docker, userData, liveFeed, testCases, sapporo, batchAccount, requestLogs, survey, language};

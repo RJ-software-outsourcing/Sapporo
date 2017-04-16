@@ -4,7 +4,7 @@ import { render } from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
-import { problem, userData, timer, liveFeed, sapporo } from '../api/db.js';
+import { language, problem, userData, timer, liveFeed, sapporo } from '../api/db.js';
 import {goPage} from './goPage.js';
 
 import AppBar from 'material-ui/lib/app-bar';
@@ -79,13 +79,18 @@ class Main extends Component {
             }
         });
         return array.map((problem, key) => {
-            if (!this.props._timer || !this.props._timer.coding || !Meteor.user()) {
-                return ;
-            } else {
-                let currentUser = null;
-                if (Meteor.user()) {
-                    currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
+            if (this.props._timer && this.props._timer.coding && Meteor.user()) {
+                let currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
+                
+                let defaultLang = currentUser.language || (this.props._language[0]? this.props._language[0].iso : null);
+                // No language means we can't render problems correctly.
+                if (!defaultLang) {
+                    return;
                 }
+                
+                // Backward compatitle
+                let title = problem.title[defaultLang] || problem.title;
+
                 let icon = <NotpassIcon />;
                 let color = 'grey';
                 if (isUserPassedProblem(currentUser, problem._id)) {
@@ -93,10 +98,12 @@ class Main extends Component {
                     color = 'green';
                 }
                 return (
-                    <MenuItem key={key} leftIcon={<Avatar icon={icon} color={color} size={30} style={{margin: '5'}}  backgroundColor='transparent'/>} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
-                              primaryText={problem.title} secondaryText={problem.score + ' Points'}/>
+                    <MenuItem key={key} leftIcon={<Avatar icon={icon} color={color} size={30} style={{margin: '5'}}
+                        backgroundColor='transparent'/>} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
+                        primaryText={title} secondaryText={problem.score + ' Points'}/>
                 );
             }
+            return ;
         });
     }
     unreadMailCount () {
@@ -213,6 +220,7 @@ Main.propTypes = {
 
 export default createContainer(() => {
 
+    Meteor.subscribe('language');
     Meteor.subscribe('userData');
     Meteor.subscribe('timer');
     Meteor.subscribe('liveFeed');
@@ -225,6 +233,7 @@ export default createContainer(() => {
 
     return {
         currentUser: Meteor.user(),
+        _language: language.find({}).fetch(),
         _userData: userData.find({}).fetch(),
         _problem: problem.find({}).fetch(),
         _timer: timer.findOne({timeSync: true}),

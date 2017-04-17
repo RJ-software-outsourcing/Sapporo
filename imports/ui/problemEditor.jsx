@@ -23,7 +23,7 @@ import { timeDiffSecond } from '../library/timeLib.js';
 
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 
-import { docker, userData, sapporo } from '../api/db.js';
+import { language, docker, userData, sapporo } from '../api/db.js';
 
 const textDiv = {
     width: '96%',
@@ -231,12 +231,32 @@ class ProblemEditor extends Component {
         }
     }
     render () {
-        const  editorOption = {
+        let currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
+        const editorOption = {
             $blockScrolling: true
         };
         const actions = [
             <FlatButton label="Exit" secondary={true} onTouchTap={this.closeDialog.bind(this)}/>
         ];
+        const langIso = currentUser.language || (this.props._language.length > 0 ? this.props._language[0].iso : null);
+
+        if (!langIso) {
+            return;
+        }
+        // Back compatible, should be remove after codewar
+        if (typeof this.props.data.title !== 'object') {
+            let tmp = {};
+            tmp.title = {};
+            tmp.description = {};
+            tmp.exampleInput = {};
+            tmp.exampleOutput = {};
+            tmp.title[langIso] = this.props.data.title;
+            tmp.description[langIso] = this.props.data.description;
+            tmp.exampleInput[langIso] = this.props.data.exampleInput;
+            tmp.exampleOutput[langIso] = this.props.data.exampleOutput;
+            Object.assign(this.props.data, tmp);
+        }
+
         return (
             <div>
                 {this.alreadyPass()?
@@ -249,19 +269,19 @@ class ProblemEditor extends Component {
                     <Paper style={{width: '49.5%', float:'left'}} zDepth={1}>
                         <div style={textDiv}>
                             <TextField  floatingLabelText="Title" type="text" style={{width: '80%'}}
-                                        value={this.props.data.title}/>
+                                        value={this.props.data.title[langIso]}/>
                             <TextField  floatingLabelText="Score" type="text" style={{width: '20%'}}
                                         value={this.props.data.score}/>
                         </div>
                         <div style={textDiv}>
                             <TextField floatingLabelText="Description" type="text" style={{width: '100%'}}
-                                       multiLine={true} rows={2} value={this.props.data.description}/>
+                                       multiLine={true} rows={2} value={this.props.data.description[langIso]}/>
                         </div>
                         <div style={textDiv}>
-                            <TextField floatingLabelText="Input Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleInput}/>
+                            <TextField floatingLabelText="Input Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleInput[langIso]}/>
                         </div>
                         <div style={textDiv}>
-                            <TextField floatingLabelText="Output Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleOutput}/>
+                            <TextField floatingLabelText="Output Example" type="text" multiLine={true} rows={2} style={{width:'100%'}} value={this.props.data.exampleOutput[langIso]}/>
                         </div>
                         {
                             (this.props.data.images.length > 0)?
@@ -343,10 +363,12 @@ ProblemEditor.propTypes = {
 };
 
 export default createContainer(() => {
+    Meteor.subscribe('language');
     Meteor.subscribe('docker');
     Meteor.subscribe('userData');
     Meteor.subscribe('sapporo');
     return {
+        _language: language.find({}).fetch(),
         _docker: docker.find({languages: true}).fetch(),
         _sapporo: sapporo.findOne({sapporo:true}),
         _userData: userData.find({}).fetch(),

@@ -149,7 +149,11 @@ class ProblemEditor extends Component {
             }
         }
 
-        if (tmpObj.code.length > 10000) {
+        if (!tmpObj || !tmpObj.code || tmpObj.code.length === 0) {
+            alert('Oops! Please at least write something.');
+            return;
+        }
+        else if (tmpObj.code.length > 10000) {
             alert('Your submission is rejected because your code size is too large');
             return;
         }

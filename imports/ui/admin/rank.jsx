@@ -7,7 +7,7 @@ import ListItem from 'material-ui/lib/lists/list-item';
 import LinearProgress from 'material-ui/lib/linear-progress';
 import Divider from 'material-ui/lib/divider';
 
-import { problem, userData, sapporo } from '../../api/db.js';
+import { problem, userData, sapporo, language } from '../../api/db.js';
 import { getUserTotalScore, problemSolvedCount, getTotalScore, getFinishTime } from '../../library/score_lib.js';
 
 class Rank extends Component {
@@ -15,13 +15,21 @@ class Rank extends Component {
         return problemSolvedCount(item, this.props._userData);
     }
     renderProblemAnswerRate () {
+        if (this.props._language.length === 0) {
+            return (
+                <div style={{margin: '20px 10px'}}>
+                    <h3>Please at least add one language to Multi-Language Configuration</h3>
+                </div>
+            );
+        }
+        let defaultLang = this.props._language[0].iso;
         this.sortPropsArray('_problem', (item) => {
             return this.problemSolvedCounting(item);
         });
         return this.props._problem.map((item, key) => {
             let solvedCount = this.problemSolvedCounting(item);
             return (
-                <ListItem key={key} primaryText={item.title} secondaryText={String(solvedCount)}>
+                <ListItem key={key} primaryText={item.title[defaultLang] || item.tile} secondaryText={String(solvedCount)}>
                     <LinearProgress mode="determinate" max={this.props._userData.length} value={solvedCount}
                                     color="green" style={{height:'15px'}}/>
                 </ListItem>
@@ -82,16 +90,19 @@ class Rank extends Component {
 Rank.propTypes = {
     _userData: PropTypes.array.isRequired,
     _problem: PropTypes.array.isRequired,
-    _sapporo: PropTypes.object
+    _sapporo: PropTypes.object,
+    _language: PropTypes.array.isRequired
 };
 
 export default createContainer(() => {
     Meteor.subscribe('userData');
     Meteor.subscribe('problem');
     Meteor.subscribe('sapporo');
+    Meteor.subscribe('language');
     return {
         _userData: userData.find({}).fetch(),
         _problem: problem.find({}).fetch(),
-        _sapporo: sapporo.findOne({sapporo: true})
+        _sapporo: sapporo.findOne({sapporo: true}),
+        _language: language.find({}).fetch()
     };
 }, Rank);

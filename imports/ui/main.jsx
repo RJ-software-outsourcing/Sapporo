@@ -36,6 +36,13 @@ import { getNumberOfUnread } from '../library/mail.js';
 
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
 
+
+const problemTitleStyle = {
+    width: '150px',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden'
+};
+
 class Main extends Component {
     constructor(props) {
         super(props);
@@ -100,7 +107,7 @@ class Main extends Component {
                 return (
                     <MenuItem key={key} leftIcon={<Avatar icon={icon} color={color} size={30} style={{margin: '5'}}
                         backgroundColor='transparent'/>} onTouchTap={this.goPageWrap.bind(this, 'problemEditor', problem)}
-                        primaryText={title} secondaryText={problem.score + ' Points'}/>
+                        primaryText={<div style={problemTitleStyle}>{title}</div>} secondaryText={problem.score + ' Points'}/>
                 );
             }
             return ;

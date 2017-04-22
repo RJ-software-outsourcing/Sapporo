@@ -265,7 +265,9 @@ class Survey extends Component {
                     (schedule.start && schedule.end)? (
                         <div>
                             <div>
-                                <FlatButton label="New Survey" icon={<AddIcon />} onTouchTap={this.toggleNewSurveyDialog.bind(this, true)}/>
+                                {
+                                    (this.props._surveyData.length < 3)? <FlatButton label="New Survey" icon={<AddIcon />} onTouchTap={this.toggleNewSurveyDialog.bind(this, true)}/> : null
+                                }
                             </div>
                             <List>
                                 {this.renderSurveys()}

@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
-
+import { timer } from '../api/db.js';
 import { survey } from '../api/db.js';
+import { timeSchedule } from '../library/timeLib.js';
 
 import Paper from 'material-ui/lib/paper';
 import List from 'material-ui/lib/lists/list';
@@ -35,39 +36,69 @@ const questionSelection = [{
 
 const surveyForm = {
     questions:[{
-        description: '您相信世界上有外星人嗎?',
+        description: '會場方向指引清楚明瞭',
         value: null
     }, {
-        description: '您相信努力就一定有回報嗎?',
+        description: '比賽流程及規則說明清楚詳細',
+        value: null
+    }, {
+        description: '比賽過程中有疑問或需要協助時,工作人員能及時予以協助 ',
+        value: null
+    }, {
+        description: '活動時間安排適宜',
+        value: null
+    }, {
+        description: '比賽場地 (交通便利,場地大小, 照明.. ) ',
+        value: null
+    }, {
+        description: '餐點安排',
+        value: null
+    }, {
+        description: '我覺得試題整體來說難易適中',
+        value: null
+    }, {
+        description: '我會推薦這個活動訊息給我的朋友',
+        value: null
+    }, {
+        description: '我覺得參加這次活動對未來就業/升學有所幫助',
+        value: null
+    }, {
+        description: '這次活動讓我對HPE/HPI有更深入的了解',
+        value: null
+    }, {
+        description: '下次舉辦Codewars活動我願意再參加',
+        value: null
+    }, {
+        description: '整體而言，我對這次比賽活動感到滿意',
         value: null
     }],
     otherQuestions: [{
-        description: '下列哪個是賭聖的電話號碼?',
+        description: '本次參加活動身分?',
         value: null,
         options: [{
-            description: '香港948794狂', value: '香港948794狂'
+            description: '領隊', value: '領隊'
         }, {
-            description: '香港3345678', value: '香港3345678'
+            description: '參賽者', value: '參賽者'
         }]
     }, {
         description: '如何得知此活動訊息',
         value: null,
         options: [{
-            description: '夢到的', value: '夢到的'
+            description: '網路', value: '網路'
         }, {
-            description: '不小心走錯房間', value: '不小心走錯房間'
+            description: '海報', value: '海報'
         }, {
-            description: '恩? 什麼活動?', value: '恩? 什麼活動?'
+            description: '學校網站(電子公佈欄)', value: '學校網站(電子公佈欄)'
+        }, {
+            description: '親友推薦', value: '親友推薦'
+        }, {
+            description: '師長推薦', value: '師長推薦'
+        }, {
+            description: '其他', value: '其他'
         }]
     }],
     textField: [{
-        description: '猴子最討厭什麼線？',
-        value: null
-    }, {
-        description: '什麼情況下2大於5，5大於0，0大於2呢？',
-        value: null
-    }, {
-        description: '小明踩到大便，為什麼沒弄髒鞋子?',
+        description: '姓名/電話/e-mail',
         value: null
     }],
     suggestion: null
@@ -78,7 +109,7 @@ class Survey extends Component {
         super(props);
         this.state = {
             newSurveyOpen: false,
-            survey: surveyForm,
+            survey: JSON.parse(JSON.stringify(surveyForm)),
             editID: null,
             surveyFound: [],
             findName: null
@@ -88,7 +119,7 @@ class Survey extends Component {
     toggleNewSurveyDialog (clearSurvey) {
         if (clearSurvey) {
             this.setState({
-                survey: surveyForm,
+                survey: JSON.parse(JSON.stringify(surveyForm)),
                 editID: null
             });
         }
@@ -213,6 +244,8 @@ class Survey extends Component {
             <FlatButton label="Submit" primary={true} keyboardFocused={true} onTouchTap={this.surveyAction.bind(this, true)}/>
         ];
 
+        const schedule = timeSchedule(this.props._timer.systemTime, this.props._timer.start, this.props._timer.end);
+
         return (
             <Paper style={{marginTop:'10px', padding:'10px'}}>
                 {
@@ -227,22 +260,34 @@ class Survey extends Component {
                     </div>
                     :''
                 }
-                <div>
-                    <FlatButton label="New Survey" icon={<AddIcon />} onTouchTap={this.toggleNewSurveyDialog.bind(this, true)}/>
-                </div>
-                <List>
-                    {this.renderSurveys()}
-                </List>
+
+                {
+                    (schedule.start && schedule.end)? (
+                        <div>
+                            <div>
+                                <FlatButton label="New Survey" icon={<AddIcon />} onTouchTap={this.toggleNewSurveyDialog.bind(this, true)}/>
+                            </div>
+                            <List>
+                                {this.renderSurveys()}
+                            </List>
 
 
-                <Dialog title="" actions={actions} modal={false} open={this.state.newSurveyOpen} onRequestClose={this.toggleNewSurveyDialog.bind(this, true)}
-                        autoScrollBodyContent={true}>
-                    {this.renderQuestions()}
-                    {this.renderOtherQuestions()}
-                    {this.renderTextField()}
-                    <TextField style={{width:'100%'}} floatingLabelText='對這次的活動是否有什麼建議呢?' multiLine={true} rows={5}
-                               value={this.state.survey.suggestion} onChange={this.updateSuggestion.bind(this)} />
-                </Dialog>
+                            <Dialog title="" actions={actions} modal={false} open={this.state.newSurveyOpen} onRequestClose={this.toggleNewSurveyDialog.bind(this, true)}
+                                    autoScrollBodyContent={true}>
+                                {this.renderQuestions()}
+                                {this.renderOtherQuestions()}
+                                {this.renderTextField()}
+                                <TextField style={{width:'100%'}} floatingLabelText='對這次的活動是否有什麼建議呢?' multiLine={true} rows={5}
+                                           value={this.state.survey.suggestion} onChange={this.updateSuggestion.bind(this)} />
+                            </Dialog>
+                        </div>
+                    ) : (
+                        <div>
+                            問卷將在比賽結束後開放...
+                        </div>
+                    )
+                }
+
             </Paper>
         );
     }
@@ -250,13 +295,16 @@ class Survey extends Component {
 
 Survey.propTypes = {
     _surveyData: PropTypes.array.isRequired,
-    currentUser: PropTypes.object
+    currentUser: PropTypes.object,
+    _timer: PropTypes.object
 };
 
 export default createContainer(() => {
     Meteor.subscribe('survey');
+    Meteor.subscribe('timer');
     return {
         currentUser: Meteor.user(),
-        _surveyData: survey.find({user: Meteor.user().username}).fetch()
+        _surveyData: survey.find({user: Meteor.user().username}).fetch(),
+        _timer: timer.findOne({timeSync: true})
     };
 }, Survey);

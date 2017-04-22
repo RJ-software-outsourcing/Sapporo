@@ -25,6 +25,8 @@ import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.j
 
 import { language, docker, userData, sapporo } from '../api/db.js';
 
+import {SetInfoErrDialog, IniEleWithInfoErrDialog } from './infoErrDialog.jsx'
+
 const textDiv = {
     width: '96%',
     padding: '0px 2%'
@@ -41,6 +43,7 @@ class ProblemEditor extends Component {
             updateLock: true,
             lastSubmitTime: null
         };
+        IniEleWithInfoErrDialog(this);
     }
     updateCode(code) {
         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
@@ -137,30 +140,26 @@ class ProblemEditor extends Component {
         }
     }
     submitCode (isTest) {
-        // Already hide from UI.
-        // if (!isTest && this.alreadyPass() && !(confirm('You already solved this problem. Are you sure you want to submit again? Your current result will be overrided.'))) {
-        //     return;
-        // }
         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
         if (!isTest) {
             if (!tmpObj.passTest) {
-                alert('You must pass test before submit');
+                this.showErr('You must pass test before submit')
                 return;
             }
         }
 
         if (!tmpObj || !tmpObj.code || tmpObj.code.length === 0) {
-            alert('Oops! Please at least write something.');
+            this.showErr('Oops! Please at least write something.')
             return;
         }
         else if (tmpObj.code.length > 10000) {
-            alert('Your submission is rejected because your code size is too large');
+            this.showErr('Your submission is rejected because your code size is too large')
             return;
         }
 
         let now = new Date();
         if ((isTest || !tmpObj.passTest) && this.state.lastSubmitTime && (timeDiffSecond(this.state.lastSubmitTime, now) < this.props._sapporo.submitwait) ) {
-            alert(`Please wait at least ${this.props._sapporo.submitwait} seconds between each submission. Last submission was ${timeDiffSecond(this.state.lastSubmitTime, now)} seconds ago.`);
+            this.showErr(`Please wait at least ${this.props._sapporo.submitwait} seconds between each submission. Last submission was ${timeDiffSecond(this.state.lastSubmitTime, now)} seconds ago.`);
             return;
         } else {
             this.setState({
@@ -183,9 +182,9 @@ class ProblemEditor extends Component {
                         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
                         tmpObj.passTest = true;
                         localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
-                        alert('You\'ve passed testing. You can now submit your code.');
+                        this.showInfo('You\'ve passed testing. You can now submit your code.')
                     } else {
-                        alert('Your submission is correct! Congrats :D');
+                        this.showInfo('Your submission is correct! Congrats :D');
                     }
                     this.closeDialog();
                 } else {
@@ -197,20 +196,22 @@ class ProblemEditor extends Component {
                     if (isTest) {
                         this.setState({testResult:result});
                     } else {
-                        alert('Failed! Please verify your code.');
+                        this.showErr('Failed! Please verify your code.');
                         this.closeDialog();
                     }
                 }
             } else {
-                if (err.error && (err.error === 503)) {
-                    alert(err.reason);
-                } else {
-                    alert(err);
-                }
                 this.closeDialog();
+                if( err.error && (err.error === 503) ){
+                    this.showErr(err.reason);
+                } else{
+                    this.showErr("[" + err.error + "] " + err.reason);
+                }
+
             }
             //this.closeDialog();
         });
+
     }
     closeDialog() {
         this.setState({runCode: false, testResult: null});
@@ -263,6 +264,7 @@ class ProblemEditor extends Component {
 
         return (
             <div>
+                {SetInfoErrDialog(this)}
                 {this.alreadyPass()?
                     <Paper style={{width:'100%', textAlign:'center'}}>
                         <h3 style={{color:'green'}}>You've Solved This Problem!</h3>
@@ -351,7 +353,6 @@ class ProblemEditor extends Component {
                         :  <LinearProgress mode="indeterminate"/>
                     }
                 </Dialog>
-
 
             </div>
         );

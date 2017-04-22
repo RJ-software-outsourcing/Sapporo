@@ -5,39 +5,39 @@ import ReactDOM from 'react-dom';
 const DLG_TYPE_WARNING = 'warning';
 const DLG_TYPE_INFO = 'info';
 
-// This function MUST be called at contructor
-export var IniEleWithInfoErrDialog = function (ele)
-{
-  ele.state.dlgType = DLG_TYPE_INFO; // info, warning
-  ele.state.dlgOpen = false;
-  ele.state.msg = "";
+
+export var SetInfoErrDialogMethods = function (ele) {
+
+    ele.showErr = function (msg) {
+        ele.setState({
+            dlgType: DLG_TYPE_WARNING,
+            dlgOpen: true,
+            dlgmsg: msg
+        });
+    }
+
+    ele.showInfo = function (msg) {
+        ele.setState({
+            dlgType: DLG_TYPE_INFO,
+            dlgOpen: true,
+            dlgmsg: msg
+        });
+    }
+
+    ele.closeInfoErrDialog = function (){
+        ele.setState({
+            dlgOpen: false
+        });
+    }
+
 }
 
 export var SetInfoErrDialog = function (ele) {
 
-  ele.showErr = function (msg) {
-     ele.setState({
-      dlgType: DLG_TYPE_WARNING,
-      dlgOpen: true,
-      msg: msg
-    })   
-  }
+    var dlgType = ele.state.dlgType ? ele.state.dlgType : DLG_TYPE_INFO;
+    var dlgOpen = ele.state.dlgOpen ? ele.state.dlgOpen : false;
 
-  ele.showInfo = function (msg) {
-      ele.setState({
-      dlgType: DLG_TYPE_INFO,
-      dlgOpen: true,
-      msg: msg
-    })       
-  }
-
-  ele.closeInfoErrDialog = function (){
-    ele.setState({
-      dlgOpen: false
-    }) 
-  }
-  
-  return <Dialog title={ ele.state.dlgType == DLG_TYPE_WARNING ? 'WARNING' : 'INFO'}  open={ele.state.dlgOpen} onRequestClose={ele.closeInfoErrDialog.bind(ele)} >
-            {ele.state.msg}
-         </Dialog>
+    return <Dialog title={ dlgType === DLG_TYPE_WARNING ? 'WARNING' : 'INFO'}  open={dlgOpen} onRequestClose={ele.closeInfoErrDialog.bind(ele)} >
+               {ele.state.dlgmsg ? ele.state.dlgmsg : ""}
+           </Dialog>
 }

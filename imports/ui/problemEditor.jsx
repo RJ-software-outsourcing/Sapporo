@@ -25,7 +25,7 @@ import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.j
 
 import { language, docker, userData, sapporo } from '../api/db.js';
 
-import {SetInfoErrDialog, IniEleWithInfoErrDialog } from './infoErrDialog.jsx'
+import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx'
 
 const textDiv = {
     width: '96%',
@@ -43,7 +43,6 @@ class ProblemEditor extends Component {
             updateLock: true,
             lastSubmitTime: null
         };
-        IniEleWithInfoErrDialog(this);
     }
     updateCode(code) {
         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
@@ -122,6 +121,9 @@ class ProblemEditor extends Component {
             updateLock: true
         });
     }
+    componentWillMount () {
+        SetInfoErrDialogMethods(this);
+    }
     componentDidMount () {
         this.setState({
             updateLock: false
@@ -143,17 +145,17 @@ class ProblemEditor extends Component {
         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
         if (!isTest) {
             if (!tmpObj.passTest) {
-                this.showErr('You must pass test before submit')
+                this.showErr('You must pass test before submit');
                 return;
             }
         }
 
         if (!tmpObj || !tmpObj.code || tmpObj.code.length === 0) {
-            this.showErr('Oops! Please at least write something.')
+            this.showErr('Oops! Please at least write something.');
             return;
         }
         else if (tmpObj.code.length > 10000) {
-            this.showErr('Your submission is rejected because your code size is too large')
+            this.showErr('Your submission is rejected because your code size is too large');
             return;
         }
 
@@ -182,7 +184,7 @@ class ProblemEditor extends Component {
                         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
                         tmpObj.passTest = true;
                         localStorage.setItem(this.props.data._id, JSON.stringify(tmpObj));
-                        this.showInfo('You\'ve passed testing. You can now submit your code.')
+                        this.showInfo('You\'ve passed testing. You can now submit your code.');
                     } else {
                         this.showInfo('Your submission is correct! Congrats :D');
                     }
@@ -261,7 +263,6 @@ class ProblemEditor extends Component {
             tmp.exampleOutput[langIso] = this.props.data.exampleOutput;
             Object.assign(this.props.data, tmp);
         }
-
         return (
             <div>
                 {SetInfoErrDialog(this)}
@@ -353,7 +354,6 @@ class ProblemEditor extends Component {
                         :  <LinearProgress mode="indeterminate"/>
                     }
                 </Dialog>
-
             </div>
         );
     }

@@ -36,8 +36,9 @@ const SetInfoErrDialog = function (ele) {
 
     var dlgType = ele.state.dlgType ? ele.state.dlgType : DLG_TYPE_INFO;
     var dlgOpen = ele.state.dlgOpen ? ele.state.dlgOpen : false;
+    var titleColor = dlgType === DLG_TYPE_WARNING ? "red" : "green";
 
-    return <Dialog title={ dlgType === DLG_TYPE_WARNING ? 'WARNING' : 'INFO'}  open={dlgOpen} onRequestClose={ele.closeInfoErrDialog.bind(ele)} >
+    return <Dialog title={ dlgType === DLG_TYPE_WARNING ? 'WARNING' : 'INFOMATION'} titleStyle={{color: titleColor, fontWeight: 'bold' }}  open={dlgOpen} onRequestClose={ele.closeInfoErrDialog.bind(ele)} >
                {ele.state.dlgmsg ? ele.state.dlgmsg : ""}
            </Dialog>
 }

@@ -34,6 +34,8 @@ import Avatar from 'material-ui/lib/avatar';
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
 
+import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx'
+
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
 
 
@@ -68,7 +70,7 @@ class Main extends Component {
             this.navClose();
             this.goPageWrap('login');
             if (err) {
-                alert(err);
+                this.showErr(err.reason || 'Unknow logout error.');
             }
         });
     }
@@ -130,6 +132,9 @@ class Main extends Component {
             goPage(page, data);
             this.navClose();
         });
+    }
+    componentWillMount () {
+        SetInfoErrDialogMethods(this);
     }
     componentDidMount () {
         this.goPageWrap('login');
@@ -210,6 +215,7 @@ class Main extends Component {
                     {this.renderProblems()}
                 </LeftNav>
                 <div id="section"></div>
+                {SetInfoErrDialog(this)}
             </div>
         );
     }

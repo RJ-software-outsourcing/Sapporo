@@ -16,6 +16,8 @@ import FlatButton from 'material-ui/lib/flat-button';
 import AddIcon from 'material-ui/lib/svg-icons/action/note-add';
 import Divider from 'material-ui/lib/divider';
 
+import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx';
+
 const questionSelection = [{
     description: '非常不同意',
     value: 0
@@ -191,7 +193,7 @@ class Survey extends Component {
             //console.log(this.state.survey);
             Meteor.call('survey.submit', this.state.survey, this.state.editID, (error)=>{
                 if (error) {
-                    alert(error);
+                    this.showErr("[" + error.error + "] " + error.reason);
                 }
             });
         }
@@ -204,6 +206,9 @@ class Survey extends Component {
             editID: item._id
         });
         this.toggleNewSurveyDialog();
+    }
+    componentWillMount () {
+        SetInfoErrDialogMethods(this);
     }
     renderSurveys () {
         if (this.props._surveyData) {
@@ -223,7 +228,7 @@ class Survey extends Component {
     findUserSurvey(){
         Meteor.call('survey.search', this.state.findName, (err, data)=> {
             if (err) {
-                alert(err);
+                this.showErr("[" + err.error + "] " + err.reason);
             }
             this.setState({
                 surveyFound: data
@@ -274,8 +279,7 @@ class Survey extends Component {
                             <List>
                                 {this.renderSurveys()}
                             </List>
-
-
+                            {SetInfoErrDialog(this)}
                             <Dialog title="" actions={actions} modal={false} open={this.state.newSurveyOpen} onRequestClose={this.toggleNewSurveyDialog.bind(this, true)}
                                     autoScrollBodyContent={true}>
                                 {this.renderQuestions()}
@@ -291,7 +295,6 @@ class Survey extends Component {
                         </div>
                     )
                 }
-
             </Paper>
         );
     }

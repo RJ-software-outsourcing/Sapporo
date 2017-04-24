@@ -267,7 +267,6 @@ class Survey extends Component {
                     </div>
                     :''
                 }
-
                 {
                     (schedule.start && schedule.end)? (
                         <div>

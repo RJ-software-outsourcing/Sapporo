@@ -34,7 +34,7 @@ import Avatar from 'material-ui/lib/avatar';
 import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.js';
 import { getNumberOfUnread } from '../library/mail.js';
 
-import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx'
+import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx';
 
 injectTapEventPlugin(); //Workaround for Meterial-UI with React verion under 1.0
 

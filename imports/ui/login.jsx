@@ -35,7 +35,8 @@ class Login extends Component {
         this.state = {
             username: '',
             password: '',
-            stafflogin: false
+            stafflogin: false,
+            loginErrMsg: ""
         };
     }
     updateUsername(event) {
@@ -47,7 +48,7 @@ class Login extends Component {
     checkUser (callback) {
         Meteor.call('user.check', Meteor.user()._id, Meteor.user().username, (err) => {
             if (err) {
-                alert('User Check failed');
+                this.renderErrMsg(err);
             } else if (callback) {
                 callback();
             }
@@ -60,13 +61,19 @@ class Login extends Component {
     }
     closeStaffLogin () {
         this.setState({
-            stafflogin: false
+            stafflogin: false,
+            loginErrMsg: ""
+        });
+    }
+    renderErrMsg (err){
+        this.setState({
+            loginErrMsg: err.reason || 'Unknow login error'
         });
     }
     loginStaff () {
         Meteor.loginWithPassword(this.state.username, this.state.password, (err) => {
             if (err) {
-                alert(err);
+                this.renderErrMsg(err);
             } else {
                 this.checkUser(()=>{
                     if (Meteor.user()) {
@@ -82,7 +89,7 @@ class Login extends Component {
             password: this.state.password
         }, (err) => {
             if (err) {
-                alert(err);
+                this.renderErrMsg(err);
             } else {
                 this.loginStaff();
             }
@@ -91,7 +98,7 @@ class Login extends Component {
     loginOauth () {
         Meteor.loginWithMeteorOAuth2Server({}, (err) => {
             if (err) {
-                alert(err);
+                this.renderErrMsg(err);
             } else {
                 this.checkUser();
             }
@@ -103,7 +110,7 @@ class Login extends Component {
     loginFacebook () {
         Meteor.loginWithFacebook({}, (err) => {
             if (err) {
-                alert(err);
+                this.renderErrMsg(err);
             } else {
                 this.checkUser();
             }
@@ -131,6 +138,7 @@ class Login extends Component {
                         <TextField floatingLabelText="User Name" onChange={this.updateUsername.bind(this)} style={{width:'50%'}}/>
                         <TextField type="password" floatingLabelText="Password" onChange={this.updatePassword.bind(this)} style={{width:'50%'}}/>
                     </div>
+                    <div style={{width:'90%', marginLeft:'5%', color:"red"}}>{this.state.loginErrMsg}</div>
                     <div style={{textAlign:'center'}}>
                         <FlatButton label="GO"  primary={true} onTouchTap={this.loginStaff.bind(this)} style={{margin:'20px'}}/>
                         {

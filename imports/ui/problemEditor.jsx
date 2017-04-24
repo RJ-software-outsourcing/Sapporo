@@ -25,7 +25,7 @@ import { getCurrentUserData,  isUserPassedProblem } from '../library/score_lib.j
 
 import { language, docker, userData, sapporo } from '../api/db.js';
 
-import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx'
+import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx';
 
 const textDiv = {
     width: '96%',

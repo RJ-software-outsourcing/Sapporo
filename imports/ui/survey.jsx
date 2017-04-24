@@ -209,7 +209,8 @@ class Survey extends Component {
         if (this.props._surveyData) {
             return this.props._surveyData.map((item, key)=> {
                 return (
-                    <ListItem key={key} primaryText={item.createdAt.toString()} onTouchTap={this.editSurvey.bind(this, item)}/>
+                    <ListItem key={key} primaryText={item.user + ' (' + (key + 1).toString() + ')'}
+                            secondaryText={item.createdAt.toString()} onTouchTap={this.editSurvey.bind(this, item)}/>
                 );
             });
         }
@@ -232,7 +233,8 @@ class Survey extends Component {
     renderFind(){
         return this.state.surveyFound.map((item, key)=>{
             return (
-                <ListItem key={key} primaryText={item.createdAt.toString()} onTouchTap={this.editSurvey.bind(this, item)}/>
+                <ListItem key={key} primaryText={item.user + ' (' + (key + 1).toString() + ')'}
+                        secondaryText={item.createdAt.toString()} onTouchTap={this.editSurvey.bind(this, item)}/>
             );
         });
     }

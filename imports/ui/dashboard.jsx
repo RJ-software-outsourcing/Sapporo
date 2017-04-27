@@ -23,7 +23,7 @@ import PassIcon from 'material-ui/lib/svg-icons/navigation/check';
 import AboutIcon from 'material-ui/lib/svg-icons/action/code';
 import IconButton from 'material-ui/lib/icon-button';
 
-import { problem, userData, liveFeed, timer} from '../api/db.js';
+import { problem, userData, liveFeed, timer, language } from '../api/db.js';
 import { getTotalScore, getUserTotalScore, getCurrentUserData, getUserPassedProblem } from '../library/score_lib.js';
 import { setMailAsRead } from '../library/mail.js';
 
@@ -117,6 +117,20 @@ class Dashboard extends Component {
             </div>
         );
     }
+    createUserManualCb() {
+        let currentUser = getCurrentUserData(Meteor.user()._id, this.props._userData);
+        let defaultLang = currentUser.language || (this.props._language[0]? this.props._language[0].iso : null);
+
+        if (defaultLang) {
+            return function () {
+                let protocol = window.location.protocol;
+                let hostname = window.location.hostname;
+                window.open(protocol + '//' + hostname + ':8888/' + defaultLang + '/userGuide.pdf', 'popUpWindow');
+            };
+        }
+
+        return function () {};
+    }
     getContent (tile) {
         let contentStyle = {
             height: 'inherit',
@@ -189,11 +203,13 @@ class Dashboard extends Component {
             content: this.getPassProblemTile(),
             icon: <IconButton><PassIcon color="white" /></IconButton>
         }, {
-            title: 'Top 5',
+            title: 'User Guide',
             cols: 2,
             backgroundColor: 'rgba(0,165,165,0.6)',
             image: '/images/7.png',
-            icon: <IconButton><AboutIcon color="white" /></IconButton>
+            class: 'hoverItem',
+            icon: <IconButton><AboutIcon color="white" /></IconButton>,
+            click: this.createUserManualCb(),
         }, {
             title: 'Codewars World Wide',
             cols: 2,
@@ -253,6 +269,7 @@ export default createContainer(() => {
     Meteor.subscribe('timer');
     Meteor.subscribe('userData');
     Meteor.subscribe('liveFeed');
+    Meteor.subscribe('language');
     
     // Pass coding to force resubscribing if coding
     // status changed.
@@ -263,6 +280,7 @@ export default createContainer(() => {
         currentUser: Meteor.user(),
         _userData: userData.find({}).fetch(),
         _problem: problem.find({}).fetch(),
+        _language: language.find({}).fetch(),
         _liveFeed: liveFeed.find({}, {sort: {date_created: -1}}).fetch()
     };
 }, Dashboard);

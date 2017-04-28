@@ -67,8 +67,10 @@ const getFinishTime = function (user) {
     let finishTimes = [];
     for (var key in user) {
         if (user[key].log && Array.isArray(user[key].log) && (user[key].log.length > 0)) {
-            let length = user[key].log.length;
-            finishTimes.push(((user[key].log)[length-1]).time);
+            if (user[key] && user[key].result) {
+                let length = user[key].log.length;
+                finishTimes.push(((user[key].log)[length-1]).time);
+            }
         }
     }
     let latest = null;

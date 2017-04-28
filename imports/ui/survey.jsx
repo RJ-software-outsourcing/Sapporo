@@ -19,88 +19,80 @@ import Divider from 'material-ui/lib/divider';
 import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx';
 
 const questionSelection = [{
-    description: '非常不同意',
+    description: ['非常不同意', 'Strongly Agree'],
     value: 0
 }, {
-    description: '不同意',
+    description: ['不同意', 'Disagree'],
     value: 1
 }, {
-    description: '普通',
+    description: ['普通', 'OK'],
     value: 2
 }, {
-    description: '同意',
+    description: ['同意', 'Agree'],
     value: 3
 }, {
-    description: '非常同意',
+    description: ['非常同意', 'Strongly Agree'],
     value: 4
 }];
 
 
 const surveyForm = {
     questions:[{
-        description: '會場方向指引清楚明瞭',
+        description: ['會場方向指引清楚明瞭', 'Directions to the the venue was clear'],
         value: null
     }, {
-        description: '比賽流程及規則說明清楚詳細',
+        description: ['比賽流程及規則說明清楚詳細', 'Explanation for competition rules and SOP were detailed and clear'],
         value: null
     }, {
-        description: '比賽過程中有疑問或需要協助時,工作人員能及時予以協助 ',
+        description: ['比賽過程中有疑問或需要協助時,工作人員能及時予以協助', 'During the competition, assistance was received in a timely manner'],
         value: null
     }, {
-        description: '活動時間安排適宜',
+        description: ['活動時間安排適宜', 'Scheduling for the event was appropriate'],
         value: null
     }, {
-        description: '比賽場地 (交通便利,場地大小, 照明.. ) ',
+        description: ['比賽場地 (交通便利,場地大小, 照明.. )', 'Venue was well-chosen for the event (ease of transportation, venue size, lighting)'],
         value: null
     }, {
-        description: '餐點安排',
+        description: ['餐點安排', 'Food and beverage arrangements were satisfactory'],
         value: null
     }, {
-        description: '我覺得試題整體來說難易適中',
+        description: ['我覺得試題整體來說難易適中', 'In general, difficulty of the problems were reasonable'],
         value: null
     }, {
-        description: '我會推薦這個活動訊息給我的朋友',
+        description: ['我會推薦這個活動訊息給我的朋友', 'I would recommend CodeWars to my friends'],
         value: null
     }, {
-        description: '我覺得參加這次活動對未來就業/升學有所幫助',
+        description: ['我覺得參加這次活動對未來就業/升學有所幫助', 'I think attending CodeWars is beneficial for my college applications and future employment'],
         value: null
     }, {
-        description: '這次活動讓我對HPE/HPI有更深入的了解',
+        description: ['這次活動讓我對HPE/HPI有更深入的了解', 'I gained a deeper understanding of HPE/HPI through CodeWars'],
         value: null
     }, {
-        description: '下次舉辦Codewars活動我願意再參加',
+        description: ['下次舉辦Codewars活動我願意再參加', 'I would like to attend CodeWars again'],
         value: null
     }, {
-        description: '整體而言，我對這次比賽活動感到滿意',
+        description: ['整體而言，我對這次比賽活動感到滿意', 'As a whole, I was satisfied with this year\'s CodeWars'],
         value: null
     }],
     otherQuestions: [{
-        description: '本次參加活動身分?',
+        description: ['如何得知此活動訊息', 'How did you hear about CodeWars?'],
         value: null,
         options: [{
-            description: '領隊', value: '領隊'
+            description: ['網路', 'Internet'], value: '網路'
         }, {
-            description: '參賽者', value: '參賽者'
-        }]
-    }, {
-        description: '如何得知此活動訊息',
-        value: null,
-        options: [{
-            description: '網路', value: '網路'
+            description: ['海報', 'Poster'], value: '海報'
         }, {
-            description: '海報', value: '海報'
+            description: ['學校網站(電子公佈欄)', 'School Website'], value: '學校網站(電子公佈欄)'
         }, {
-            description: '學校網站(電子公佈欄)', value: '學校網站(電子公佈欄)'
+            description: ['親友推薦', 'Friends and Relatives Recommended'], value: '親友推薦'
         }, {
-            description: '親友推薦', value: '親友推薦'
+            description: ['師長推薦', 'Teacher Recommended'], value: '師長推薦'
         }, {
-            description: '師長推薦', value: '師長推薦'
-        }, {
-            description: '其他', value: '其他'
+            description: ['其他', 'Others'], value: '其他'
         }]
     }],
     textField: [{
-        description: '姓名/電話/e-mail',
+        description: ['姓名/電話/e-mail', 'Name, phone number, e-mail'],
         value: null
     }],
     suggestion: null
@@ -132,7 +124,7 @@ class Survey extends Component {
     renderOptions (selections) {
         return selections.map((item, key)=>{
             return (
-                <MenuItem key={key} value={item.value} primaryText={item.description}/>
+                <MenuItem key={key} value={item.value} primaryText={item.description.map(x => x + ' ')}/>
             );
         });
     }
@@ -147,7 +139,7 @@ class Survey extends Component {
         return this.state.survey.questions.map((item, key)=>{
             return (
                 <div key={key} style={{width:'100%'}}>
-                    <SelectField style={{width:'100%'}}  floatingLabelText={item.description} value={item.value} onChange={this.updateSurvey.bind(this, 'questions', key)}>
+                    <SelectField autoWidth={true} fullWidth={true} floatingLabelText={item.description.map(x => x + ' ')} value={item.value} onChange={this.updateSurvey.bind(this, 'questions', key)}>
                         {this.renderOptions(questionSelection)}
                     </SelectField>
                 </div>
@@ -158,7 +150,7 @@ class Survey extends Component {
         return this.state.survey.otherQuestions.map((item, key)=>{
             return (
                 <div key={key} >
-                    <SelectField style={{width:'100%'}} floatingLabelText={item.description} value={item.value} onChange={this.updateSurvey.bind(this, 'otherQuestions', key)}>
+                    <SelectField style={{width:'100%'}} floatingLabelText={item.description.map(x => x + ' ')} value={item.value} onChange={this.updateSurvey.bind(this, 'otherQuestions', key)}>
                         {this.renderOptions(item.options)}
                     </SelectField>
                 </div>
@@ -176,7 +168,7 @@ class Survey extends Component {
         return this.state.survey.textField.map((item, key)=>{
             return (
                 <div key={key}>
-                    <TextField style={{width:'100%'}} floatingLabelText={item.description} value={item.value} onChange={this.updateSurveyTextField.bind(this, key)} />
+                    <TextField style={{width:'100%'}} floatingLabelText={item.description.map(x => x + ' ')} value={item.value} onChange={this.updateSurveyTextField.bind(this, key)} />
                 </div>
             );
         });
@@ -193,7 +185,7 @@ class Survey extends Component {
             //console.log(this.state.survey);
             Meteor.call('survey.submit', this.state.survey, this.state.editID, (error)=>{
                 if (error) {
-                    this.showErr("[" + error.error + "] " + error.reason);
+                    this.showErr('[" + error.error + "] ' + error.reason);
                 }
             });
         }
@@ -228,7 +220,7 @@ class Survey extends Component {
     findUserSurvey(){
         Meteor.call('survey.search', this.state.findName, (err, data)=> {
             if (err) {
-                this.showErr("[" + err.error + "] " + err.reason);
+                this.showErr('[" + err.error + "] ' + err.reason);
             }
             this.setState({
                 surveyFound: data
@@ -279,12 +271,12 @@ class Survey extends Component {
                                 {this.renderSurveys()}
                             </List>
                             {SetInfoErrDialog(this)}
-                            <Dialog title="" actions={actions} modal={false} open={this.state.newSurveyOpen} onRequestClose={this.toggleNewSurveyDialog.bind(this, true)}
+                            <Dialog title="" actions={actions} modal={false} contentStyle={{maxWidth: 'none'}} open={this.state.newSurveyOpen} onRequestClose={this.toggleNewSurveyDialog.bind(this, true)}
                                     autoScrollBodyContent={true}>
                                 {this.renderQuestions()}
                                 {this.renderOtherQuestions()}
                                 {this.renderTextField()}
-                                <TextField style={{width:'100%'}} floatingLabelText='對這次的活動是否有什麼建議呢?' multiLine={true} rows={5}
+                                <TextField style={{width:'100%'}} floatingLabelText={['對這次的活動是否有什麼建議呢?', 'Suggestions for CodeWars?'].map(x => x + ' ')} multiLine={true} rows={5}
                                            value={this.state.survey.suggestion} onChange={this.updateSuggestion.bind(this)} />
                             </Dialog>
                         </div>

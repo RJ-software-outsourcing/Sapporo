@@ -180,6 +180,7 @@ class ProblemEditor extends Component {
             this.setState({testResult:null});
             if (!err) {
                 if (result.pass) {
+                    this.closeDialog();
                     if (isTest) {
                         let tmpObj = JSON.parse(localStorage.getItem(this.props.data._id));
                         tmpObj.passTest = true;
@@ -188,7 +189,6 @@ class ProblemEditor extends Component {
                     } else {
                         this.showInfo('Your submission is correct! Congrats :D');
                     }
-                    this.closeDialog();
                 } else {
                     // No matter it's a test or a submission, always set the
                     // pass fail.
@@ -198,8 +198,8 @@ class ProblemEditor extends Component {
                     if (isTest) {
                         this.setState({testResult:result});
                     } else {
-                        this.showErr('Failed! Please verify your code.');
                         this.closeDialog();
+                        this.showErr('Failed! Please verify your code.');
                     }
                 }
             } else {
@@ -211,7 +211,6 @@ class ProblemEditor extends Component {
                 }
 
             }
-            //this.closeDialog();
         });
 
     }

@@ -78,7 +78,7 @@ export default class About extends Component {
                 <div style={{width:'96%', marginLeft:'2%', marginBottom:'10px'}}>
                     <span>
                         This system is written entirely in JavaScript. JavaScript has become the most popular and fast-growing programming language nowadays.
-                        With the power of JavaScript's ecosystem, we are able to build a modern system for CodeWars 2017.
+                        With the power of JavaScript's ecosystem, we are able to build a modern system for CodeWars 2018.
                     </span>
                 </div>
                 <List>

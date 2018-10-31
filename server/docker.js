@@ -15,7 +15,7 @@ let currentDockerIdx = 0;
 let concurrentCount = [];
 const maximumInput = 10000;
 const maximumOutput = 10000;
-const maxMemory = 50; //MB
+const maxMemory = 128; //MB
 const checkDockerInterval = 10000;
 
 Meteor.startup(() => {

@@ -19,22 +19,21 @@ import Divider from 'material-ui/lib/divider';
 import {SetInfoErrDialog, SetInfoErrDialogMethods} from './infoErrDialog.jsx';
 
 const questionSelection = [{
-    description: ['非常不同意', 'Strongly Agree'],
-    value: 0
-}, {
-    description: ['不同意', 'Disagree'],
-    value: 1
-}, {
-    description: ['普通', 'OK'],
-    value: 2
+    description: ['非常同意', 'Strongly Agree'],
+    value: 4
 }, {
     description: ['同意', 'Agree'],
     value: 3
 }, {
-    description: ['非常同意', 'Strongly Agree'],
-    value: 4
+    description: ['普通', 'OK'],
+    value: 2
+}, {
+    description: ['不同意', 'Disagree'],
+    value: 1
+}, {
+    description: ['非常不同意', 'Strongly Agree'],
+    value: 0
 }];
-
 
 const surveyForm = {
     questions:[{
@@ -68,7 +67,7 @@ const surveyForm = {
         description: ['這次活動讓我對HPE/HPI有更深入的了解', 'I gained a deeper understanding of HPE/HPI through CodeWars'],
         value: null
     }, {
-        description: ['下次舉辦Codewars活動我願意再參加', 'I would like to attend CodeWars again'],
+        description: ['下次舉辦CodeWars活動我願意再參加', 'I would like to attend CodeWars again'],
         value: null
     }, {
         description: ['整體而言，我對這次比賽活動感到滿意', 'As a whole, I was satisfied with this year\'s CodeWars'],
@@ -182,6 +181,24 @@ class Survey extends Component {
     }
     surveyAction (isSubmit) {
         if (isSubmit) {
+            // Confirm all the questions are answered.
+            let surveyQuestions = this.state.survey.questions;
+            let surveyOtherQuestions = this.state.survey.otherQuestions;
+
+            for(var i in surveyQuestions) {
+              if (surveyQuestions[i].value === null) {
+                alert("CodeWars 小天使提示 - 部分問題似乎漏掉回答了 \n");
+                return;
+              }
+            }
+
+            for(var i in surveyOtherQuestions) {
+              if (surveyOtherQuestions[i].value === null) {
+                alert("CodeWars 小天使提示 - 部分問題似乎漏掉回答了 \n");
+                return;
+              }
+            }
+
             //console.log(this.state.survey);
             Meteor.call('survey.submit', this.state.survey, this.state.editID, (error)=>{
                 if (error) {

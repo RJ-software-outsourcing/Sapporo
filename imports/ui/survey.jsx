@@ -31,7 +31,7 @@ const questionSelection = [{
     description: ['不同意', 'Disagree'],
     value: 1
 }, {
-    description: ['非常不同意', 'Strongly Agree'],
+    description: ['非常不同意', 'Strongly Disagree'],
     value: 0
 }];
 

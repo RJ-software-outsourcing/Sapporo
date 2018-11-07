@@ -8,12 +8,12 @@ const generateDate = function (baseDate, year, month, day=1, hour=0, minute=0, s
         return null;
     } else {
         let time = new Date(baseDate.getTime()); //Update everything base on baseDate
-        time.setFullYear(year);
-        time.setMonth(month);
-        time.setDate(day);
-        time.setHours(hour);
-        time.setMinutes(minute);
         time.setSeconds(second);
+        time.setMinutes(minute);
+        time.setHours(hour);
+        time.setDate(day);
+        time.setMonth(month);
+        time.setFullYear(year);
         return time;
     }
 };
